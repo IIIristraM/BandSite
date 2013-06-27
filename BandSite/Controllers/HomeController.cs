@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BandSite.Models.Implementations;
+using BandSite.Models.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -8,9 +10,22 @@ namespace BandSite.Controllers
 {
     public class HomeController : Controller
     {
+        IDbContext _db;
+
         public ActionResult Index()
         {
-            ViewBag.Message = "Modify this template to jump-start your ASP.NET MVC application.";
+            using (_db = new DbContextEfFactory("BandSiteDB").CreateContext())
+            {
+                try
+                {
+                    var count = _db.Albums.Content.Count();
+                    ViewBag.Message = "Albums Count: " + count;
+                }
+                catch (Exception e)
+                {
+                    string message = e.Message;
+                }
+            }
 
             return View();
         }

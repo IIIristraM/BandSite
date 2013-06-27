@@ -1,5 +1,7 @@
-﻿using System;
+﻿using BandSite.Models.Implementations;
+using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using System.Web.Http;
@@ -16,6 +18,9 @@ namespace BandSite
     {
         protected void Application_Start()
         {
+            //удалить
+            Database.SetInitializer<DbContextEf>(new DropCreateDatabaseAlways<DbContextEf>());
+
             AreaRegistration.RegisterAllAreas();
 
             WebApiConfig.Register(GlobalConfiguration.Configuration);
