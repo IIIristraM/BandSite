@@ -4,32 +4,44 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Web;
+using System.Data.Entity.Migrations;
 
 namespace BandSite.Models.Implementations
 {
-    public class RepositoryEf<Entiy> : IRepository<Entiy>
-        where Entiy : class
+    public class RepositoryEf<Entity> : IRepository<Entity>
+        where Entity : class, IEntity
     {
-        protected DbSet<Entiy> content;
+        protected DbSet<Entity> content;
 
-        public RepositoryEf(DbSet<Entiy> entitySet)
+        public RepositoryEf(DbSet<Entity> entitySet)
         {
             content = entitySet;
         }
 
-        public IQueryable<Entiy> Content
+        public IQueryable<Entity> Content
         {
-            get { return content; }
+            get { return (IQueryable<Entity>)content; }
         }
 
-        public Entiy Insert(Entiy entity)
+        public Entity Insert(Entity entity)
         {
             return content.Add(entity);
         }
 
-        public Entiy Delete(Entiy entity)
+        public Entity Delete(Entity entity)
         {
             return content.Remove(entity);
+        }
+
+        public Entity Update(Entity entity)
+        {
+            content.Where(e => e.Id == entity.Id).Load();
+            Entity result = content.Find(entity.Id);
+            if (result.TrySetPropertiesFrom(entity))
+            {
+                return result;
+            }
+            return null;
         }
     }
 }

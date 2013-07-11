@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace BandSite.Models.Interfaces
 {
-    public interface IRepository<Entiy> where Entiy : class
+    public interface IRepository<Entity> where Entity : class, IEntity
     {
-        IQueryable<Entiy> Content { get; }
+        IQueryable<Entity> Content { get; }
 
-        Entiy Insert(Entiy entity);
-        Entiy Delete(Entiy entity);
+        Entity Insert(Entity entity);
+        Entity Delete(Entity entity);
+        Entity Update(Entity entity);
     }
 }

@@ -17,8 +17,6 @@ body {
 a {
     color: #333;
     outline: none;
-    padding-left: 3px;
-    padding-right: 3px;
     text-decoration: underline;
 }
 
@@ -28,7 +26,6 @@ a {
     }
 
     a:hover {
-        background-color: #c7d1d6;
     }
 
 header, footer, hgroup,
@@ -95,7 +92,7 @@ h5, h6 {
 ----------------------------------------------------------*/
 .content-wrapper {
     margin: 0 auto;
-    max-width: 960px;
+    max-width: 90%;
 }
 
 #body {
@@ -153,10 +150,6 @@ footer {
 }
 
     #login a {
-        background-color: #d3dce0;
-        margin-left: 10px;
-        margin-right: 3px;
-        padding: 2px 3px;
         text-decoration: none;
     }
 
@@ -164,7 +157,9 @@ footer {
         background: none;
         margin: 0;
         padding: 0;
-        text-decoration: underline;
+        text-decoration: none;
+        color: white;
+        font-weight: bold;
     }
 
     #login ul {
@@ -352,14 +347,12 @@ aside {
     }
 
     #loginForm input {
-        width: 250px;
     }
 
     #loginForm input[type="checkbox"],
     #loginForm input[type="submit"],
     #loginForm input[type="button"],
     #loginForm button {
-        width: auto;
     }
 
 #socialLoginForm {
@@ -416,7 +409,8 @@ fieldset {
 
 label {
     display: block;
-    font-size: 1.2em;
+    margin-bottom: 5px;
+    margin-top: 5px;
     font-weight: 600;
 }
 
@@ -426,7 +420,6 @@ label.checkbox {
 
 input, textarea {
     border: 1px solid #e2e2e2;
-    background: #fff;
     color: #333;
     font-size: 1.2em;
     margin: 5px 0 6px 0;
@@ -452,8 +445,7 @@ textarea {
     input[type="submit"],
     input[type="button"],
     button {
-        background-color: #d3dce0;
-        border: 1px solid #787878;
+        border: 0px;
         cursor: pointer;
         font-size: 1.2em;
         font-weight: 600;
@@ -753,4 +745,23 @@ tr.pager td {
         footer p {
             margin: 0;
         }
+}
+
+.site-logo{
+    background-image: url(images/Logo.png);
+    width: 48px;
+    height: 48px;
+}
+
+.title-area{
+    position: absolute;
+    float: left;
+    margin-top: 45px;
+    margin-left: 1px;
+}
+
+.right-shadow{
+    -webkit-box-shadow: rgba(0,0,0,0.1) 2px 0px;
+    box-shadow: rgba(0,0,0,0.1) 2px 0px;
+    padding-right: 40px
 }

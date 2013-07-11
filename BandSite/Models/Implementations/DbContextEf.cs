@@ -9,18 +9,25 @@ namespace BandSite.Models.Implementations
 {
     public class DbContextEf : DbContext, IDbContext
     {
-        protected IRepository<Album> albumsRepo;
-        protected IRepository<Song> songsRepo;
+        public DbContextEf()
+            : this("BandSiteDB")
+        {
+        }
 
         public DbContextEf(string connectionName)
             : base("name=" + connectionName)
         {
-            albumsRepo = new RepositoryEf<Album>(Albums);
-            songsRepo = new RepositoryEf<Song>(Songs);
+            ((IDbContext)this).Albums = new RepositoryEf<Album>(Albums);
+            ((IDbContext)this).Songs = new RepositoryEf<Song>(Songs);
+            ((IDbContext)this).UserProfiles = new RepositoryEf<UserProfile>(UserProfiles);
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<UserProfile>().HasKey(u => u.Id);
+            modelBuilder.Entity<Album>().HasKey(a => a.Id);
+            modelBuilder.Entity<Song>().HasKey(s => s.Id);
+
             modelBuilder.Entity<Album>()
                         .HasMany(a => a.Songs)
                         .WithMany(s => s.Albums)
@@ -31,18 +38,14 @@ namespace BandSite.Models.Implementations
 
         public DbSet<Album> Albums { get; set; }
         public DbSet<Song> Songs { get; set; }
+        public DbSet<UserProfile> UserProfiles { get; set; }
 
-        IRepository<Album> IDbContext.Albums
-        {
-            get { return albumsRepo; }
-            set { albumsRepo = value; }
-        }
 
-        IRepository<Song> IDbContext.Songs
-        {
-            get { return songsRepo; }
-            set { songsRepo = value; }
-        }
+        #region IDbContext Implementation
+
+        IRepository<Album> IDbContext.Albums { get; set; }
+        IRepository<Song> IDbContext.Songs { get; set; }
+        IRepository<UserProfile> IDbContext.UserProfiles { get; set; }
 
         int IDbContext.SaveChanges()
         {
@@ -53,5 +56,7 @@ namespace BandSite.Models.Implementations
         {
             base.Dispose();
         }
+
+        #endregion
     }
 }

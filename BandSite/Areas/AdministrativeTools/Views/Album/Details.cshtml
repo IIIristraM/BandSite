@@ -1,0 +1,29 @@
+﻿@model BandSite.Models.Implementations.Album
+<fieldset>
+    <legend>Album</legend>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Title)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Title)
+    </div>
+    <br>
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Published)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Published)
+    </div>
+    <br>
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Description)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Description)
+    </div>
+</fieldset>
+<br>
+<div data-nav-action-type="show" data-item-id="@(Model.Id)" data-entity-type="album" data-related-entity-type="song"></div>
+<br>
+<div id="edit" data-entity-type="album" data-nav-action-type="edit" data-icon-type="square" data-item-id="@Model.Id"></div>

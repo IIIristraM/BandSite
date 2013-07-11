@@ -43,6 +43,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
@@ -181,6 +182,10 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Areas\AdministrativeTools\AdministrativeToolsAreaRegistration.cs" />
+    <Compile Include="Areas\AdministrativeTools\Controllers\AlbumController.cs" />
+    <Compile Include="Areas\AdministrativeTools\Controllers\NavigationController.cs" />
+    <Compile Include="Areas\AdministrativeTools\Controllers\SongController.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
@@ -188,17 +193,25 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountModels.cs" />
-    <Compile Include="Models\Album.cs" />
+    <Compile Include="Models\AddAlbumModel.cs" />
+    <Compile Include="Models\AddSongModel.cs" />
+    <Compile Include="Models\DeleteAlbumModel.cs" />
+    <Compile Include="Models\DeleteSongModel.cs" />
+    <Compile Include="Models\Implementations\Album.cs" />
     <Compile Include="Models\Implementations\DbContextEf.cs" />
     <Compile Include="Models\Implementations\DbContextEfFactory.cs" />
     <Compile Include="Models\Implementations\RepositoryEf.cs" />
+    <Compile Include="Models\Interfaces\IEntity.cs" />
+    <Compile Include="Models\Implementations\UserProfile.cs" />
     <Compile Include="Models\Interfaces\IDbContextFactory.cs" />
-    <Compile Include="Models\Song.cs" />
+    <Compile Include="Models\Implementations\Song.cs" />
     <Compile Include="Models\Interfaces\IDbContext.cs" />
     <Compile Include="Models\Interfaces\IRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\admin-tools.css" />
+    <Content Include="Content\authentication.css" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
@@ -255,7 +268,24 @@
     <Content Include="Content\themes\base\minified\jquery.ui.theme.min.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
+    <Content Include="Areas\AdministrativeTools\Views\Web.config" />
+    <Content Include="Areas\AdministrativeTools\Views\Song\Index.cshtml" />
+    <Content Include="Areas\AdministrativeTools\Views\Song\Details.cshtml" />
+    <Content Include="Areas\AdministrativeTools\Views\Song\Create.cshtml" />
+    <Content Include="Areas\AdministrativeTools\Views\Song\Edit.cshtml" />
+    <Content Include="Areas\AdministrativeTools\Views\Song\Delete.cshtml" />
+    <Content Include="Areas\AdministrativeTools\Views\Navigation\Index.cshtml" />
+    <Content Include="Areas\AdministrativeTools\Views\Album\Index.cshtml" />
+    <Content Include="Areas\AdministrativeTools\Views\Album\Details.cshtml" />
+    <Content Include="Areas\AdministrativeTools\Views\Album\Create.cshtml" />
+    <Content Include="Areas\AdministrativeTools\Views\Album\Edit.cshtml" />
+    <Content Include="Areas\AdministrativeTools\Views\Album\Delete.cshtml" />
+    <Content Include="Areas\AdministrativeTools\Views\Album\AddSong.cshtml" />
+    <Content Include="Areas\AdministrativeTools\Views\Album\ShowSong.cshtml" />
+    <Content Include="Areas\AdministrativeTools\Views\Song\AddAlbum.cshtml" />
+    <Content Include="Areas\AdministrativeTools\Views\Song\ShowAlbum.cshtml" />
     <None Include="Scripts\jquery-1.8.2.intellisense.js" />
+    <Content Include="Scripts\admin-navigation.js" />
     <Content Include="Scripts\jquery-1.8.2.js" />
     <Content Include="Scripts\jquery-1.8.2.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
@@ -270,6 +300,7 @@
     <Content Include="Scripts\knockout-2.2.0.debug.js" />
     <Content Include="Scripts\knockout-2.2.0.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
+    <Content Include="Scripts\start-page-initializer.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -314,9 +345,14 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Areas\AdministrativeTools\Models\" />
+    <Folder Include="Areas\AdministrativeTools\Views\Shared\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

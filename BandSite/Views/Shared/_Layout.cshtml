@@ -6,23 +6,32 @@
         <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
         <meta name="viewport" content="width=device-width" />
         @Styles.Render("~/Content/css")
+        @Styles.Render("~/Content/themes/base/css")
         @Scripts.Render("~/bundles/modernizr")
+        @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/jqueryui")
+        <script src="~/Scripts/start-page-initializer.js"></script>
+        @RenderSection("scripts", required: false)
     </head>
     <body>
         <header>
             <div class="content-wrapper">
-                <div class="float-left">
-                    <p class="site-title">@Html.ActionLink("your logo here", "Index", "Home")</p>
+                <div class="title-area">
+                    <div class="site-title">@Html.ActionLink("Just Band", "Index", "Home")</div>
+                    <div class="site-logo"></div>
                 </div>
                 <div class="float-right">
                     <section id="login">
-                        @Html.Partial("_LoginPartial")
+                        <div class="float-right">
+                             @Html.Partial("_LoginPartial")
+                        </div>
                     </section>
+                    <div style="clear:both; visibility:hidden; margin-bottom: 30px;"></div>
                     <nav>
                         <ul id="menu">
-                            <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                            <li>@Html.ActionLink("About", "About", "Home")</li>
-                            <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                            <li>@Html.RouteLink("Home", "Default", routeValues: new { controller = "Home", action = "Index"})</li>
+                            <li>@Html.RouteLink("About", "Default", routeValues: new { controller = "Home", action = "About"})</li>
+                            <li>@Html.RouteLink("Contact", "Default", routeValues: new { controller = "Home", action = "Contact"})</li>
                         </ul>
                     </nav>
                 </div>
@@ -41,8 +50,5 @@
                 </div>
             </div>
         </footer>
-
-        @Scripts.Render("~/bundles/jquery")
-        @RenderSection("scripts", required: false)
     </body>
 </html>

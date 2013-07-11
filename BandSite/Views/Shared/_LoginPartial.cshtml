@@ -1,14 +1,22 @@
 ﻿@if (Request.IsAuthenticated) {
-    <text>
-        Hello, @Html.ActionLink(User.Identity.Name, "Manage", "Account", routeValues: null, htmlAttributes: new { @class = "username", title = "Manage" })!
-        @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" })) {
+    <div class="float-left">
+        @Html.RouteLink("UserName", "Default", routeValues: new { controller = "Account", action="Manage" }, htmlAttributes: new { @class = "username", title = "Manage", username = User.Identity.Name })
+        @using (Html.BeginRouteForm(routeName: "Default", 
+                                    routeValues: new { controller = "Account", action = "LogOff" }, 
+                                    method: FormMethod.Post, 
+                                    htmlAttributes: new { id = "logoutForm" }))
+        {
             @Html.AntiForgeryToken()
-            <a href="javascript:document.getElementById('logoutForm').submit()">Log off</a>
+            <a href="javascript:document.getElementById('logoutForm').submit()" id="logoutLink"></a>
         }
-    </text>
+    </div>
+    <div class="float-left">
+       <div class="admin-tools-button"></div>
+    </div >
 } else {
     <ul>
-        <li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
-        <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+        <li>@Html.RouteLink("Register", "Default", routeValues: new { controller = "Account", action="Register" }, htmlAttributes: new { id = "registerLink" })</li>
+        <li>@Html.RouteLink("Log in", "Default", routeValues: new { controller = "Account", action="Login", returnUrl = Request.Url.AbsolutePath }, htmlAttributes: new { id = "loginLink" })</li>
     </ul>
 }
+<div style="clear:both; visibility:hidden;"></div>

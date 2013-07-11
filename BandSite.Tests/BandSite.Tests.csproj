@@ -125,6 +125,9 @@
     <Content Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="CRUD_Albums_Songs.orderedtest">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

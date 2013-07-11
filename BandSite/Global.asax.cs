@@ -1,4 +1,5 @@
 ﻿using BandSite.Models.Implementations;
+using BandSite.Models.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -16,12 +17,23 @@ namespace BandSite
 
     public class MvcApplication : System.Web.HttpApplication
     {
+        protected static IDbContextFactory _dbFactory;
+
+        public static IDbContextFactory DbFactory 
+        {
+            get 
+            { 
+                if (_dbFactory == null) 
+                { 
+                    _dbFactory = new DbContextEfFactory("BandSiteDB"); 
+                }
+                return _dbFactory;
+            }
+        }
+
         protected void Application_Start()
         {
-            //удалить
-            Database.SetInitializer<DbContextEf>(new DropCreateDatabaseAlways<DbContextEf>());
-
-            AreaRegistration.RegisterAllAreas();
+            //AreaRegistration.RegisterAllAreas();
 
             WebApiConfig.Register(GlobalConfiguration.Configuration);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);

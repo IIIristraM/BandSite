@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BandSite.Models.Implementations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ namespace BandSite.Models.Interfaces
     {
         IRepository<Album> Albums { get; set; }
         IRepository<Song> Songs { get; set; }
+        IRepository<UserProfile> UserProfiles { get; set; }
 
         int SaveChanges();
     }
