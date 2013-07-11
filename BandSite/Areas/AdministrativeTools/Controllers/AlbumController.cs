@@ -144,7 +144,7 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
             }
             album.Songs.Add(song);
             int added = db.SaveChanges();
-            return Json(new { hash = "action=edit&entity=album&id=" + album.Id + "&relatedentity=song&added=" + added });
+            return Json(new { hash = "action=edit&entity=album&id=" + album.Id + "&relatedentity=song&added=" + added + "&loader=0" });
         }
 
         [HttpPost]
@@ -159,7 +159,7 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
             }
             album.Songs.Remove(song);
             int deleted = db.SaveChanges();
-            return Json(new { hash = "action=edit&entity=album&id=" + album.Id + "&relatedentity=song&deleted=" + deleted });
+            return Json(new { hash = "action=edit&entity=album&id=" + album.Id + "&relatedentity=song&deleted=" + deleted + "&loader=0" });
         }
 
         public ActionResult ShowSong(int albumId)
