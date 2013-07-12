@@ -586,14 +586,9 @@ tr.pager td {
 
     /* header
     ----------------------------------------------------------*/
-    header .float-left,
-    header .float-right {
-        float: none;
-    }
 
     /* logo */
     header .site-title {
-        margin: 10px;
         text-align: center;
     }
 
@@ -620,7 +615,6 @@ tr.pager td {
             background: none;
             color: #999;
             font-weight: 600;
-            margin: 2px;
             padding: 0;
         }
 
@@ -636,7 +630,6 @@ tr.pager td {
     ul#menu {
         margin: 0;
         padding: 0;
-        text-align: center;
     }
 
         ul#menu li {
@@ -647,15 +640,6 @@ tr.pager td {
 
     /* main layout
     ----------------------------------------------------------*/
-    .main-content,
-    .featured + .main-content {
-        background-position: 10px 0;
-    }
-
-    .content-wrapper {
-        padding-right: 10px;
-        padding-left: 10px;
-    }
 
     .featured .content-wrapper {
         padding: 10px;
@@ -745,6 +729,19 @@ tr.pager td {
         footer p {
             margin: 0;
         }
+
+    .login-area{
+        display:inline-table;
+        margin: 0 auto;
+    }
+
+    .mobile-float-disable{
+        float: none;
+    }
+}
+
+.login-area {
+    padding: 3px;
 }
 
 .site-logo{
@@ -756,7 +753,7 @@ tr.pager td {
 .title-area{
     position: absolute;
     float: left;
-    margin-top: 45px;
+    margin-top: 60px;
     margin-left: 1px;
 }
 

@@ -20,13 +20,13 @@
                     <div class="site-title">@Html.ActionLink("Just Band", "Index", "Home")</div>
                     <div class="site-logo"></div>
                 </div>
-                <div class="float-right">
+                <div class="float-right mobile-float-disable">
                     <section id="login">
-                        <div class="float-right">
+                        <div class="float-right mobile-float-disable">
                              @Html.Partial("_LoginPartial")
                         </div>
                     </section>
-                    <div style="clear:both; visibility:hidden; margin-bottom: 30px;"></div>
+                    <div style="clear:both; visibility:hidden; margin-bottom: 40px;"></div>
                     <nav>
                         <ul id="menu">
                             <li>@Html.RouteLink("Home", "Default", routeValues: new { controller = "Home", action = "Index"})</li>
