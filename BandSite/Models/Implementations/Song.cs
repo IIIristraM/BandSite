@@ -20,6 +20,8 @@ namespace BandSite.Models.Implementations
         [DataType(DataType.MultilineText)]
         public virtual string Text { get; set; }
 
+        public virtual byte[] File { get; set; }
+
         public virtual ICollection<Album> Albums 
         { 
             get

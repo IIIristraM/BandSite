@@ -195,6 +195,7 @@
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\AddAlbumModel.cs" />
     <Compile Include="Models\AddSongModel.cs" />
+    <Compile Include="Models\CreateSong.cs" />
     <Compile Include="Models\DeleteAlbumModel.cs" />
     <Compile Include="Models\DeleteSongModel.cs" />
     <Compile Include="Models\Implementations\Album.cs" />
@@ -300,6 +301,7 @@
     <Content Include="Scripts\knockout-2.2.0.debug.js" />
     <Content Include="Scripts\knockout-2.2.0.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
+    <Content Include="Scripts\profile-management.js" />
     <Content Include="Scripts\start-page-initializer.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -347,6 +349,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="Areas\AdministrativeTools\Models\" />
     <Folder Include="Areas\AdministrativeTools\Views\Shared\" />
+    <Folder Include="Content\songs\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

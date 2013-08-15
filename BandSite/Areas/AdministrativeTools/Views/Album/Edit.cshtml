@@ -1,5 +1,5 @@
 ﻿@model BandSite.Models.Implementations.Album
-<div class="float-left right-shadow">
+<div>
 @using (Html.BeginForm("Edit", "Album")) {
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true)
@@ -39,10 +39,10 @@
     </fieldset>
 }
 </div>
-<div class="float-left">
-   <div style="margin-left: 40px;" data-nav-action-type="show" data-item-id="@(Model.Id)" data-entity-type="album" data-related-entity-type="song" class="editable"></div>
+<div>
+   <div style="display: inline-block;" data-nav-action-type="show" data-item-id="@(Model.Id)" data-entity-type="album" data-related-entity-type="song" class="editable"></div>
     <br>
-    <div style="margin-left: 40px;" data-nav-action-type="add" data-item-id="@(Model.Id)" data-entity-type="album" data-related-entity-type="song"></div>
+    <div data-nav-action-type="add" data-item-id="@(Model.Id)" data-entity-type="album" data-related-entity-type="song"></div>
 </div>
 <div style="clear:both; visibility:hidden;"></div>
 @section Scripts {

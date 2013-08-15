@@ -4,17 +4,17 @@
 
 $(function GenerateRegisterButton() {
     $("#loginLink").empty();
-    $("#loginLink").append("<div class='login-button'></div>")
+    $("#loginLink").append("<div class='login-button'></div>");
 });
 
 $(function GenerateRegisterButton() {
     $("#registerLink").empty();
-    $("#registerLink").append("<div class='register-button'></div>")
+    $("#registerLink").append("<div class='register-button'></div>");
 });
 
 $(function GenerateRegisterButton() {
     $("#logoutLink").empty();
-    $("#logoutLink").append("<div class='logout-button'></div>")
+    $("#logoutLink").append("<div class='logout-button'></div>");
 });
 
 $(function DisplayUserName() {

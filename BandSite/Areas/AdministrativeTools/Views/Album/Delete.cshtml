@@ -21,12 +21,12 @@
     <div class="display-label">
          @Html.DisplayNameFor(model => model.Description)
     </div>
-    <div class="display-field">
+    <div class="display-field" style="text-align: justify;">
         @Html.DisplayFor(model => model.Description)
     </div>
 </fieldset>
 <br>
-<div data-nav-action-type="show" data-item-id="@(Model.Id)" data-entity-type="album" data-related-entity-type="song"></div>
+<div style="display: inline-block;"  data-nav-action-type="show" data-item-id="@(Model.Id)" data-entity-type="album" data-related-entity-type="song"></div>
 <br>
 @using (Html.BeginForm()) {
     @Html.AntiForgeryToken()

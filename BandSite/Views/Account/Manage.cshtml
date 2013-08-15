@@ -1,32 +1,35 @@
 ﻿@model BandSite.Models.LocalPasswordModel
 @{
-    ViewBag.Title = "Manage Account";
+    ViewBag.Title = "Manage Profile";
 }
-
-<hgroup class="title">
-    <h1>@ViewBag.Title.</h1>
-</hgroup>
-
-<p class="message-success">@ViewBag.StatusMessage</p>
-
-<p>You're logged in as <strong>@User.Identity.Name</strong>.</p>
-
-@if (ViewBag.HasLocalPassword)
-{
-    @Html.Partial("_ChangePasswordPartial")
-}
-else
-{ 
-    @Html.Partial("_SetPasswordPartial")
-}
-
-<section id="externalLogins">
-    @Html.Action("RemoveExternalLogins")
-
-    <h3>Add an external login</h3>
-    @Html.Action("ExternalLoginsList", new { ReturnUrl = ViewBag.ReturnUrl })
-</section>
-
 @section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
+   @Scripts.Render("~/bundles/jqueryval")
+   @Scripts.Render("~/Scripts/profile-management.js");
 }
+
+<div id="settings-tabs">
+    <ul>
+        <li><a href="#account-tab">Account Settings</a></li>
+        <li><a href="#playlist-tab">My Playlist</a></li>
+    </ul>
+    <div id="account-tab">
+
+        @if (ViewBag.HasLocalPassword)
+        {
+             @Html.Partial("_ChangePasswordPartial")
+        }
+        else
+        { 
+             @Html.Partial("_SetPasswordPartial")
+        }
+        <br><hr><br>
+        <section id="externalLogins">
+            @Html.Action("RemoveExternalLogins")
+            <h3>Add an external login</h3>
+            @Html.Action("ExternalLoginsList", new { ReturnUrl = ViewBag.ReturnUrl })
+        </section>
+    </div>
+    <div id="playlist-tab">
+        <div id="player"></div>
+    </div>
+</div>

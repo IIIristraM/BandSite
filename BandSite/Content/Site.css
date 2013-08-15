@@ -1,4 +1,19 @@
-﻿html {
+﻿.login-area {
+    padding: 3px;
+}
+
+.title-area{
+    float:left;
+    width: 150px;
+}
+
+.login-margin-bottom{
+    clear:both; 
+    visibility:hidden;
+    margin-bottom: 40px;
+}
+
+html {
     background-color: #e2e2e2;
     margin: 0;
     padding: 0;
@@ -12,6 +27,7 @@ body {
     font-family: "Segoe UI", Verdana, Helvetica, Sans-Serif;
     margin: 0;
     padding: 0;
+    min-width: 650px;
 }
 
 a {
@@ -31,6 +47,7 @@ a {
 header, footer, hgroup,
 nav, section {
     display: block;
+    min-width: 400px;
 }
 
 mark {
@@ -102,7 +119,6 @@ h5, h6 {
 }
 
     .main-content {
-        background: url("../Images/accent.png") no-repeat;
         padding-left: 10px;
         padding-top: 30px;
     }
@@ -588,19 +604,16 @@ tr.pager td {
     ----------------------------------------------------------*/
 
     /* logo */
-    header .site-title {
-        text-align: center;
-    }
 
     /* login */
     #login {
         font-size: .85em;
         margin: 0 0 12px;
         text-align: center;
+        min-width: 300px;
     }
 
         #login ul {
-            margin: 5px 0;
             padding: 0;
         }
 
@@ -623,13 +636,15 @@ tr.pager td {
         }
 
     /* menu */
-    nav {
-        margin-bottom: 5px;
+
+    header{
+        padding-bottom:5px;
     }
 
     ul#menu {
         margin: 0;
         padding: 0;
+        text-align:center;
     }
 
         ul#menu li {
@@ -738,10 +753,16 @@ tr.pager td {
     .mobile-float-disable{
         float: none;
     }
-}
 
-.login-area {
-    padding: 3px;
+    .login-margin-bottom {
+        margin-bottom: 0px;
+    }
+
+    .title-area{
+        margin-top: 110px;
+        left: 50%;
+        margin-left: -23px;
+    }
 }
 
 .site-logo{
@@ -750,15 +771,134 @@ tr.pager td {
     height: 48px;
 }
 
-.title-area{
-    position: absolute;
-    float: left;
-    margin-top: 60px;
-    margin-left: 1px;
-}
-
 .right-shadow{
     -webkit-box-shadow: rgba(0,0,0,0.1) 2px 0px;
     box-shadow: rgba(0,0,0,0.1) 2px 0px;
     padding-right: 40px
 }
+
+.song-control-panel{
+    line-height: 32px;
+    width: 720px;
+}
+
+.song-control-panel .play-btn,
+.song-control-panel .loop-btn,
+.song-control-panel .song-title,
+.song-control-panel .back-btn,
+.song-control-panel .forward-btn,
+.song-control-panel .volume-btn {
+    float: left;
+    width: 32px;
+    height: 32px;
+    margin: 0px;
+}
+
+    .song-control-panel .play-btn:hover,
+    .song-control-panel .loop-btn:hover,
+    .song-control-panel .song-title:hover,
+    .song-control-panel .back-btn:hover,
+    .song-control-panel .forward-btn:hover,
+    .song-control-panel .volume-btn:hover {
+        cursor:pointer;
+    }
+
+.song-control-panel .song-title{
+    width: 200px;
+    margin-right: 5px;
+    padding-left: 7px;
+}
+
+.song-control-panel .time-line{
+    float: left;
+    width: 215px;
+    margin-right: 35px;
+}
+
+.song-control-panel .time-line .time-slider{
+    float:left;
+    width: 160px;
+    margin-right: 15px;
+    margin-top: 10px;
+}
+
+.song-control-panel .time-line .time-label{
+    float:left;
+    width: 30px;
+}
+
+.song-control-panel .play-btn[data-state=play]{
+    background-image: url(images/Media-Play.png);
+}
+
+.song-control-panel .play-btn[data-state=pause]{
+    background-image: url(images/Media-Pause.png);
+}
+
+.song-control-panel .loop-btn[data-state=once]{
+    background-image: url(images/Stop-Loop.png);
+}
+
+.song-control-panel .loop-btn[data-state=songloop]{
+    background-image: url(images/Song-Loop.png);
+}
+
+.song-control-panel .loop-btn[data-state=listloop]{
+    background-image: url(images/List-Loop.png);
+}
+
+.song-control-panel .loop-btn{
+    margin-right: 35px;
+}
+
+.song-control-panel .back-btn{
+    background-image: url(images/Media-Back.png);
+}
+
+.song-control-panel .forward-btn{
+    background-image: url(images/Media-Forward.png);
+}
+
+.song-control-panel .volume-btn[data-state=normal]{
+    background-image: url(images/Speaker-Volume.png);
+}
+
+.song-control-panel .volume-btn[data-state=mute]{
+    background-image: url(images/Volume-Mute.png);
+}
+
+.song-control-panel .volume-slider{
+    float: left;
+    width: 50px;
+    margin-top: 12px;
+    margin-left: 5px;
+    height: 7px;
+}
+
+.song-control-panel .volume-slider .ui-slider-handle{
+    width: 7px;
+    height: 7px;
+    top: -1px;
+    margin-left: -6px;
+}
+
+.song-control-panel .volume-slider .ui-slider-handle:hover{
+    top: -2px;
+}
+
+.song-control-panel .ui-state-default{
+    border-radius: 50% 50%;
+    background: #fff !important;
+}
+
+.song-control-panel .ui-state-default:hover{
+    border: 2px solid #999 !important;
+}
+
+.play-list { list-style-type: none; margin: 0; padding: 0; width: 720px; }
+.play-list li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1em; height: 18px; }
+.play-list li span { position: absolute; margin-left: -1.3em; }
+.play-list-item:hover {
+    opacity: 0.6;
+    cursor:pointer;
+} 

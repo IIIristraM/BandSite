@@ -12,6 +12,7 @@ using BandSite.Filters;
 using BandSite.Models;
 using BandSite.Models.Interfaces;
 using BandSite.Models.Implementations;
+using System.IO;
 
 namespace BandSite.Controllers
 {
@@ -19,6 +20,7 @@ namespace BandSite.Controllers
     [InitializeSimpleMembership]
     public class AccountController : Controller
     {
+        private IDbContext _db = MvcApplication.DbFactory.CreateContext();
         //
         // GET: /Account/Login
 
@@ -265,26 +267,24 @@ namespace BandSite.Controllers
             if (ModelState.IsValid)
             {
                 // Insert a new user into the database
-                using (IDbContext db = MvcApplication.DbFactory.CreateContext())
-                {
-                    UserProfile user = db.UserProfiles.Content.FirstOrDefault(u => u.UserName.ToLower() == model.UserName.ToLower());
-                    // Check if user already exists
-                    if (user == null)
-                    {
-                        // Insert name into the profile table
-                        db.UserProfiles.Insert(new UserProfile { UserName = model.UserName });
-                        db.SaveChanges();
 
-                        OAuthWebSecurity.CreateOrUpdateAccount(provider, providerUserId, model.UserName);
-                        OAuthWebSecurity.Login(provider, providerUserId, createPersistentCookie: false);
+               UserProfile user = _db.UserProfiles.Content.FirstOrDefault(u => u.UserName.ToLower() == model.UserName.ToLower());
+               // Check if user already exists
+               if (user == null)
+               {
+                   // Insert name into the profile table
+                   _db.UserProfiles.Insert(new UserProfile { UserName = model.UserName });
+                   _db.SaveChanges();
 
-                        return RedirectToLocal(returnUrl);
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("UserName", "User name already exists. Please enter a different user name.");
-                    }
-                }
+                   OAuthWebSecurity.CreateOrUpdateAccount(provider, providerUserId, model.UserName);
+                   OAuthWebSecurity.Login(provider, providerUserId, createPersistentCookie: false);
+
+                   return RedirectToLocal(returnUrl);
+               }
+               else
+               {
+                   ModelState.AddModelError("UserName", "User name already exists. Please enter a different user name.");
+               }
             }
 
             ViewBag.ProviderDisplayName = OAuthWebSecurity.GetOAuthClientData(provider).DisplayName;
@@ -328,6 +328,13 @@ namespace BandSite.Controllers
 
             ViewBag.ShowRemoveButton = externalLogins.Count > 1 || OAuthWebSecurity.HasLocalAccount(WebSecurity.GetUserId(User.Identity.Name));
             return PartialView("_RemoveExternalLoginsPartial", externalLogins);
+        }
+
+        [HttpPost]
+        public ActionResult GetPlaylist()
+        {
+            var playlist = _db.Songs.Content.Select(s => new { id = s.Id, title = s.Title }).ToList();
+            return Json(playlist);
         }
 
         #region Helpers
@@ -405,5 +412,11 @@ namespace BandSite.Controllers
             }
         }
         #endregion
+
+        protected override void Dispose(bool disposing)
+        {
+            _db.Dispose();
+            base.Dispose(disposing);
+        }
     }
 }

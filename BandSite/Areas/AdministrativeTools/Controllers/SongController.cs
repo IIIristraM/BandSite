@@ -8,6 +8,10 @@ using System.Web.Mvc;
 using BandSite.Models;
 using BandSite.Models.Implementations;
 using BandSite.Models.Interfaces;
+using System.IO;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Data.Objects;
 
 namespace BandSite.Areas.AdministrativeTools.Controllers
 {
@@ -50,16 +54,21 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Song song)
+        public ActionResult Create(CreateSong song)
         {
             if (ModelState.IsValid)
             {
-                _db.Songs.Insert(song);
+                Song newSong = new Song();
+                newSong.Title = song.Title;
+                newSong.Text = song.Text;
+                newSong.File = new byte[song.UploadFile.InputStream.Length];
+                song.UploadFile.InputStream.Read(newSong.File, 0, newSong.File.Length);
+                _db.Songs.Insert(newSong);
                 _db.SaveChanges();
                 return Json(new { hash = "action=index&entity=song" });
             }
 
-            return PartialView(song);
+            return PartialView();
         }
 
         //
@@ -170,9 +179,115 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
             return PartialView(_db.Albums.Content.Where(a => a.Songs.Where(s => s.Id == songId).Count() == 1).ToList());
         }
 
+        public FileStreamResult GetStream(int id)
+        {
+            Response.Headers.Add("Accept-Ranges", "bytes");
+            Response.Cache.SetCacheability(HttpCacheability.Public);
+            Response.Cache.SetMaxAge(new TimeSpan(0, 10, 0));
+            var query = _db.Songs.Content.Where(s => s.Id == id).Select(s => s.File);
+            var song = query.FirstOrDefault();
+            if(song != null)
+            {
+                SqlConnectionStringBuilder scsb = new SqlConnectionStringBuilder(ConfigurationManager.ConnectionStrings["BandSiteDB"].ConnectionString);
+                SqlConnection conn = new SqlConnection(scsb.ConnectionString);
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(query.ToString(), conn);
+                cmd.Parameters.Add(new SqlParameter("p__linq__0", id));
+                SqlDataReader reader = cmd.ExecuteReader( CommandBehavior.SequentialAccess |
+                                                          CommandBehavior.SingleResult |
+                                                          CommandBehavior.SingleRow |
+                                                          CommandBehavior.CloseConnection);
+                if (reader.Read())
+                {
+                    Stream content = new SqlReaderStream(reader, 0);
+                    return File(content, "audio/mp3");
+                }
+                return null;
+            }
+            return null;
+        }
+
         protected override void Dispose(bool disposing)
         {
             _db.Dispose();
+            base.Dispose(disposing);
+        }
+    }
+
+    public class SqlReaderStream : Stream
+    {
+        private SqlDataReader reader;
+        private int columnIndex;
+        private long position;
+
+        public SqlReaderStream(
+            SqlDataReader reader,
+            int columnIndex)
+        {
+            this.reader = reader;
+            this.columnIndex = columnIndex;
+        }
+
+        public override long Position
+        {
+            get { return position; }
+            set { throw new NotImplementedException(); }
+        }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            long bytesRead = reader.GetBytes(columnIndex, position, buffer, offset, count);
+            position += bytesRead;
+            return (int)bytesRead;
+        }
+
+        public override bool CanRead
+        {
+            get { return true; }
+        }
+
+        public override bool CanSeek
+        {
+            get { return false; }
+        }
+
+        public override bool CanWrite
+        {
+            get { return false; }
+        }
+
+        public override void Flush()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override long Length
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public override long Seek(long offset, SeekOrigin origin)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void SetLength(long value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && null != reader)
+            {
+                reader.Dispose();
+                reader = null;
+            }
             base.Dispose(disposing);
         }
     }

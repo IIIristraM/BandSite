@@ -26,12 +26,15 @@
                              @Html.Partial("_LoginPartial")
                         </div>
                     </section>
-                    <div style="clear:both; visibility:hidden; margin-bottom: 40px;"></div>
-                    <nav>
+                    <div class="login-margin-bottom"></div>
+                    <nav id="menu-panel">
                         <ul id="menu">
                             <li>@Html.RouteLink("Home", "Default", routeValues: new { controller = "Home", action = "Index"})</li>
                             <li>@Html.RouteLink("About", "Default", routeValues: new { controller = "Home", action = "About"})</li>
                             <li>@Html.RouteLink("Contact", "Default", routeValues: new { controller = "Home", action = "Contact"})</li>
+                            <li><a href="#">Item 1</a></li>
+                            <li><a href="#">Item 2</a></li>
+                            <li><a href="#">Item 3</a></li>
                         </ul>
                     </nav>
                 </div>
