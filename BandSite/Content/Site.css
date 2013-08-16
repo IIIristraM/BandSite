@@ -902,3 +902,33 @@ tr.pager td {
     opacity: 0.6;
     cursor:pointer;
 } 
+
+.search-icon{
+    background-image: url(images/Search-Find.png);
+    width: 32px;
+    height: 32px;
+    margin: 5px 0 6px 0;
+}
+
+.listen-btn {
+    background-image: url(images/Headphone-02.png);
+    width: 32px;
+    height: 32px;
+    margin: 5px 0 5px 25px;
+    float:left;
+}
+
+.populate-btn{
+    background-image: url(images/Add-New.png);
+    width: 32px;
+    height: 32px;
+    margin: 5px 0 5px 0px;
+    float:left;
+}
+
+.play-list .remove-item{
+    background-image: url(images/Document-Delete-01.png);
+    width: 32px;
+    height: 32px;
+    margin: -7px 0 0 700px;
+}

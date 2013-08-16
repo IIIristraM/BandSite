@@ -333,8 +333,17 @@ namespace BandSite.Controllers
         [HttpPost]
         public ActionResult GetPlaylist()
         {
-            var playlist = _db.Songs.Content.Select(s => new { id = s.Id, title = s.Title }).ToList();
-            return Json(playlist);
+            var currentUser = User.Identity.Name;
+            var user = _db.UserProfiles.Content.Where(u => u.UserName == currentUser).FirstOrDefault();
+            if (user != null)
+            {
+                var playlist = user.Songs.Select(s => new { id = s.Id, title = s.Title });
+                if (playlist.Count() > 0)
+                {
+                    return Json(playlist.ToList());
+                }
+            }
+            return Json(new object[0]);
         }
 
         #region Helpers

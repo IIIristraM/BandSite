@@ -207,6 +207,82 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
             return null;
         }
 
+        public ActionResult PopulateUsersPlaylist(int userId, int songId)
+        {
+            UserProfile user = null;
+            if (userId == -1)
+            {
+                user = _db.UserProfiles.Content.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+            }
+            else
+            {
+                user = _db.UserProfiles.Content.Where(u => u.Id == userId).FirstOrDefault();
+            }
+            if (user != null)
+            {
+                var song = _db.Songs.Content.Where(s => s.Id == songId).FirstOrDefault();
+                if (song != null)
+                {
+                    try
+                    {
+                        user.Songs.Add(song);
+                        _db.SaveChanges();
+                    }
+                    catch
+                    {
+                        return Json(new { status = "fail", error = "somthing go wrong" });
+                    }
+                    return Json(new { status = "success" });
+                }
+                else
+                {
+                    return Json(new { status = "fail", error = "song not found" });
+                }
+            }
+            else
+            {
+                return Json(new { status = "fail", error = "user not found" });
+            }
+        }
+
+        public ActionResult RemoveFromUsersPlaylist(int userId, int songId)
+        {
+            UserProfile user = null;
+            if (userId == -1)
+            {
+                user = _db.UserProfiles.Content.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+            }
+            else
+            {
+                user = _db.UserProfiles.Content.Where(u => u.Id == userId).FirstOrDefault();
+            }
+            if (user != null)
+            {
+                var song = _db.Songs.Content.Where(s => s.Id == songId).FirstOrDefault();
+                if (song != null)
+                {
+                    try
+                    {
+                        user.Songs.Remove(song);
+                        _db.SaveChanges();
+                    }
+                    catch
+                    {
+                        return Json(new { status = "fail", error = "somthing go wrong" });
+                    }
+                    return Json(new { status = "success" });
+                }
+                else
+                {
+                    return Json(new { status = "fail", error = "song not found" });
+                }
+            }
+            else
+            {
+                return Json(new { status = "fail", error = "user not found" });
+            }
+        }
+
         protected override void Dispose(bool disposing)
         {
             _db.Dispose();

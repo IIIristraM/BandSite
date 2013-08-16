@@ -4,6 +4,7 @@
 }
 @section Scripts {
    @Scripts.Render("~/bundles/jqueryval")
+@Scripts.Render("~/Scripts/audioPlayer.js");
    @Scripts.Render("~/Scripts/profile-management.js");
 }
 
@@ -30,6 +31,17 @@
         </section>
     </div>
     <div id="playlist-tab">
+        <div class="search-icon float-left"></div>
+        <div class="float-left">
+             <input class="search-field" id="add_song_title" type="text" name="q" 
+                    data-autocomplete-source="@Url.RouteUrl("AdministrativeTools_default",new {controller = "Song", action = "SongsSearch"})"
+                    data-related-entity-type="song"/>
+             <input type="hidden" id="add_song_id" />
+        </div>
+        <div class="listen-btn"></div>
+        <div class="populate-btn"></div>
+        <div class="clear-fix"></div>
+        <br><br>
         <div id="player"></div>
     </div>
 </div>
