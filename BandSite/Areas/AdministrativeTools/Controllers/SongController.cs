@@ -221,11 +221,11 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
             if (user != null)
             {
                 var song = _db.Songs.Content.Where(s => s.Id == songId).FirstOrDefault();
-                if (song != null)
+                if ((song != null) && (user.Playlists.Where(p => p.SongId == songId).Count() == 0))
                 {
                     try
                     {
-                        user.Songs.Add(song);
+                        _db.Playlists.Insert(new Playlist() { SongId = songId, UserId = user.Id, Order = user.Playlists.Count() + 1 });
                         _db.SaveChanges();
                     }
                     catch
@@ -263,8 +263,13 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
                 {
                     try
                     {
-                        user.Songs.Remove(song);
-                        _db.SaveChanges();
+                        var playlist = _db.Playlists.Content.Where(p => (p.SongId == songId) && (p.UserId == user.Id)).FirstOrDefault();
+                        if (playlist != null)
+                        {
+                            _db.Playlists.Delete(playlist);
+                            foreach (var pl in _db.Playlists.Content.Where(p => p.Order > playlist.Order)) { pl.Order--; }
+                            _db.SaveChanges();
+                        }
                     }
                     catch
                     {

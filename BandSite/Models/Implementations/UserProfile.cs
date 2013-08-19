@@ -9,15 +9,15 @@ namespace BandSite.Models.Implementations
 {
     public class UserProfile : IEntity
     {
-        private ICollection<Song> _songs;
+        private ICollection<Playlist> _playlists;
 
         public int Id { get; set; }
         public string UserName { get; set; }
-        public virtual ICollection<Song> Songs
+        public virtual ICollection<Playlist> Playlists
         {
             get
             {
-                return _songs ?? (_songs = (new HashSet<Song>()));
+                return _playlists ?? (_playlists = (new HashSet<Playlist>()));
             }
         }
 

@@ -11,7 +11,7 @@ namespace BandSite.Models.Implementations
     public class Song : IEntity
     {
         private ICollection<Album> _albums;
-        private ICollection<UserProfile> _users;
+        private ICollection<Playlist> _playlists;
 
         public virtual int Id { get; set; }
 
@@ -30,11 +30,11 @@ namespace BandSite.Models.Implementations
                 return _albums ?? (_albums = new HashSet<Album>());
             }
         }
-        public virtual ICollection<UserProfile> Users
+        public virtual ICollection<Playlist> Playlists
         {
             get
             {
-                return _users ?? (_users = new HashSet<UserProfile>());
+                return _playlists ?? (_playlists = new HashSet<Playlist>());
             }
         }
 

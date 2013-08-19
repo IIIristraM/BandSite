@@ -20,6 +20,7 @@ namespace BandSite.Models.Implementations
             ((IDbContext)this).Albums = new RepositoryEf<Album>(Albums);
             ((IDbContext)this).Songs = new RepositoryEf<Song>(Songs);
             ((IDbContext)this).UserProfiles = new RepositoryEf<UserProfile>(UserProfiles);
+            ((IDbContext)this).Playlists = new RepositoryEf<Playlist>(Playlists);
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -39,13 +40,14 @@ namespace BandSite.Models.Implementations
         public DbSet<Album> Albums { get; set; }
         public DbSet<Song> Songs { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
-
+        public DbSet<Playlist> Playlists { get; set; }
 
         #region IDbContext Implementation
 
         IRepository<Album> IDbContext.Albums { get; set; }
         IRepository<Song> IDbContext.Songs { get; set; }
         IRepository<UserProfile> IDbContext.UserProfiles { get; set; }
+        IRepository<Playlist> IDbContext.Playlists { get; set; }
 
         int IDbContext.SaveChanges()
         {

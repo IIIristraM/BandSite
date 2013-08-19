@@ -65,6 +65,19 @@ function GeneratePlayer() {
                 type: "POST"
             });
         };
+
+        player.updatePlaylistOrder = function (event, ui) {
+            var url = ui.item.attr("data-song-url");
+            var id = url.substr(url.lastIndexOf("/") + 1);
+            var $player = $("#" + this.id);
+            var $palylist = $player.find(".play-list");
+            var order = $palylist.find(".play-list-item").index($(".play-list-item[data-song-guid=" + ui.item.attr("data-song-guid") + "]").get(0)) + 1;
+            $.ajax({
+                url: "/Account/ReorderPlaylist?songId=" + id + "&order=" + order,
+                type: "POST",
+                cache: false
+            });
+        };
     });
 }
 

@@ -12,6 +12,7 @@ namespace BandSite.Models.Interfaces
         IRepository<Album> Albums { get; set; }
         IRepository<Song> Songs { get; set; }
         IRepository<UserProfile> UserProfiles { get; set; }
+        IRepository<Playlist> Playlists { get; set; }
 
         int SaveChanges();
     }

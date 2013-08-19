@@ -2,11 +2,7 @@
     var min = Math.floor(seconds / 60);
     var sec = Math.floor(seconds - min * 60);
     var normalizedSec;
-    if (sec < 10) {
-        normalizedSec = "0" + sec;
-    } else {
-        normalizedSec = sec;
-    }
+    (sec < 10) ? normalizedSec = "0" + sec : normalizedSec = sec;
     if ((min + ":" + normalizedSec).indexOf("NaN") !== -1) return "0:00";
     return min + ":" + normalizedSec;
 }
@@ -50,7 +46,7 @@ AudioPlayer.prototype.removePlaylistItem = function (guid) {
         $player.find(".song-title").empty();
         $player.find(".song-title").html("No songs in list");
     }
-}
+};
 
 AudioPlayer.prototype.addPlaylistItem = function (title, url, guid) {
     if ($(".play-list-item[data-song-url='" + url + "']").length === 0) {
@@ -132,10 +128,14 @@ AudioPlayer.prototype.generateMarkup = function () {
        "</ul>"
     );
     $("#" + this.id).find(".play-list").sortable({
-        stop: function () {
+        update: function (event, ui) {
             _this.defaultGUID = $("#" + _this.id).find(".play-list-item").first().attr("data-song-guid");
+            _this.updatePlaylistOrder(event, ui);
         }
     });
+};
+
+AudioPlayer.prototype.updatePlaylistOrder = function () {
 };
 
 AudioPlayer.prototype.getAudio = function () {

@@ -337,13 +337,41 @@ namespace BandSite.Controllers
             var user = _db.UserProfiles.Content.Where(u => u.UserName == currentUser).FirstOrDefault();
             if (user != null)
             {
-                var playlist = user.Songs.Select(s => new { id = s.Id, title = s.Title });
+                var playlist = user.Playlists.OrderBy(p => p.Order).Select(p => new { id = p.Song.Id, title = p.Song.Title });
                 if (playlist.Count() > 0)
                 {
                     return Json(playlist.ToList());
                 }
             }
             return Json(new object[0]);
+        }
+
+        [HttpPost]
+        public ActionResult ReorderPlaylist(int songId, int order)
+        {
+            var currentUser = User.Identity.Name;
+            var user = _db.UserProfiles.Content.Where(u => u.UserName == currentUser).FirstOrDefault();
+            if (user != null)
+            {
+                var playlist = user.Playlists.Where(p => (p.SongId == songId)&&(p.UserId == user.Id)).FirstOrDefault();
+                if ((playlist != null) && (order <= user.Playlists.Count))
+                {
+                    if (order > playlist.Order)
+                    {
+                        foreach (var pl in _db.Playlists.Content.Where(p => (p.Order > playlist.Order) && (p.Order <= order))) { pl.Order--; }
+                        playlist.Order = order;
+                    }
+                    else
+                    {
+
+                        foreach (var pl in _db.Playlists.Content.Where(p => (p.Order >= order) && (p.Order < playlist.Order))) { pl.Order++; }
+                        playlist.Order = order;
+                    }
+                    _db.SaveChanges();
+                    return Json(new { status = "success" });
+                }
+            }
+            return Json(new { status = "fail", error = "user not found" });
         }
 
         #region Helpers
