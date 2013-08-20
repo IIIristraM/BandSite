@@ -895,9 +895,9 @@ tr.pager td {
     border: 2px solid #999 !important;
 }
 
-.play-list { list-style-type: none; margin: 0; padding: 0; width: 720px; }
-.play-list li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1em; height: 18px; }
-.play-list li span { position: absolute; margin-left: -1.3em; }
+.play-list, .user-list { list-style-type: none; margin: 0; padding: 0; width: 720px; }
+.play-list li, .user-list li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1em; height: 18px; }
+.play-list li span, .user-list li span { position: absolute; margin-left: -1.3em; }
 .play-list-item:hover {
     opacity: 0.6;
     cursor:pointer;

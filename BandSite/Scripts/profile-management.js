@@ -43,6 +43,46 @@ $(function () {
             });
         }
     });
+
+    $.ajax({
+        url: "/Account/GetUserslist",
+        type: "GET",
+        cache: false
+    }).done(function (usersList) {
+        var html = "";
+        if (usersList.length > 0) {
+            $("#user-name").val(usersList[0].name);
+        }
+        for (var i = 0; i < usersList.length; i++) {
+            html = html +
+                   "<li class='user-list-item ui-state-default'>" +
+                         "<span>" +
+                              usersList[i].name +
+                         "</span>" +
+                    "</li>";
+        }
+        $(".user-list").html(html);
+        $(".user-list-item").click(function () {
+            var username = $(this).find("span").html();
+            $("#user-name").val(username);
+        });
+    });
+
+    var chat = $.connection.chat;
+    $.connection.hub.start().done(function () {
+        chat.server.register();
+    });
+
+    chat.client.addMessage = function (user, message) {
+        $("#msg-list").append("<li style='list-style-type: none;'><b>" + user + "</b> : " + message + "</li>");
+    };
+
+    $("#send-btn").click(function () {
+        var message = $("#message-txt").val();
+        var user = $("#user-name").val();
+        $("#msg-list").append("<li style='list-style-type: none;'><b>Me</b> : " + message + "</li>");
+        chat.server.send(user, message);
+    });
 });
 
 function GeneratePlayer() {

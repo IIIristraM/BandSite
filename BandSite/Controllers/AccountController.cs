@@ -374,6 +374,11 @@ namespace BandSite.Controllers
             return Json(new { status = "fail", error = "user not found" });
         }
 
+        public ActionResult GetUserslist()
+        {
+            return Json(_db.UserProfiles.Content.Where(u => u.UserName != User.Identity.Name).Select(u => new { name = u.UserName }).ToList(), JsonRequestBehavior.AllowGet);
+        }
+
         #region Helpers
         private ActionResult RedirectToLocal(string returnUrl)
         {
