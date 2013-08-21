@@ -219,11 +219,11 @@
     <Compile Include="Models\Implementations\DbContextEfFactory.cs" />
     <Compile Include="Models\Implementations\Playlist.cs" />
     <Compile Include="Models\Implementations\RepositoryEf.cs" />
-    <Compile Include="Models\Interfaces\IEntity.cs" />
     <Compile Include="Models\Implementations\UserProfile.cs" />
     <Compile Include="Models\Interfaces\IDbContextFactory.cs" />
     <Compile Include="Models\Implementations\Song.cs" />
     <Compile Include="Models\Interfaces\IDbContext.cs" />
+    <Compile Include="Models\Interfaces\IEntity.cs" />
     <Compile Include="Models\Interfaces\IRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
