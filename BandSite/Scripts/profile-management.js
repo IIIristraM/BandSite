@@ -50,9 +50,6 @@ $(function () {
         cache: false
     }).done(function (usersList) {
         var html = "";
-        if (usersList.length > 0) {
-            $("#user-name").val(usersList[0].name);
-        }
         for (var i = 0; i < usersList.length; i++) {
             html = html +
                    "<li class='user-list-item ui-state-default'>" +
@@ -62,9 +59,15 @@ $(function () {
                     "</li>";
         }
         $(".user-list").html(html);
+        if (usersList.length > 0) {
+            $("#user-name").val(usersList[0].name);
+            $(".user-list").find(".user-list-item").first().addClass("user-list-item-highlight");
+        }
         $(".user-list-item").click(function () {
             var username = $(this).find("span").html();
             $("#user-name").val(username);
+            $(".user-list").find(".user-list-item-highlight").removeClass("user-list-item-highlight");
+            $(this).addClass("user-list-item-highlight");
         });
     });
 
@@ -74,14 +77,15 @@ $(function () {
     });
 
     chat.client.addMessage = function (user, message) {
-        $("#msg-list").append("<li style='list-style-type: none;'><b>" + user + "</b> : " + message + "</li>");
+        $("#msg-list").append("<li class='msg-list-item'><span><b>" + user + " :</b><br>" + message + "</span></li>");
     };
 
     $("#send-btn").click(function () {
         var message = $("#message-txt").val();
         var user = $("#user-name").val();
-        $("#msg-list").append("<li style='list-style-type: none;'><b>Me</b> : " + message + "</li>");
+        $("#msg-list").append("<li class='msg-list-item'><span><b>Me :</b><br>" + message + "</span></li>");
         chat.server.send(user, message);
+        $("#message-txt").val("");
     });
 });
 

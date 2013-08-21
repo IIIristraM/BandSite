@@ -895,13 +895,27 @@ tr.pager td {
     border: 2px solid #999 !important;
 }
 
-.play-list, .user-list { list-style-type: none; margin: 0; padding: 0; width: 720px; }
-.play-list li, .user-list li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1em; height: 18px; }
-.play-list li span, .user-list li span { position: absolute; margin-left: -1.3em; }
+.play-list{ list-style-type: none; margin: 0; padding: 0; width: 720px; }
+.play-list li{ margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1em; height: 18px; }
+.play-list li span{ position: absolute; margin-left: -1.3em; }
 .play-list-item:hover {
     opacity: 0.6;
     cursor:pointer;
 } 
+
+.msg-list { list-style-type: none; margin: 0; padding: 0; width: 500px;}
+.msg-list li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1em;}
+.msg-list li span { margin-left: -1.3em; white-space:pre-wrap;}
+.msg-list-item {
+    display: block;
+}
+
+.user-list { list-style-type: none; margin-right: 50px; padding: 0;}
+.user-list li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1em; height: 18px; width: 100px; }
+.user-list li span { position: absolute; margin-left: -1.3em; }
+.user-list-item-highlight{
+     margin-left: 15px !important;
+}
 
 .search-icon{
     background-image: url(images/Search-Find.png);
@@ -931,4 +945,8 @@ tr.pager td {
     width: 32px;
     height: 32px;
     margin: -7px 0 0 700px;
+}
+
+.message-txt{
+    height: 100px;
 }
