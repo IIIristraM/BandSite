@@ -1,0 +1,144 @@
+﻿.admin-nav-menu{
+    width: 30%;
+    min-width: 200px;
+    height: 600px;
+    margin-top: 25px;
+    display: table-cell;
+    padding-top: 30px;
+    vertical-align: top;
+}
+
+.admin-action-frame{
+    width: 69%;
+    min-width: 400px;
+    display: table-cell;
+    margin-top: 25px;
+    padding-top: 30px;
+    vertical-align: top;
+    text-align: center;
+}
+
+#content{
+    display: inline-block;
+}
+
+.admin-nav-menu-item{
+    width: 128px;
+    height: 128px;
+    margin: 2px;
+    margin-bottom: 30px;
+    color: white;
+    line-height: 170px;
+    text-align: center;
+}
+
+.admin-nav-menu-item-songs{
+    background-image: url(images/SongsButton.jpg);
+}
+
+.admin-nav-menu-item-albums{
+    background-image: url(images/AlbumsButton.jpg);
+}
+
+.admin-nav-menu-item-users{
+    background-image: url(images/UsersButton.jpg);
+}
+
+div[data-nav-action-type=edit]{
+    background-image: url(images/Edit.png);
+    width: 24px;
+    height: 24px;
+    float:left;
+    margin: 1px;
+}
+
+div[data-nav-action-type=edit][data-icon-type=square]{
+    background-image: url(images/Edit-Square.jpg);
+    width: 32px;
+    height: 32px;
+    float:left;
+    margin: 1px;
+}
+
+div[data-nav-action-type=delete], input[type=submit][data-sumbit-action-type=delete]{
+    background-image: url(images/Delete.png);
+    width: 24px;
+    height: 24px;
+    float:left;
+    margin: 1px;
+}
+
+div[data-nav-action-type=details]{
+    background-image: url(images/Details.png);
+    width: 24px;
+    height: 24px;
+    float:left;
+    margin: 1px;
+}
+
+div[data-nav-action-type=create]{
+    background-image: url(images/CreateNew.png);
+    width: 32px;
+    height: 32px;
+    margin-left: 110px;
+    margin-top: -14px;
+    float: left;
+    border-radius: 50% 50%;
+    border: 2px solid black;
+}
+
+input[type=submit]{
+    display: block;
+    width: 32px;
+    height: 32px;
+    background-image: url(images/OkButton.jpg);
+}
+
+input[type=submit][data-sumbit-action-type=add]{
+    display: block;
+    width: 32px;
+    height: 32px;
+    background-image: url(images/Add.jpg);
+}
+
+.admin-fields {
+}
+
+input.text-box.admin-fields{
+    width: 500px;
+}
+
+textarea.text-box.multi-line.admin-fields{
+    height: 345px;
+}
+
+.display-field{
+    white-space: pre-line;
+}
+
+.admin-labels{
+    font-weight: bold;
+}
+
+.admin-tools-button{
+    background-image: url(images/Settings.jpg);
+    width: 48px;
+    height: 48px;
+    margin: 1px;
+}
+
+table, td ,tr{
+    padding-top: 0px; 
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.ajax-loader{
+    background-image: url(images/ajax-loader.gif);
+    width: 31px;
+    height: 31px;
+    background-repeat: no-repeat;
+    display: none;
+    margin-top: 200px;
+    margin-left: 35%;
+}

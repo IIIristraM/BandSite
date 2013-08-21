@@ -1,0 +1,29 @@
+﻿@model BandSite.Models.Implementations.Song
+<h3>Are you sure you want to delete this?</h3>
+<br>
+<fieldset>
+    <legend>Song</legend>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Title)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Title)
+    </div>
+    <br>
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Text)
+    </div>
+    <div class="display-field" style="text-align:justify;">
+        @Html.DisplayFor(model => model.Text)
+    </div>
+</fieldset>
+<br>
+<div style="display: inline-block;"  data-nav-action-type="show" data-item-id="@(Model.Id)" data-entity-type="song" data-related-entity-type="album"></div>
+<br>
+@using (Html.BeginForm()) {
+    @Html.AntiForgeryToken()
+    <p>
+        <input type="submit" value="" />
+    </p>
+}

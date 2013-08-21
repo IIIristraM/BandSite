@@ -1,0 +1,62 @@
+﻿@model BandSite.Models.LocalPasswordModel
+@{
+    ViewBag.Title = "Manage Profile";
+}
+@section Scripts {
+   @Scripts.Render("~/bundles/jqueryval")
+   @Scripts.Render("~/Scripts/audioPlayer.js")
+   @Scripts.Render("~/Scripts/profile-management.js")
+}
+
+<div id="settings-tabs">
+    <ul>
+        <li><a href="#account-tab">Account Settings</a></li>
+        <li><a href="#playlist-tab">My Playlist</a></li>
+        <li><a href="#chat-tab">Chat</a></li>
+    </ul>
+    <div id="account-tab">
+
+        @if (ViewBag.HasLocalPassword)
+        {
+             @Html.Partial("_ChangePasswordPartial")
+        }
+        else
+        { 
+             @Html.Partial("_SetPasswordPartial")
+        }
+        <br><hr><br>
+        <section id="externalLogins">
+            @Html.Action("RemoveExternalLogins")
+            <h3>Add an external login</h3>
+            @Html.Action("ExternalLoginsList", new { ReturnUrl = ViewBag.ReturnUrl })
+        </section>
+    </div>
+    <div id="playlist-tab">
+        <div class="search-icon float-left"></div>
+        <div class="float-left">
+             <input class="search-field" id="add_song_title" type="text" name="q" 
+                    data-autocomplete-source="@Url.RouteUrl("AdministrativeTools_default",new {controller = "Song", action = "SongsSearch"})"
+                    data-related-entity-type="song"/>
+             <input type="hidden" id="add_song_id" />
+        </div>
+        <div class="listen-btn"></div>
+        <div class="populate-btn"></div>
+        <div class="clear-fix"></div>
+        <br><br>
+        <div id="player"></div>
+    </div>
+    <div id="chat-tab">
+        <div class="float-left">
+             <ul class="user-list"></ul>
+        </div>
+        <div class="float-left">
+            <div class="msg-content">
+                <ul id="msg-list" class="msg-list"></ul>
+            </div>
+            <input id="user-name" type="hidden" />
+            <div><textarea id="message-txt" class="message-txt"></textarea></div>
+            <div><input id="send-btn" type="button" value="send"/></div>
+        </div>
+        <div class="clear-fix"></div>
+    </div>
+</div>
