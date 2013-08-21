@@ -151,12 +151,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BandSite\BandSite.csproj">
-      <Project>{12B8763C-5126-4AE6-9900-E35E2888B82F}</Project>
-      <Name>BandSite</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Controllers\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
