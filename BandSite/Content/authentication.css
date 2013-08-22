@@ -1,5 +1,5 @@
 ﻿.login-button{
-    background-image: url(images/Login.jpg);
+    background-image: url(img/Login.jpg);
     width: 48px;
     height: 48px;
     margin: 1px;
@@ -7,7 +7,7 @@
 }
 
 .logout-button{
-    background-image: url(images/Logout.jpg);
+    background-image: url(img/Logout.jpg);
     width: 48px;
     height: 48px;
     margin: 1px;
@@ -15,7 +15,7 @@
 }
 
 .register-button{
-    background-image: url(images/Register.jpg);
+    background-image: url(img/Register.jpg);
     width: 48px;
     height: 48px;
     margin: 1px;
@@ -30,7 +30,7 @@
     line-height: 48px;
     background-color: black;
     height: 48px;
-    background-image: url(images/User-Profile.jpg);
+    background-image: url(img/User-Profile.jpg);
     background-repeat: no-repeat;
 }
 
@@ -38,6 +38,6 @@ button[data-account-provider=google]{
     display: block;
     width: 48px;
     height: 48px;
-    background-image: url(images/Google.jpg);
+    background-image: url(img/Google.jpg);
     margin: 1px;
 }

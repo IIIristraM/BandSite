@@ -33,19 +33,19 @@
 }
 
 .admin-nav-menu-item-songs{
-    background-image: url(images/SongsButton.jpg);
+    background-image: url(img/SongsButton.jpg);
 }
 
 .admin-nav-menu-item-albums{
-    background-image: url(images/AlbumsButton.jpg);
+    background-image: url(img/AlbumsButton.jpg);
 }
 
 .admin-nav-menu-item-users{
-    background-image: url(images/UsersButton.jpg);
+    background-image: url(img/UsersButton.jpg);
 }
 
 div[data-nav-action-type=edit]{
-    background-image: url(images/Edit.png);
+    background-image: url(img/Edit.png);
     width: 24px;
     height: 24px;
     float:left;
@@ -53,7 +53,7 @@ div[data-nav-action-type=edit]{
 }
 
 div[data-nav-action-type=edit][data-icon-type=square]{
-    background-image: url(images/Edit-Square.jpg);
+    background-image: url(img/Edit-Square.jpg);
     width: 32px;
     height: 32px;
     float:left;
@@ -61,7 +61,7 @@ div[data-nav-action-type=edit][data-icon-type=square]{
 }
 
 div[data-nav-action-type=delete], input[type=submit][data-sumbit-action-type=delete]{
-    background-image: url(images/Delete.png);
+    background-image: url(img/Delete.png);
     width: 24px;
     height: 24px;
     float:left;
@@ -69,7 +69,7 @@ div[data-nav-action-type=delete], input[type=submit][data-sumbit-action-type=del
 }
 
 div[data-nav-action-type=details]{
-    background-image: url(images/Details.png);
+    background-image: url(img/Details.png);
     width: 24px;
     height: 24px;
     float:left;
@@ -77,7 +77,7 @@ div[data-nav-action-type=details]{
 }
 
 div[data-nav-action-type=create]{
-    background-image: url(images/CreateNew.png);
+    background-image: url(img/CreateNew.png);
     width: 32px;
     height: 32px;
     margin-left: 110px;
@@ -91,14 +91,14 @@ input[type=submit]{
     display: block;
     width: 32px;
     height: 32px;
-    background-image: url(images/OkButton.jpg);
+    background-image: url(img/OkButton.jpg);
 }
 
 input[type=submit][data-sumbit-action-type=add]{
     display: block;
     width: 32px;
     height: 32px;
-    background-image: url(images/Add.jpg);
+    background-image: url(img/Add.jpg);
 }
 
 .admin-fields {
@@ -121,7 +121,7 @@ textarea.text-box.multi-line.admin-fields{
 }
 
 .admin-tools-button{
-    background-image: url(images/Settings.jpg);
+    background-image: url(img/Settings.jpg);
     width: 48px;
     height: 48px;
     margin: 1px;
@@ -134,7 +134,7 @@ table, td ,tr{
 }
 
 .ajax-loader{
-    background-image: url(images/ajax-loader.gif);
+    background-image: url(img/ajax-loader.gif);
     width: 31px;
     height: 31px;
     background-repeat: no-repeat;

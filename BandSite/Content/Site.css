@@ -766,7 +766,7 @@ tr.pager td {
 }
 
 .site-logo{
-    background-image: url(images/Logo.png);
+    background-image: url(img/Logo.png);
     width: 48px;
     height: 48px;
 }
@@ -828,23 +828,23 @@ tr.pager td {
 }
 
 .song-control-panel .play-btn[data-state=play]{
-    background-image: url(images/Media-Play.png);
+    background-image: url(img/Media-Play.png);
 }
 
 .song-control-panel .play-btn[data-state=pause]{
-    background-image: url(images/Media-Pause.png);
+    background-image: url(img/Media-Pause.png);
 }
 
 .song-control-panel .loop-btn[data-state=once]{
-    background-image: url(images/Stop-Loop.png);
+    background-image: url(img/Stop-Loop.png);
 }
 
 .song-control-panel .loop-btn[data-state=songloop]{
-    background-image: url(images/Song-Loop.png);
+    background-image: url(img/Song-Loop.png);
 }
 
 .song-control-panel .loop-btn[data-state=listloop]{
-    background-image: url(images/List-Loop.png);
+    background-image: url(img/List-Loop.png);
 }
 
 .song-control-panel .loop-btn{
@@ -852,19 +852,19 @@ tr.pager td {
 }
 
 .song-control-panel .back-btn{
-    background-image: url(images/Media-Back.png);
+    background-image: url(img/Media-Back.png);
 }
 
 .song-control-panel .forward-btn{
-    background-image: url(images/Media-Forward.png);
+    background-image: url(img/Media-Forward.png);
 }
 
 .song-control-panel .volume-btn[data-state=normal]{
-    background-image: url(images/Speaker-Volume.png);
+    background-image: url(img/Speaker-Volume.png);
 }
 
 .song-control-panel .volume-btn[data-state=mute]{
-    background-image: url(images/Volume-Mute.png);
+    background-image: url(img/Volume-Mute.png);
 }
 
 .song-control-panel .volume-slider{
@@ -918,14 +918,14 @@ tr.pager td {
 }
 
 .search-icon{
-    background-image: url(images/Search-Find.png);
+    background-image: url(img/Search-Find.png);
     width: 32px;
     height: 32px;
     margin: 5px 0 6px 0;
 }
 
 .listen-btn {
-    background-image: url(images/Headphone-02.png);
+    background-image: url(img/Headphone-02.png);
     width: 32px;
     height: 32px;
     margin: 5px 0 5px 25px;
@@ -933,7 +933,7 @@ tr.pager td {
 }
 
 .populate-btn{
-    background-image: url(images/Add-New.png);
+    background-image: url(img/Add-New.png);
     width: 32px;
     height: 32px;
     margin: 5px 0 5px 0px;
@@ -941,7 +941,7 @@ tr.pager td {
 }
 
 .play-list .remove-item{
-    background-image: url(images/Document-Delete-01.png);
+    background-image: url(img/Document-Delete-01.png);
     width: 32px;
     height: 32px;
     margin: -7px 0 0 700px;
