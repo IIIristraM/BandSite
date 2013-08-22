@@ -27,12 +27,16 @@ namespace BandSite.Models
             }
         }
 
-        public void Send(string user, string message)
+        public void Send(string users, string message)
         {
-            if (_connectedUsers.ContainsKey(user))
+            var list = users.Split(new char[] {'#'}, StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < list.Length; i++)
             {
-                Clients.Client(_connectedUsers[user]).addMessage(Context.User.Identity.Name, HttpUtility.HtmlEncode(message));
-            }
+                if (_connectedUsers.ContainsKey(list[i]))
+                {
+                    Clients.Client(_connectedUsers[list[i]]).addMessage(Context.User.Identity.Name, HttpUtility.HtmlEncode(message));
+                }
+            }  
         }
 
         public void Logout()

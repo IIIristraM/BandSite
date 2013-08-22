@@ -911,7 +911,7 @@ tr.pager td {
 }
 
 .user-list { list-style-type: none; margin-right: 50px; padding: 0;}
-.user-list li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1em; height: 18px; width: 100px; }
+.user-list li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1em; height: 18px; width: 150px; }
 .user-list li span { position: absolute; margin-left: -1.3em; }
 .user-list-item-highlight{
      margin-left: 15px !important;
@@ -919,9 +919,13 @@ tr.pager td {
 
 .indicator{
     float: right;
-    width: 7px;
-    height: 100%;
+    width: 10px;
+    height: 10px;
+    border-radius: 50% 50%;
+    margin-top: 4px;
+    opacity: 0.5;
 }
+
 .user-list-item-online{
     background: green !important;
 }

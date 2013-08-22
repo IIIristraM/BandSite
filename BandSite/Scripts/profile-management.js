@@ -52,6 +52,13 @@ $(function () {
     };
 });
 
+function ReplaceSimbols(string) {
+    string = string.replace(/'/, "_");
+    string = string.replace(/\./, "_");
+    string = string.replace(/\s/, "_");
+    return string;
+}
+
 function GenerateChat() {
     $.ajax({
         url: "/Account/GetUserslist",
@@ -61,7 +68,7 @@ function GenerateChat() {
         var html = "";
         for (var i = 0; i < usersList.length; i++) {
             html = html +
-                   "<li class='user-list-item ui-state-default' data-user-name='" + usersList[i].name + "'>" +
+                   "<li class='user-list-item ui-state-default' data-user-name='" + ReplaceSimbols(usersList[i].name) + "'>" +
                         "<div class='float-left'>" + 
                              "<span>" +
                                    usersList[i].name +
@@ -73,15 +80,22 @@ function GenerateChat() {
         }
         $(".user-list").html(html);
         if (usersList.length > 0) {
-            $("#user-name").val(usersList[0].name);
+            $("#user-name").val(usersList[0].name + "#");
             $(".user-list").find(".user-list-item").first().addClass("user-list-item-highlight");
         }
         $(".user-list-item").click(function () {
             var username = $(this).find("span").html();
-            $("#user-name").val(username);
-            $(".user-list").find(".user-list-item-highlight").removeClass("user-list-item-highlight");
-            $(this).addClass("user-list-item-highlight");
-            
+            if (!$(this).hasClass("user-list-item-highlight")) {
+                var names = $("#user-name").val();
+                $("#user-name").val(names + username + "#");
+                $(this).addClass("user-list-item-highlight");
+            }
+            else {
+                var names = $("#user-name").val();
+                names = names.replace(username + "#", "");
+                $("#user-name").val(names);
+                $(this).removeClass("user-list-item-highlight");
+            }
         });
     });
 
@@ -93,12 +107,12 @@ function GenerateChat() {
 
     chat.client.onOnline = function (usernames) {
         for (var i = 0; i < usernames.length; i++) {
-            $(".user-list").find(".user-list-item[data-user-name=" + usernames[i] + "]").find(".indicator").addClass("user-list-item-online");
+            $(".user-list").find(".user-list-item[data-user-name=" + ReplaceSimbols(usernames[i]) + "]").find(".indicator").addClass("user-list-item-online");
         }
     };
 
     chat.client.onOffline = function (username) {
-        $(".user-list").find(".user-list-item[data-user-name=" + username + "]").find(".indicator").removeClass("user-list-item-online");
+        $(".user-list").find(".user-list-item[data-user-name=" + ReplaceSimbols(username) + "]").find(".indicator").removeClass("user-list-item-online");
     };
 
     $.connection.hub.start().done(function () {
