@@ -917,6 +917,15 @@ tr.pager td {
      margin-left: 15px !important;
 }
 
+.indicator{
+    float: right;
+    width: 7px;
+    height: 100%;
+}
+.user-list-item-online{
+    background: green !important;
+}
+
 .search-icon{
     background-image: url(img/Search-Find.png);
     width: 32px;

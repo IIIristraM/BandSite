@@ -1,4 +1,5 @@
 ﻿var player;
+var chat;
 
 $(function () {
     $("#settings-tabs").tabs();
@@ -42,8 +43,16 @@ $(function () {
                 type: "POST"
             });
         }
-    });
+    });    
 
+    GenerateChat();
+
+    window.onbeforeunload = function () {
+        chat.server.logout();
+    };
+});
+
+function GenerateChat() {
     $.ajax({
         url: "/Account/GetUserslist",
         type: "GET",
@@ -52,10 +61,14 @@ $(function () {
         var html = "";
         for (var i = 0; i < usersList.length; i++) {
             html = html +
-                   "<li class='user-list-item ui-state-default'>" +
-                         "<span>" +
-                              usersList[i].name +
-                         "</span>" +
+                   "<li class='user-list-item ui-state-default' data-user-name='" + usersList[i].name + "'>" +
+                        "<div class='float-left'>" + 
+                             "<span>" +
+                                   usersList[i].name +
+                             "</span>" +
+                        "</div>" +
+                        "<div class='indicator'></div>" +
+                        "<div class='clear-fix'></div>" +
                     "</li>";
         }
         $(".user-list").html(html);
@@ -68,17 +81,29 @@ $(function () {
             $("#user-name").val(username);
             $(".user-list").find(".user-list-item-highlight").removeClass("user-list-item-highlight");
             $(this).addClass("user-list-item-highlight");
+            
         });
     });
 
-    var chat = $.connection.chat;
-    $.connection.hub.start().done(function () {
-        chat.server.register();
-    });
+    chat = $.connection.chat
 
     chat.client.addMessage = function (user, message) {
         $("#msg-list").append("<li class='msg-list-item'><span><b>" + user + " :</b><br>" + message + "</span></li>");
     };
+
+    chat.client.onOnline = function (usernames) {
+        for (var i = 0; i < usernames.length; i++) {
+            $(".user-list").find(".user-list-item[data-user-name=" + usernames[i] + "]").find(".indicator").addClass("user-list-item-online");
+        }
+    }
+
+    chat.client.onOffline = function (username) {
+        $(".user-list").find(".user-list-item[data-user-name=" + username + "]").find(".indicator").removeClass("user-list-item-online");
+    }
+
+    $.connection.hub.start().done(function () {
+        chat.server.register();
+    });
 
     $("#send-btn").click(function () {
         var message = $("#message-txt").val();
@@ -87,7 +112,7 @@ $(function () {
         chat.server.send(user, message);
         $("#message-txt").val("");
     });
-});
+}
 
 function GeneratePlayer() {
     $.ajax({

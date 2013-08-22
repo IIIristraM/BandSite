@@ -22,6 +22,8 @@ namespace BandSite.Models
                 {
                     _connectedUsers[Context.User.Identity.Name] = Context.ConnectionId;
                 }
+                Clients.Others.onOnline(new string[] { Context.User.Identity.Name });
+                Clients.Caller.onOnline(_connectedUsers.Select(u => u.Key).ToArray());
             }
         }
 
@@ -29,7 +31,20 @@ namespace BandSite.Models
         {
             if (_connectedUsers.ContainsKey(user))
             {
-                Clients.Client(_connectedUsers[user]).addMessage(Context.User.Identity.Name, message);
+                HttpServerUtility httpUtil = new HttpServerUtility();
+                Clients.Client(_connectedUsers[user]).addMessage(Context.User.Identity.Name, httpUtil.HtmlEncode(message));
+            }
+        }
+
+        public void Logout()
+        {
+            lock (_connectedUsers)
+            {
+                if (_connectedUsers.ContainsKey(Context.User.Identity.Name))
+                {
+                    _connectedUsers.Remove(Context.User.Identity.Name);
+                }
+                Clients.Others.onOffline(Context.User.Identity.Name);
             }
         }
     }
