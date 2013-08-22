@@ -85,7 +85,7 @@ function GenerateChat() {
         });
     });
 
-    chat = $.connection.chat
+    chat = $.connection.chat;
 
     chat.client.addMessage = function (user, message) {
         $("#msg-list").append("<li class='msg-list-item'><span><b>" + user + " :</b><br>" + message + "</span></li>");
@@ -95,11 +95,11 @@ function GenerateChat() {
         for (var i = 0; i < usernames.length; i++) {
             $(".user-list").find(".user-list-item[data-user-name=" + usernames[i] + "]").find(".indicator").addClass("user-list-item-online");
         }
-    }
+    };
 
     chat.client.onOffline = function (username) {
         $(".user-list").find(".user-list-item[data-user-name=" + username + "]").find(".indicator").removeClass("user-list-item-online");
-    }
+    };
 
     $.connection.hub.start().done(function () {
         chat.server.register();

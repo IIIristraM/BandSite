@@ -31,8 +31,7 @@ namespace BandSite.Models
         {
             if (_connectedUsers.ContainsKey(user))
             {
-                HttpServerUtility httpUtil = new HttpServerUtility();
-                Clients.Client(_connectedUsers[user]).addMessage(Context.User.Identity.Name, httpUtil.HtmlEncode(message));
+                Clients.Client(_connectedUsers[user]).addMessage(Context.User.Identity.Name, HttpUtility.HtmlEncode(message));
             }
         }
 
