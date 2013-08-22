@@ -27,7 +27,11 @@ namespace BandSite.Filters
             {
                 try
                 {
-                    WebSecurity.InitializeDatabaseConnection("BandSiteDB", "UserProfiles", "Id", "UserName", autoCreateTables: true);
+                    #if DEBUG
+                         WebSecurity.InitializeDatabaseConnection("BandSiteDB-Debug", "UserProfiles", "Id", "UserName", autoCreateTables: true);
+                    #else
+                         WebSecurity.InitializeDatabaseConnection("BandSiteDB", "UserProfiles", "Id", "UserName", autoCreateTables: true);
+                    #endif
                 }
                 catch (Exception ex)
                 {

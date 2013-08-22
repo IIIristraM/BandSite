@@ -188,7 +188,12 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
             var song = query.FirstOrDefault();
             if(song != null)
             {
-                SqlConnectionStringBuilder scsb = new SqlConnectionStringBuilder(ConfigurationManager.ConnectionStrings["BandSiteDB"].ConnectionString);
+                #if DEBUG
+                     SqlConnectionStringBuilder scsb = new SqlConnectionStringBuilder(ConfigurationManager.ConnectionStrings["BandSiteDB-Debug"].ConnectionString);
+                #else
+                      SqlConnectionStringBuilder scsb = new SqlConnectionStringBuilder(ConfigurationManager.ConnectionStrings["BandSiteDB"].ConnectionString);
+                #endif
+
                 SqlConnection conn = new SqlConnection(scsb.ConnectionString);
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(query.ToString(), conn);
