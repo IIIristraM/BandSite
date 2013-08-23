@@ -165,6 +165,7 @@ function RewriteSubmit() {
             },
             complete: function () {
                 $("#action-loader").hide();
+                $(".ajax-loader").find(".progress").empty();
             }
         };
         formData = $form.serialize();

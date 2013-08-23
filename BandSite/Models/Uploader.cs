@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Web;
 
 namespace BandSite.Models
@@ -34,8 +35,8 @@ namespace BandSite.Models
             {
                 stream.Read(buffer, offset, 4096);
                 offset += 4096;
-                var percentage = stream.Position / stream.Length * 100;
-                _connectedUsers[userName].Caller.showProgress(percentage);
+                var percentage = (double)stream.Position / stream.Length * 100;
+                _connectedUsers[userName].Caller.showProgress(Math.Round(percentage, 2));
             }
             return buffer;
         }
