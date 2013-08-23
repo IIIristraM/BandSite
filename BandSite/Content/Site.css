@@ -903,6 +903,10 @@ tr.pager td {
     cursor:pointer;
 } 
 
+.msg-content{
+    max-height: 600px;
+    overflow: auto;
+}
 .msg-list { list-style-type: none; margin: 0; padding: 0; width: 500px;}
 .msg-list li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1em;}
 .msg-list li span { margin-left: -1.3em; white-space:pre-wrap;}

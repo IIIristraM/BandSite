@@ -25,23 +25,49 @@ namespace BandSite.Models.Implementations
 
         public Entity Insert(Entity entity)
         {
-            return content.Add(entity);
+            if (entity != null)
+            {
+                return content.Add(entity);
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public Entity Delete(Entity entity)
         {
-            return content.Remove(entity);
+            if (entity != null)
+            {
+                return Delete(entity.Id);
+            }
+            else
+            {
+                return null;
+            }
         }
 
-        public Entity Update(Entity entity)
+        public Entity Delete(int id)
         {
-            content.Where(e => e.Id == entity.Id).Load();
-            Entity result = content.Find(entity.Id);
-            if (result.TrySetPropertiesFrom(entity))
+            var item = content.Find(id);
+            if (item != null)
             {
-                return result;
+                return content.Remove(item);
             }
-            return null;
+            else
+            {
+                return null;
+            }
+        }
+
+        public Entity Update(int id, Entity entity)
+        {
+            Entity result = content.Find(id);
+            if (result != null)
+            {
+                result.TrySetPropertiesFrom(entity);
+            }
+            return result;
         }
     }
 }

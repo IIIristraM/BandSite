@@ -14,6 +14,21 @@ namespace BandSite.Models.Implementations
         public DbContextEfFactory(string connectionName)
         {
             ConnectionName = connectionName;
+            SetInitializer();
+        }
+
+        public DbContextEfFactory()
+        { 
+            #if DEBUG
+                 ConnectionName = "BandSiteDB-Debug";
+            #else
+                 ConnectionName = "BandSiteDB";
+            #endif
+            SetInitializer();
+        }
+
+        protected void SetInitializer()
+        {
             Database.SetInitializer<DbContextEf>(new DropCreateDatabaseIfModelChanges<DbContextEf>());
         }
 

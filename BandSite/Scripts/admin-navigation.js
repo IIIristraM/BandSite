@@ -149,7 +149,14 @@ function RewriteSubmit() {
         var options = {
             url: $form.attr("action"),
             type: $form.attr("method"),
-            cache: false
+            cache: false,
+            beforeSend: function () {
+                $("#action-loader").show();
+                $("#content").empty();
+            },
+            complete: function () {
+                $("#action-loader").hide();
+            }
         };
         formData = $form.serialize();
         if ($form.attr("enctype") === "multipart/form-data") {

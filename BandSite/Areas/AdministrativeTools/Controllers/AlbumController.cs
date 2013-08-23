@@ -82,7 +82,7 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Albums.Update(album);
+                db.Albums.Update(album.Id, album);
                 db.SaveChanges();
                 return Json(new { hash = "action=index&entity=album" });
             }

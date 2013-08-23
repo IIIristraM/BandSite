@@ -12,6 +12,7 @@ namespace BandSite.Models.Interfaces
 
         Entity Insert(Entity entity);
         Entity Delete(Entity entity);
-        Entity Update(Entity entity);
+        Entity Delete(int id);
+        Entity Update(int id, Entity entity);
     }
 }

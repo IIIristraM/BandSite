@@ -93,7 +93,7 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
         {
             if (ModelState.IsValid)
             {
-                _db.Songs.Update(song);
+                _db.Songs.Update(song.Id, song);
                 _db.SaveChanges();
                 return Json(new { hash = "action=index&entity=song" });
             }

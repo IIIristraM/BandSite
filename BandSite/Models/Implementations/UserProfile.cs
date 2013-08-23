@@ -10,6 +10,8 @@ namespace BandSite.Models.Implementations
     public class UserProfile : IEntity
     {
         private ICollection<Playlist> _playlists;
+        private ICollection<Message> _inputMessages;
+        private ICollection<Message> _outputMessages;
 
         public int Id { get; set; }
         public string UserName { get; set; }
@@ -19,6 +21,37 @@ namespace BandSite.Models.Implementations
             {
                 return _playlists ?? (_playlists = (new HashSet<Playlist>()));
             }
+        }
+
+        public virtual ICollection<Message> InputMessages 
+        {
+            get 
+            {
+                return _inputMessages ?? (_inputMessages = (new HashSet<Message>()));
+            }
+        }
+
+        public virtual ICollection<Message> OutputMessages
+        {
+            get
+            {
+                return _outputMessages ?? (_outputMessages = (new HashSet<Message>()));
+            }
+        }
+
+        public ICollection<Message> UnreadMessages()
+        {
+            return InputMessages.Where(m => m.Status == MessageStatus.Unread.ToString()).ToList();
+        }
+
+        public ICollection<Message> ReadMessages()
+        {
+            return InputMessages.Where(m => m.Status == MessageStatus.Read.ToString()).ToList();
+        }
+
+        public ICollection<Message> ReadMessages(int count)
+        {
+            return InputMessages.Where(m => m.Status == MessageStatus.Read.ToString()).Take(count).ToList();
         }
 
         public bool TrySetPropertiesFrom(object source)
