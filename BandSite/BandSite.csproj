@@ -226,6 +226,7 @@
     <Compile Include="Models\Interfaces\IDbContext.cs" />
     <Compile Include="Models\Interfaces\IEntity.cs" />
     <Compile Include="Models\Interfaces\IRepository.cs" />
+    <Compile Include="Models\Uploader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

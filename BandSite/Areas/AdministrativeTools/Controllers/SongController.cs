@@ -62,7 +62,9 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
                 newSong.Title = song.Title;
                 newSong.Text = song.Text;
                 newSong.File = new byte[song.UploadFile.InputStream.Length];
-                song.UploadFile.InputStream.Read(newSong.File, 0, newSong.File.Length);
+                //song.UploadFile.InputStream.Read(newSong.File, 0, newSong.File.Length);
+                var uploader = new Uploader();
+                uploader.Upload(newSong.File, song.UploadFile.InputStream, User.Identity.Name);
                 _db.Songs.Insert(newSong);
                 _db.SaveChanges();
                 return Json(new { hash = "action=index&entity=song" });

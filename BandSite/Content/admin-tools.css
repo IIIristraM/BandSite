@@ -142,3 +142,9 @@ table, td ,tr{
     margin-top: 200px;
     margin-left: 35%;
 }
+
+.progress{
+    position: relative;
+    top: 40px;
+    left: -1px
+}

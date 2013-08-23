@@ -1,10 +1,12 @@
 ﻿var _entity = "song";
 var _action = "index";
+var uploader;
 
 function GenerateCreateButtons() {
     $("[data-nav-action-type=create]").unbind("click");
     $("[data-nav-action-type=create]").click(function () {
         _entity = $(this).attr("data-entity-type");
+        uploader.server.createAnchor();
         location.hash = "entity=" + _entity + "&action=create";
     });
 }
@@ -135,6 +137,13 @@ function RenderContent() {
 
 $(function(){
     RenderContent();
+    uploader = $.connection.uploader;
+    $.connection.hub.start();
+    uploader.client.showProgress = function (percentage) {
+        $(".ajax-loader").find(".progress").empty();
+        $(".ajax-loader").find(".progress").append(percentage + " %");
+    }
+
     window.onhashchange = function () {
         RenderContent();
     };
