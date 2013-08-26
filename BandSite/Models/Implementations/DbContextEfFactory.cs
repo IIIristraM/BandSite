@@ -29,12 +29,15 @@ namespace BandSite.Models.Implementations
 
         protected void SetInitializer()
         {
-            Database.SetInitializer<DbContextEf>(new DropCreateDatabaseIfModelChanges<DbContextEf>());
+            Database.SetInitializer<DbContextEf>(new DropCreateDatabaseAlways<DbContextEf>());
         }
 
         public IDbContext CreateContext()
         {
-            return new DbContextEf(ConnectionName);
+            var context = new DbContextEf(ConnectionName);
+            context.Database.CreateIfNotExists();
+            context.Database.Initialize(false);
+            return context;
         }
     }
 }

@@ -435,7 +435,6 @@
     <Folder Include="App_Data\" />
     <Folder Include="Areas\AdministrativeTools\Models\" />
     <Folder Include="Areas\AdministrativeTools\Views\Shared\" />
-    <Folder Include="Content\songs\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

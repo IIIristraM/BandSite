@@ -16,7 +16,7 @@ namespace BandSite.Models.Implementations
          #endif
 
 
-               public DbContextEf(string connectionName)
+        public DbContextEf(string connectionName)
             : base("name=" + connectionName)
         {
             ((IDbContext)this).Albums = new RepositoryEf<Album>(Albums);
@@ -24,7 +24,6 @@ namespace BandSite.Models.Implementations
             ((IDbContext)this).UserProfiles = new RepositoryEf<UserProfile>(UserProfiles);
             ((IDbContext)this).Playlists = new RepositoryEf<Playlist>(Playlists);
             ((IDbContext)this).Messages = new RepositoryEf<Message>(Messages);
-            this.Database.Initialize(false);
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)

@@ -2,6 +2,7 @@
 using BandSite.Models.Interfaces;
 using Microsoft.AspNet.SignalR;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -10,30 +11,22 @@ namespace BandSite.Models
 {
     public class Chat : Hub
     {
-        private static Dictionary<string, string> _connectedUsers = new Dictionary<string, string>();
+        private static ConcurrentDictionary<string, string> _connectedUsers = new ConcurrentDictionary<string, string>();
         private IDbContext _db = MvcApplication.DbFactory.CreateContext();
 
         public void Register()
         {
-            lock (_connectedUsers)
-            {
-                if (!_connectedUsers.ContainsKey(Context.User.Identity.Name))
-                {
-                    _connectedUsers.Add(Context.User.Identity.Name, Context.ConnectionId);
-                }
-                else
-                {
-                    _connectedUsers[Context.User.Identity.Name] = Context.ConnectionId;
-                }
-                Clients.Others.onOnline(new string[] { Context.User.Identity.Name });
-                Clients.Caller.onOnline(_connectedUsers.Select(u => u.Key).ToArray());
-            }
+            _connectedUsers.AddOrUpdate(Context.User.Identity.Name, Context.ConnectionId, (key, oldValue) => Context.ConnectionId);
+
+            Clients.Others.onOnline(new string[] { Context.User.Identity.Name });
+            Clients.Caller.onOnline(_connectedUsers.Select(u => u.Key).ToArray());
+
+            GetUnreadMessages();
+        }
+
+        public void GetUnreadMessages()
+        {
             var user = _db.UserProfiles.Content.Where(u => u.UserName == Context.User.Identity.Name).First();
-            var topReadMsgs = user.ReadMessages(3);
-            foreach (var msg in topReadMsgs)
-            {
-                Clients.Caller.addMessage(msg.UserFrom.UserName, HttpUtility.HtmlEncode(msg.Text));
-            }
             var unreadMsgs = user.UnreadMessages();
             foreach (var msg in unreadMsgs)
             {
@@ -81,12 +74,10 @@ namespace BandSite.Models
 
         public void Logout()
         {
-            lock (_connectedUsers)
+            string value;
+            if (_connectedUsers.ContainsKey(Context.User.Identity.Name))
             {
-                if (_connectedUsers.ContainsKey(Context.User.Identity.Name))
-                {
-                    _connectedUsers.Remove(Context.User.Identity.Name);
-                }
+                _connectedUsers.TryRemove(Context.User.Identity.Name, out value);
                 Clients.Others.onOffline(Context.User.Identity.Name);
             }
         }
