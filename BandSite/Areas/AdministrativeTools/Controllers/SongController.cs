@@ -136,7 +136,7 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
                             var uploader = new Uploader();
                             uploader.Upload(updatedSong.File, song.UploadFile.InputStream, User.Identity.Name);
                         }
-                        db.Songs.Update(updatedSong.Id, updatedSong);
+                        db.Songs.Update(song.Id, updatedSong);
                         db.SaveChanges();
                         return Json(new { hash = "action=index&entity=song" });
                     }

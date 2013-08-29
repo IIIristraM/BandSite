@@ -117,7 +117,7 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
                     var updatedAlbum = new Album();
                     if (updatedAlbum.TrySetPropertiesFrom(album))
                     {
-                        db.Albums.Update(updatedAlbum.Id, updatedAlbum);
+                        db.Albums.Update(album.Id, updatedAlbum);
                         db.SaveChanges();
                         return Json(new { hash = "action=index&entity=album" });
                     }
