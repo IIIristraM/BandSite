@@ -1,31 +1,40 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using BandSite.Models;
-using BandSite.Models.Implementations;
-using BandSite.Models.Interfaces;
 using System.IO;
 using System.Data.SqlClient;
 using System.Configuration;
-using System.Data.Objects;
+using BandSite.Models.DataLayer;
+using BandSite.Models.Entities;
+using BandSite.Models.ViewModels;
+using BandSite.Models.Functionality;
 
 namespace BandSite.Areas.AdministrativeTools.Controllers
 {
     [Authorize]
     public class SongController : Controller
     {
-        private IDbContext _db = MvcApplication.DbFactory.CreateContext();
+        private IDbContextFactory _dbContextFactory;
+
+        public SongController() {}
+
+        public SongController(IDbContextFactory dbContextFactory)
+            : this()
+        {
+            _dbContextFactory = dbContextFactory;
+        }
 
         //
         // GET: /AdministrativeTools/Song/
 
         public ActionResult Index()
         {
-            return PartialView(_db.Songs.Content.ToList());
+            using (var db = _dbContextFactory.CreateContext())
+            {
+                return PartialView(db.Songs.Content.ToList());
+            }
         }
 
         //
@@ -33,12 +42,20 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
 
         public ActionResult Details(int id = 0)
         {
-            Song song = _db.Songs.Content.Where(s => s.Id == id).FirstOrDefault();
-            if (song == null)
+            using (var db = _dbContextFactory.CreateContext())
             {
-                return HttpNotFound();
+                Song song = db.Songs.Content.FirstOrDefault(s => s.Id == id);
+                if (song == null)
+                {
+                    return HttpNotFound();
+                }
+                return PartialView(new CRUDSongModel
+                {
+                    Id = song.Id,
+                    Title = song.Title,
+                    Text = song.Text
+                });
             }
-            return PartialView(song);
         }
 
         //
@@ -54,23 +71,26 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(CreateSong song)
+        public ActionResult Create(CRUDSongModel song)
         {
-            if (ModelState.IsValid)
+            using (var db = _dbContextFactory.CreateContext())
             {
-                Song newSong = new Song();
-                newSong.Title = song.Title;
-                newSong.Text = song.Text;
-                newSong.File = new byte[song.UploadFile.InputStream.Length];
-                //song.UploadFile.InputStream.Read(newSong.File, 0, newSong.File.Length);
-                var uploader = new Uploader();
-                uploader.Upload(newSong.File, song.UploadFile.InputStream, User.Identity.Name);
-                _db.Songs.Insert(newSong);
-                _db.SaveChanges();
-                return Json(new { hash = "action=index&entity=song" });
-            }
+                if (ModelState.IsValid)
+                {
+                    var newSong = new Song {Title = song.Title, Text = song.Text};
+                    if (song.UploadFile != null)
+                    {
+                        newSong.File = new byte[song.UploadFile.InputStream.Length];
+                        var uploader = new Uploader();
+                        uploader.Upload(newSong.File, song.UploadFile.InputStream, User.Identity.Name);
+                    }
+                    db.Songs.Insert(newSong);
+                    db.SaveChanges();
+                    return Json(new { hash = "action=index&entity=song" });
+                }
 
-            return PartialView();
+                return PartialView();
+            }
         }
 
         //
@@ -78,12 +98,22 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
 
         public ActionResult Edit(int id = 0)
         {
-            Song song = _db.Songs.Content.Where(s => s.Id == id).FirstOrDefault();
-            if (song == null)
+            using (var db = _dbContextFactory.CreateContext())
             {
-                return HttpNotFound();
+                CRUDSongModel song = db.Songs.Content
+                                              .Where(s => s.Id == id)
+                                              .Select(s => new CRUDSongModel
+                                              {
+                                                  Id = s.Id,
+                                                  Title = s.Title,
+                                                  Text = s.Text,
+                                              }).FirstOrDefault();
+                if (song == null)
+                {
+                    return HttpNotFound();
+                }
+                return PartialView(song);
             }
-            return PartialView(song);
         }
 
         //
@@ -91,15 +121,28 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Song song)
+        public ActionResult Edit(CRUDSongModel song)
         {
-            if (ModelState.IsValid)
+            using (var db = _dbContextFactory.CreateContext())
             {
-                _db.Songs.Update(song.Id, song);
-                _db.SaveChanges();
-                return Json(new { hash = "action=index&entity=song" });
+                if (ModelState.IsValid)
+                {
+                    var updatedSong = new Song();
+                    if (updatedSong.TrySetPropertiesFrom(song))
+                    {
+                        if (song.UploadFile != null)
+                        {
+                            updatedSong.File = new byte[song.UploadFile.InputStream.Length];
+                            var uploader = new Uploader();
+                            uploader.Upload(updatedSong.File, song.UploadFile.InputStream, User.Identity.Name);
+                        }
+                        db.Songs.Update(updatedSong.Id, updatedSong);
+                        db.SaveChanges();
+                        return Json(new { hash = "action=index&entity=song" });
+                    }
+                }
+                return PartialView(song);
             }
-            return PartialView(song);
         }
 
         //
@@ -107,12 +150,20 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
 
         public ActionResult Delete(int id = 0)
         {
-            Song song = _db.Songs.Content.Where(s => s.Id == id).FirstOrDefault();
-            if (song == null)
+            using (var db = _dbContextFactory.CreateContext())
             {
-                return HttpNotFound();
+                Song song = db.Songs.Content.FirstOrDefault(s => s.Id == id);
+                if (song == null)
+                {
+                    return HttpNotFound();
+                }
+                return PartialView(new CRUDSongModel
+                {
+                    Id = song.Id,
+                    Title = song.Title,
+                    Text = song.Text
+                });
             }
-            return PartialView(song);
         }
 
         //
@@ -122,210 +173,202 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Song song = _db.Songs.Content.Where(s => s.Id == id).FirstOrDefault();
-            _db.Songs.Delete(song);
-            _db.SaveChanges();
-            return Json(new { hash = "action=index&entity=song" });
+            using (var db = _dbContextFactory.CreateContext())
+            {
+                Song song = db.Songs.Content.FirstOrDefault(s => s.Id == id);
+                db.Songs.Delete(song);
+                db.SaveChanges();
+                return Json(new { hash = "action=index&entity=song" });
+            }
         }
 
         public ActionResult SongsSearch(string term)
         {
-            var songs = _db.Songs.Content.Where(s => s.Title.Contains(term)).Select(s => new { label = s.Title, value = s.Id});
-            return Json(songs, JsonRequestBehavior.AllowGet);
+            using (var db = _dbContextFactory.CreateContext())
+            {
+                var songs = db.Songs.Content.Where(s => s.Title.Contains(term)).Select(s => new { label = s.Title, value = s.Id }).ToList();
+                return Json(songs, JsonRequestBehavior.AllowGet);
+            }
         }
 
         public ActionResult AddAlbum(int songId)
         {
-            Song song = _db.Songs.Content.Where(s => s.Id == songId).FirstOrDefault();
-            if (song == null)
+            using (var db = _dbContextFactory.CreateContext())
             {
-                return HttpNotFound();
+                Song song = db.Songs.Content.FirstOrDefault(s => s.Id == songId);
+                if (song == null)
+                {
+                    return HttpNotFound();
+                }
+                var model = new SongAlbumRelationModel { SongId = song.Id };
+                return PartialView(model);
             }
-            AddAlbumModel model = new AddAlbumModel() { SongId = song.Id };
-            return PartialView(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult AddAlbum(AddAlbumModel model)
+        public ActionResult AddAlbum(SongAlbumRelationModel model)
         {
-            Album album = _db.Albums.Content.Where(a => a.Id == model.AlbumId).FirstOrDefault();
-            Song song = _db.Songs.Content.Where(s => s.Id == model.SongId).FirstOrDefault();
-            if ((album == null) || (song == null))
+            using (var db = _dbContextFactory.CreateContext())
             {
-                return HttpNotFound();
+                Album album = db.Albums.Content.FirstOrDefault(a => a.Id == model.AlbumId);
+                Song song = db.Songs.Content.FirstOrDefault(s => s.Id == model.SongId);
+                if ((album == null) || (song == null))
+                {
+                    return HttpNotFound();
+                }
+                song.Albums.Add(album);
+                int added = db.SaveChanges();
+                return Json(new { hash = "action=edit&entity=song&id=" + song.Id + "&relatedentity=album&added=" + added + "&loader=0" });
             }
-            song.Albums.Add(album);
-            int added = _db.SaveChanges();
-            return Json(new { hash = "action=edit&entity=song&id=" + song.Id + "&relatedentity=album&added=" + added + "&loader=0" });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteAlbum(DeleteAlbumModel model)
+        public ActionResult DeleteAlbum(SongAlbumRelationModel model)
         {
-            Album album = _db.Albums.Content.Where(a => a.Id == model.AlbumId).FirstOrDefault();
-            Song song = _db.Songs.Content.Where(s => s.Id == model.SongId).FirstOrDefault();
-            if ((album == null) || (song == null))
+            using (var db = _dbContextFactory.CreateContext())
             {
-                return HttpNotFound();
+                Album album = db.Albums.Content.FirstOrDefault(a => a.Id == model.AlbumId);
+                Song song = db.Songs.Content.FirstOrDefault(s => s.Id == model.SongId);
+                if ((album == null) || (song == null))
+                {
+                    return HttpNotFound();
+                }
+                song.Albums.Remove(album);
+                var deleted = db.SaveChanges();
+                return Json(new { hash = "action=edit&entity=song&id=" + song.Id + "&relatedentity=album&deleted=" + deleted + "&loader=0" });
             }
-            song.Albums.Remove(album);
-            var deleted = _db.SaveChanges();
-            return Json(new { hash = "action=edit&entity=song&id=" + song.Id + "&relatedentity=album&deleted=" + deleted + "&loader=0" });
         }
 
         public ActionResult ShowAlbum(int songId)
         {
-            ViewBag.SongId = songId;
-            return PartialView(_db.Albums.Content.Where(a => a.Songs.Where(s => s.Id == songId).Count() == 1).ToList());
+            using (var db = _dbContextFactory.CreateContext())
+            {
+                ViewBag.SongId = songId;
+                return PartialView(db.Albums.Content.Where(a => a.Songs.Count(s => s.Id == songId) == 1).ToList());
+            }
         }
 
         public FileStreamResult GetStream(int id)
         {
-            Response.Headers.Add("Accept-Ranges", "bytes");
-            Response.Cache.SetCacheability(HttpCacheability.Public);
-            Response.Cache.SetMaxAge(new TimeSpan(0, 10, 0));
-            var query = _db.Songs.Content.Where(s => s.Id == id).Select(s => s.File);
-            var song = query.FirstOrDefault();
-            if(song != null)
+            using (var db = _dbContextFactory.CreateContext())
             {
-                #if DEBUG
-                     SqlConnectionStringBuilder scsb = new SqlConnectionStringBuilder(ConfigurationManager.ConnectionStrings["BandSiteDB-Debug"].ConnectionString);
-                #else
-                      SqlConnectionStringBuilder scsb = new SqlConnectionStringBuilder(ConfigurationManager.ConnectionStrings["BandSiteDB"].ConnectionString);
-                #endif
-
-                SqlConnection conn = new SqlConnection(scsb.ConnectionString);
-                conn.Open();
-                SqlCommand cmd = new SqlCommand(query.ToString(), conn);
-                cmd.Parameters.Add(new SqlParameter("p__linq__0", id));
-                SqlDataReader reader = cmd.ExecuteReader( CommandBehavior.SequentialAccess |
-                                                          CommandBehavior.SingleResult |
-                                                          CommandBehavior.SingleRow |
-                                                          CommandBehavior.CloseConnection);
-                if (reader.Read())
+                Response.Headers.Add("Accept-Ranges", "bytes");
+                Response.Cache.SetCacheability(HttpCacheability.Public);
+                Response.Cache.SetMaxAge(new TimeSpan(0, 10, 0));
+                var query = db.Songs.Content.Where(s => s.Id == id).Select(s => s.File);
+                var song = query.FirstOrDefault();
+                if (song != null)
                 {
-                    Stream content = new SqlReaderStream(reader, 0);
-                    return File(content, "audio/mp3");
+#if DEBUG
+                    var scsb = new SqlConnectionStringBuilder(ConfigurationManager.ConnectionStrings["BandSiteDB-Debug"].ConnectionString);
+#else
+                    SqlConnectionStringBuilder scsb = new SqlConnectionStringBuilder(ConfigurationManager.ConnectionStrings["BandSiteDB"].ConnectionString);
+#endif
+                    var conn = new SqlConnection(scsb.ConnectionString);
+                    conn.Open();
+                    var cmd = new SqlCommand(query.ToString(), conn);
+                    cmd.Parameters.Add(new SqlParameter("p__linq__0", id));
+                    SqlDataReader reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess |
+                                                              CommandBehavior.SingleResult |
+                                                              CommandBehavior.SingleRow |
+                                                              CommandBehavior.CloseConnection);
+                    if (reader.Read())
+                    {
+                        Stream content = new SqlReaderStream(reader, 0);
+                        return File(content, "audio/mp3");
+                    }
+                    return null;
                 }
                 return null;
             }
-            return null;
         }
 
         public ActionResult PopulateUsersPlaylist(int userId, int songId)
         {
-            UserProfile user = null;
-            if (userId == -1)
+            using (var db = _dbContextFactory.CreateContext())
             {
-                user = _db.UserProfiles.Content.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
-            }
-            else
-            {
-                user = _db.UserProfiles.Content.Where(u => u.Id == userId).FirstOrDefault();
-            }
-            if (user != null)
-            {
-                var song = _db.Songs.Content.Where(s => s.Id == songId).FirstOrDefault();
-                if ((song != null) && (user.Playlists.Where(p => p.SongId == songId).Count() == 0))
+                UserProfile user = userId == -1 ? db.UserProfiles.Content.FirstOrDefault(u => u.UserName == User.Identity.Name) : db.UserProfiles.Content.FirstOrDefault(u => u.Id == userId);
+                if (user != null)
                 {
-                    try
+                    var song = db.Songs.Content.FirstOrDefault(s => s.Id == songId);
+                    if ((song != null) && (user.Playlists.All(p => p.SongId != songId)))
                     {
-                        _db.Playlists.Insert(new Playlist() { SongId = songId, UserId = user.Id, Order = user.Playlists.Count() + 1 });
-                        _db.SaveChanges();
+                        try
+                        {
+                            db.PlaylistItems.Insert(new PlaylistItem { SongId = songId, UserId = user.Id, Order = user.Playlists.Count() + 1 });
+                            db.SaveChanges();
+                        }
+                        catch
+                        {
+                            return Json(new { status = "fail", error = "somthing go wrong" });
+                        }
+                        return Json(new { status = "success" });
                     }
-                    catch
-                    {
-                        return Json(new { status = "fail", error = "somthing go wrong" });
-                    }
-                    return Json(new { status = "success" });
-                }
-                else
-                {
                     return Json(new { status = "fail", error = "song not found" });
                 }
-            }
-            else
-            {
                 return Json(new { status = "fail", error = "user not found" });
             }
         }
 
         public ActionResult RemoveFromUsersPlaylist(int userId, int songId)
         {
-            UserProfile user = null;
-            if (userId == -1)
+            using (var db = _dbContextFactory.CreateContext())
             {
-                user = _db.UserProfiles.Content.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
-            }
-            else
-            {
-                user = _db.UserProfiles.Content.Where(u => u.Id == userId).FirstOrDefault();
-            }
-            if (user != null)
-            {
-                var song = _db.Songs.Content.Where(s => s.Id == songId).FirstOrDefault();
-                if (song != null)
+                UserProfile user = userId == -1 ? db.UserProfiles.Content.FirstOrDefault(u => u.UserName == User.Identity.Name) : db.UserProfiles.Content.FirstOrDefault(u => u.Id == userId);
+                if (user != null)
                 {
-                    try
+                    var song = db.Songs.Content.FirstOrDefault(s => s.Id == songId);
+                    if (song != null)
                     {
-                        var playlist = _db.Playlists.Content.Where(p => (p.SongId == songId) && (p.UserId == user.Id)).FirstOrDefault();
-                        if (playlist != null)
+                        try
                         {
-                            _db.Playlists.Delete(playlist);
-                            foreach (var pl in _db.Playlists.Content.Where(p => p.Order > playlist.Order)) { pl.Order--; }
-                            _db.SaveChanges();
+                            var playlist = db.PlaylistItems.Content.FirstOrDefault(p => (p.SongId == songId) && (p.UserId == user.Id));
+                            if (playlist != null)
+                            {
+                                db.PlaylistItems.Delete(playlist);
+                                foreach (var pl in db.PlaylistItems.Content.Where(p => p.Order > playlist.Order)) { pl.Order--; }
+                                db.SaveChanges();
+                            }
                         }
+                        catch
+                        {
+                            return Json(new { status = "fail", error = "somthing go wrong" });
+                        }
+                        return Json(new { status = "success" });
                     }
-                    catch
-                    {
-                        return Json(new { status = "fail", error = "somthing go wrong" });
-                    }
-                    return Json(new { status = "success" });
-                }
-                else
-                {
                     return Json(new { status = "fail", error = "song not found" });
                 }
-            }
-            else
-            {
                 return Json(new { status = "fail", error = "user not found" });
             }
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            _db.Dispose();
-            base.Dispose(disposing);
         }
     }
 
     public class SqlReaderStream : Stream
     {
-        private SqlDataReader reader;
-        private int columnIndex;
-        private long position;
+        private SqlDataReader _reader;
+        private readonly int _columnIndex;
+        private long _position;
 
         public SqlReaderStream(
             SqlDataReader reader,
             int columnIndex)
         {
-            this.reader = reader;
-            this.columnIndex = columnIndex;
+            _reader = reader;
+            _columnIndex = columnIndex;
         }
 
         public override long Position
         {
-            get { return position; }
+            get { return _position; }
             set { throw new NotImplementedException(); }
         }
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            long bytesRead = reader.GetBytes(columnIndex, position, buffer, offset, count);
-            position += bytesRead;
+            long bytesRead = _reader.GetBytes(_columnIndex, _position, buffer, offset, count);
+            _position += bytesRead;
             return (int)bytesRead;
         }
 
@@ -371,10 +414,10 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing && null != reader)
+            if (disposing && null != _reader)
             {
-                reader.Dispose();
-                reader = null;
+                _reader.Dispose();
+                _reader = null;
             }
             base.Dispose(disposing);
         }

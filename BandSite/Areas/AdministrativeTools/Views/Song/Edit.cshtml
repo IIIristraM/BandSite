@@ -1,6 +1,7 @@
-﻿@model BandSite.Models.Implementations.Song
+﻿@model BandSite.Models.ViewModels.CRUDSongModel
 <div>
-@using (Html.BeginForm("Edit", "Song")) {
+@using (Html.BeginForm("Edit", "Song", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true)
 
@@ -24,7 +25,10 @@
             @Html.EditorFor(model => model.Text)
             @Html.ValidationMessageFor(model => model.Text)
         </div>
-
+        <div class="editor-field">
+            @Html.TextBoxFor(model => model.UploadFile, new { type = "file" })
+            @Html.ValidationMessageFor(model => model.UploadFile)
+        </div>
         <p>
             <input type="submit" value="" />
         </p>

@@ -6,7 +6,6 @@ function GenerateCreateButtons() {
     $("[data-nav-action-type=create]").unbind("click");
     $("[data-nav-action-type=create]").click(function () {
         _entity = $(this).attr("data-entity-type");
-        uploader.server.createAnchor();
         location.hash = "entity=" + _entity + "&action=create";
     });
 }
@@ -127,6 +126,7 @@ function RenderContent() {
                     $("#action-loader").hide();
                 }
             }).done(function (html) {
+                uploader.server.createAnchor();
                 $("#content").append(html);
                 SetCustomControls();
                 GenerateAreas();
@@ -135,15 +135,15 @@ function RenderContent() {
     });
 }
 
-$(function(){
-    RenderContent();
+$(function () {
     uploader = $.connection.uploader;
     $.connection.hub.start();
     uploader.client.showProgress = function (percentage) {
         $(".ajax-loader").find(".progress").empty();
         $(".ajax-loader").find(".progress").append(percentage + " %");
-    }
+    };
 
+    RenderContent();
     window.onhashchange = function () {
         RenderContent();
     };
@@ -213,7 +213,7 @@ function GetParams()
 {
     var strParams = location.hash.substr(1).split('&');
     var params = {};
-    for (i = 0; i < strParams.length; i++) {
+    for (var i = 0; i < strParams.length; i++) {
         var key = (strParams[i].split('='))[0];
         params[key] = (strParams[i].split('='))[1];
     }
@@ -223,7 +223,6 @@ function GetParams()
 function AutocompleteConfig() {
     $("input[data-autocomplete-source]").each(function () {
         var target = $(this);
-        var entity = target.attr("data-entity-type");
         var relatedEntity = target.attr("data-related-entity-type");
         var wasSelected = false;
         target.unbind("focusout");
@@ -242,7 +241,7 @@ function AutocompleteConfig() {
                 $("#add_" + relatedEntity + "_id").val(ui.item.value);
                 return false;
             },
-            open: function (event, ui) {
+            open: function () {
                 wasSelected = false;
             }
         });

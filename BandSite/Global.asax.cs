@@ -1,14 +1,9 @@
-﻿using BandSite.Models.Implementations;
-using BandSite.Models.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Web;
+﻿using BandSite.Models.DataLayer;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using BandSite.Models.Infrostructure;
 
 namespace BandSite
 {
@@ -17,7 +12,7 @@ namespace BandSite
 
     public class MvcApplication : System.Web.HttpApplication
     {
-        protected static IDbContextFactory _dbFactory;
+        private static IDbContextFactory _dbFactory;
 
         public static IDbContextFactory DbFactory 
         {
@@ -38,6 +33,7 @@ namespace BandSite
         protected void Application_Start()
         {
             //AreaRegistration.RegisterAllAreas();
+            ControllerBuilder.Current.SetControllerFactory(new CustomControllerFactory());
             RouteTable.Routes.MapHubs();
             WebApiConfig.Register(GlobalConfiguration.Configuration);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);

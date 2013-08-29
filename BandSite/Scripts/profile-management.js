@@ -56,6 +56,7 @@ function ReplaceSimbols(string) {
     string = string.replace(/'/, "_");
     string = string.replace(/\./, "_");
     string = string.replace(/\s/, "_");
+    string = string.replace(/@/, "_");
     return string;
 }
 
@@ -167,7 +168,6 @@ function GeneratePlayer() {
 function AutocompleteConfig() {
     $("input[data-autocomplete-source]").each(function () {
         var target = $(this);
-        var entity = target.attr("data-entity-type");
         var relatedEntity = target.attr("data-related-entity-type");
         var wasSelected = false;
         target.unbind("focusout");
@@ -186,7 +186,7 @@ function AutocompleteConfig() {
                 $("#add_" + relatedEntity + "_id").val(ui.item.value);
                 return false;
             },
-            open: function (event, ui) {
+            open: function () {
                 wasSelected = false;
             }
         });

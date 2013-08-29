@@ -1,4 +1,4 @@
-﻿@model ICollection<BandSite.Models.ExternalLogin>
+﻿@model ICollection<BandSite.Models.ViewModels.ExternalLogin>
 
 @if (Model.Count > 0)
 {
@@ -6,7 +6,7 @@
     <br>
     <table>
         <tbody>
-        @foreach (BandSite.Models.ExternalLogin externalLogin in Model)
+        @foreach (var externalLogin in Model)
         {
             <tr>
                 <td>@externalLogin.ProviderDisplayName</td>

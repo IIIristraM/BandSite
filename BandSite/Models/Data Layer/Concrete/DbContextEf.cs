@@ -1,11 +1,8 @@
-﻿using BandSite.Models.Interfaces;
+﻿using BandSite.Models.Entities;
 using System;
-using System.Collections.Generic;
 using System.Data.Entity;
-using System.Linq;
-using System.Web;
 
-namespace BandSite.Models.Implementations
+namespace BandSite.Models.DataLayer
 {
     public class DbContextEf : DbContext, IDbContext
     {
@@ -22,7 +19,7 @@ namespace BandSite.Models.Implementations
             ((IDbContext)this).Albums = new RepositoryEf<Album>(Albums);
             ((IDbContext)this).Songs = new RepositoryEf<Song>(Songs);
             ((IDbContext)this).UserProfiles = new RepositoryEf<UserProfile>(UserProfiles);
-            ((IDbContext)this).Playlists = new RepositoryEf<Playlist>(Playlists);
+            ((IDbContext)this).PlaylistItems = new RepositoryEf<PlaylistItem>(PlaylistItems);
             ((IDbContext)this).Messages = new RepositoryEf<Message>(Messages);
         }
 
@@ -31,7 +28,7 @@ namespace BandSite.Models.Implementations
             modelBuilder.Entity<UserProfile>().HasKey(u => u.Id);
             modelBuilder.Entity<Album>().HasKey(a => a.Id);
             modelBuilder.Entity<Song>().HasKey(s => s.Id);
-            modelBuilder.Entity<Playlist>().HasKey(p => p.Id);
+            modelBuilder.Entity<PlaylistItem>().HasKey(p => p.Id);
             modelBuilder.Entity<Message>().HasKey(m => m.Id);
 
             modelBuilder.Entity<Album>()
@@ -57,7 +54,7 @@ namespace BandSite.Models.Implementations
         public DbSet<Album> Albums { get; set; }
         public DbSet<Song> Songs { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
-        public DbSet<Playlist> Playlists { get; set; }
+        public DbSet<PlaylistItem> PlaylistItems { get; set; }
         public DbSet<Message> Messages { get; set; }
 
         #region IDbContext Implementation
@@ -65,7 +62,7 @@ namespace BandSite.Models.Implementations
         IRepository<Album> IDbContext.Albums { get; set; }
         IRepository<Song> IDbContext.Songs { get; set; }
         IRepository<UserProfile> IDbContext.UserProfiles { get; set; }
-        IRepository<Playlist> IDbContext.Playlists { get; set; }
+        IRepository<PlaylistItem> IDbContext.PlaylistItems { get; set; }
         IRepository<Message> IDbContext.Messages { get; set; }
 
         int IDbContext.SaveChanges()
@@ -75,7 +72,7 @@ namespace BandSite.Models.Implementations
 
         void IDisposable.Dispose()
         {
-            base.Dispose();
+            Dispose();
         }
 
         #endregion

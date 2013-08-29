@@ -1,26 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
+﻿using BandSite.Models.DataLayer;
+using BandSite.Models.Entities;
+using BandSite.Models.ViewModels;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using BandSite.Models.Implementations;
-using BandSite.Models.Interfaces;
-using BandSite.Models;
 
 namespace BandSite.Areas.AdministrativeTools.Controllers
 {
     public class AlbumController : Controller
     {
-        private IDbContext db = MvcApplication.DbFactory.CreateContext();
+        public AlbumController(){}
+
+        public AlbumController(IDbContextFactory dbContextFactory) : this()
+        {
+            _dbContextFactory = dbContextFactory;
+        }
+
+        private IDbContextFactory _dbContextFactory;
 
         //
         // GET: /AdministrativeTools/Album/
 
         public ActionResult Index()
         {
-            return PartialView(db.Albums.Content.ToList());
+            using (var db = _dbContextFactory.CreateContext())
+            {
+                return PartialView(db.Albums.Content.ToList());
+            }
         }
 
         //
@@ -28,12 +33,21 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
 
         public ActionResult Details(int id = 0)
         {
-            Album album = db.Albums.Content.Where(a => a.Id == id).FirstOrDefault();
-            if (album == null)
+            using (var db = _dbContextFactory.CreateContext())
             {
-                return HttpNotFound();
+                CRUDAlbumModel album = db.Albums.Content.Where(a => a.Id == id).Select(a => new CRUDAlbumModel
+                {
+                    Id = a.Id,
+                    Title = a.Title,
+                    Published = a.Published,
+                    Description = a.Description
+                }).FirstOrDefault();
+                if (album == null)
+                {
+                    return HttpNotFound();
+                }
+                return PartialView(album);
             }
-            return PartialView(album);
         }
 
         //
@@ -49,15 +63,22 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Album album)
+        public ActionResult Create(CRUDAlbumModel album)
         {
-            if (ModelState.IsValid)
+            using (var db = _dbContextFactory.CreateContext())
             {
-                db.Albums.Insert(album);
-                db.SaveChanges();
-                return Json(new { hash = "action=index&entity=album"});
+                if (ModelState.IsValid)
+                {
+                    var newAlbum = new Album();
+                    if (newAlbum.TrySetPropertiesFrom(album))
+                    {
+                        db.Albums.Insert(newAlbum);
+                        db.SaveChanges();
+                        return Json(new { hash = "action=index&entity=album" });
+                    }
+                }
+                return PartialView(album);
             }
-            return PartialView(album);
         }
 
         //
@@ -65,12 +86,21 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
 
         public ActionResult Edit(int id = 0)
         {
-            Album album = db.Albums.Content.Where(a => a.Id == id).FirstOrDefault();
-            if (album == null)
+            using (var db = _dbContextFactory.CreateContext())
             {
-                return HttpNotFound();
+                CRUDAlbumModel album = db.Albums.Content.Where(a => a.Id == id).Select(a => new CRUDAlbumModel
+                {
+                    Id = a.Id,
+                    Title = a.Title,
+                    Published = a.Published,
+                    Description = a.Description
+                }).FirstOrDefault();
+                if (album == null)
+                {
+                    return HttpNotFound();
+                }
+                return PartialView(album);
             }
-            return PartialView(album);
         }
 
         //
@@ -78,15 +108,22 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Album album)
+        public ActionResult Edit(CRUDAlbumModel album)
         {
-            if (ModelState.IsValid)
+            using (var db = _dbContextFactory.CreateContext())
             {
-                db.Albums.Update(album.Id, album);
-                db.SaveChanges();
-                return Json(new { hash = "action=index&entity=album" });
+                if (ModelState.IsValid)
+                {
+                    var updatedAlbum = new Album();
+                    if (updatedAlbum.TrySetPropertiesFrom(album))
+                    {
+                        db.Albums.Update(updatedAlbum.Id, updatedAlbum);
+                        db.SaveChanges();
+                        return Json(new { hash = "action=index&entity=album" });
+                    }
+                }
+                return PartialView(album);
             }
-            return PartialView(album);
         }
 
         //
@@ -94,12 +131,21 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
 
         public ActionResult Delete(int id = 0)
         {
-            Album album = db.Albums.Content.Where(a => a.Id == id).FirstOrDefault();
-            if (album == null)
+            using (var db = _dbContextFactory.CreateContext())
             {
-                return HttpNotFound();
+                CRUDAlbumModel album = db.Albums.Content.Where(a => a.Id == id).Select(a => new CRUDAlbumModel
+                {
+                    Id = a.Id,
+                    Title = a.Title,
+                    Published = a.Published,
+                    Description = a.Description
+                }).FirstOrDefault();
+                if (album == null)
+                {
+                    return HttpNotFound();
+                }
+                return PartialView(album);
             }
-            return PartialView(album);
         }
 
         //
@@ -109,69 +155,81 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Album album = db.Albums.Content.Where(a => a.Id == id).FirstOrDefault();
-            db.Albums.Delete(album);
-            db.SaveChanges();
-            return Json(new { hash = "action=index&entity=album" });
+            using (var db = _dbContextFactory.CreateContext())
+            {
+                Album album = db.Albums.Content.FirstOrDefault(a => a.Id == id);
+                db.Albums.Delete(album);
+                db.SaveChanges();
+                return Json(new { hash = "action=index&entity=album" });
+            }
         }
 
         public ActionResult AlbumsSearch(string term)
         {
-            var albums = db.Albums.Content.Where(a => a.Title.Contains(term)).Select(a => new { label = a.Title, value = a.Id });
-            return Json(albums, JsonRequestBehavior.AllowGet);
+            using (var db = _dbContextFactory.CreateContext())
+            {
+                var albums = db.Albums.Content.Where(a => a.Title.Contains(term)).Select(a => new { label = a.Title, value = a.Id }).ToList();
+                return Json(albums, JsonRequestBehavior.AllowGet);
+            }
         }
 
         public ActionResult AddSong(int albumId)
         {
-            Album album = db.Albums.Content.Where(a => a.Id == albumId).FirstOrDefault();
-            if (album == null)
+            using (var db = _dbContextFactory.CreateContext())
             {
-                return HttpNotFound();
+                Album album = db.Albums.Content.FirstOrDefault(a => a.Id == albumId);
+                if (album == null)
+                {
+                    return HttpNotFound();
+                }
+                var model = new SongAlbumRelationModel { AlbumId = album.Id };
+                return PartialView(model);
             }
-            AddSongModel model = new AddSongModel() { AlbumId = album.Id };
-            return PartialView(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult AddSong(AddSongModel model)
+        public ActionResult AddSong(SongAlbumRelationModel model)
         {
-            Album album = db.Albums.Content.Where(a => a.Id == model.AlbumId).FirstOrDefault();
-            Song song = db.Songs.Content.Where(s => s.Id == model.SongId).FirstOrDefault();
-            if ((album == null) || (song == null))
+            using (var db = _dbContextFactory.CreateContext())
             {
-                return HttpNotFound();
+                Album album = db.Albums.Content.FirstOrDefault(a => a.Id == model.AlbumId);
+                Song song = db.Songs.Content.FirstOrDefault(s => s.Id == model.SongId);
+                if ((album == null) || (song == null))
+                {
+                    return HttpNotFound();
+                }
+                album.Songs.Add(song);
+                int added = db.SaveChanges();
+                return Json(new { hash = "action=edit&entity=album&id=" + album.Id + "&relatedentity=song&added=" + added + "&loader=0" });
             }
-            album.Songs.Add(song);
-            int added = db.SaveChanges();
-            return Json(new { hash = "action=edit&entity=album&id=" + album.Id + "&relatedentity=song&added=" + added + "&loader=0" });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteSong(DeleteSongModel model)
+        public ActionResult DeleteSong(SongAlbumRelationModel model)
         {
-            Album album = db.Albums.Content.Where(a => a.Id == model.AlbumId).FirstOrDefault();
-            Song song = db.Songs.Content.Where(s => s.Id == model.SongId).FirstOrDefault();
-            if ((album == null) || (song == null))
+            using (var db = _dbContextFactory.CreateContext())
             {
-                return HttpNotFound();
+                Album album = db.Albums.Content.FirstOrDefault(a => a.Id == model.AlbumId);
+                Song song = db.Songs.Content.FirstOrDefault(s => s.Id == model.SongId);
+                if ((album == null) || (song == null))
+                {
+                    return HttpNotFound();
+                }
+                album.Songs.Remove(song);
+                int deleted = db.SaveChanges();
+                return Json(new { hash = "action=edit&entity=album&id=" + album.Id + "&relatedentity=song&deleted=" + deleted + "&loader=0" });
             }
-            album.Songs.Remove(song);
-            int deleted = db.SaveChanges();
-            return Json(new { hash = "action=edit&entity=album&id=" + album.Id + "&relatedentity=song&deleted=" + deleted + "&loader=0" });
         }
 
         public ActionResult ShowSong(int albumId)
         {
-            ViewBag.AlbumId = albumId;
-            return PartialView(db.Songs.Content.Where(s => s.Albums.Where(a => a.Id == albumId).Count() == 1).ToList());
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            db.Dispose();
-            base.Dispose(disposing);
+            using (var db = _dbContextFactory.CreateContext())
+            {
+                ViewBag.AlbumId = albumId;
+                return PartialView(db.Songs.Content.Where(s => s.Albums.Count(a => a.Id == albumId) == 1).ToList());
+            }
         }
     }
 }

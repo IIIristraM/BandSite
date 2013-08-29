@@ -1,10 +1,6 @@
-﻿using BandSite.Models.Implementations;
-using BandSite.Models.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
+using BandSite.Models.DataLayer;
+using Microsoft.Ajax.Utilities;
 
 namespace BandSite.Controllers
 {
@@ -14,6 +10,9 @@ namespace BandSite.Controllers
         {
             return View();
         }
+
+        public HomeController() {}
+        public HomeController(IDbContextFactory dbContextFactory):this() {}
 
         public ActionResult About()
         {

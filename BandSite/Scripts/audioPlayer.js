@@ -65,7 +65,7 @@ AudioPlayer.prototype.addPlaylistItem = function (title, url, guid) {
             title: title,
             guid: guid
         };
-        var $palylist = $player.find(".play-list").append(
+        $player.find(".play-list").append(
             "<li class='play-list-item ui-state-default' data-song-url='" + url + "' data-song-guid='" + guid + "' data-song-title='" + title + "'>" +
                  "<span>" +
                       title +

@@ -1,4 +1,4 @@
-﻿@model BandSite.Models.LocalPasswordModel
+﻿@model BandSite.Models.ViewModels.LocalPasswordModel
 @{
     ViewBag.Title = "Manage Profile";
 }
@@ -16,14 +16,7 @@
     </ul>
     <div id="account-tab">
 
-        @if (ViewBag.HasLocalPassword)
-        {
-             @Html.Partial("_ChangePasswordPartial")
-        }
-        else
-        { 
-             @Html.Partial("_SetPasswordPartial")
-        }
+        @(ViewBag.HasLocalPassword ? Html.Partial("_ChangePasswordPartial") : Html.Partial("_SetPasswordPartial"))
         <br><hr><br>
         <section id="externalLogins">
             @Html.Action("RemoveExternalLogins")

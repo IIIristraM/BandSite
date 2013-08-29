@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using BandSite.Models.DataLayer;
 using System.Web.Mvc;
 
 namespace BandSite.Areas.AdministrativeTools.Controllers
@@ -11,6 +8,14 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
     {
         //
         // GET: /AdministrativeTools/Navigation/
+        public NavigationController()
+        {
+        }
+
+        public NavigationController(IDbContextFactory dbContextFactory) : this()
+        {
+            
+        }
 
         public ActionResult Index()
         {

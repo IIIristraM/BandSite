@@ -2,17 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Transactions;
-using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 using DotNetOpenAuth.AspNet;
 using Microsoft.Web.WebPages.OAuth;
 using WebMatrix.WebData;
 using BandSite.Filters;
-using BandSite.Models;
-using BandSite.Models.Interfaces;
-using BandSite.Models.Implementations;
-using System.IO;
+using BandSite.Models.DataLayer;
+using BandSite.Models.ViewModels;
+using BandSite.Models.Entities;
 
 namespace BandSite.Controllers
 {
@@ -20,7 +18,14 @@ namespace BandSite.Controllers
     [InitializeSimpleMembership]
     public class AccountController : Controller
     {
-        private IDbContext _db = MvcApplication.DbFactory.CreateContext();
+        public AccountController() {}
+
+        public AccountController(IDbContextFactory dbContextFactory) : this()
+        {
+            _dbContextFactory = dbContextFactory;
+        }
+
+        private IDbContextFactory _dbContextFactory;
         //
         // GET: /Account/Login
 
@@ -170,10 +175,7 @@ namespace BandSite.Controllers
                     {
                         return RedirectToAction("Manage", new { Message = ManageMessageId.ChangePasswordSuccess });
                     }
-                    else
-                    {
-                        ModelState.AddModelError("", "The current password is incorrect or the new password is invalid.");
-                    }
+                    ModelState.AddModelError("", "The current password is incorrect or the new password is invalid.");
                 }
             }
             else
@@ -238,14 +240,11 @@ namespace BandSite.Controllers
                 OAuthWebSecurity.CreateOrUpdateAccount(result.Provider, result.ProviderUserId, User.Identity.Name);
                 return RedirectToLocal(returnUrl);
             }
-            else
-            {
-                // User is new, ask for their desired membership name
-                string loginData = OAuthWebSecurity.SerializeProviderUserId(result.Provider, result.ProviderUserId);
-                ViewBag.ProviderDisplayName = OAuthWebSecurity.GetOAuthClientData(result.Provider).DisplayName;
-                ViewBag.ReturnUrl = returnUrl;
-                return View("ExternalLoginConfirmation", new RegisterExternalLoginModel { UserName = result.UserName, ExternalLoginData = loginData });
-            }
+            // User is new, ask for their desired membership name
+            string loginData = OAuthWebSecurity.SerializeProviderUserId(result.Provider, result.ProviderUserId);
+            ViewBag.ProviderDisplayName = OAuthWebSecurity.GetOAuthClientData(result.Provider).DisplayName;
+            ViewBag.ReturnUrl = returnUrl;
+            return View("ExternalLoginConfirmation", new RegisterExternalLoginModel { UserName = result.UserName, ExternalLoginData = loginData });
         }
 
         //
@@ -256,40 +255,40 @@ namespace BandSite.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult ExternalLoginConfirmation(RegisterExternalLoginModel model, string returnUrl)
         {
-            string provider = null;
-            string providerUserId = null;
-
-            if (User.Identity.IsAuthenticated || !OAuthWebSecurity.TryDeserializeProviderUserId(model.ExternalLoginData, out provider, out providerUserId))
+            using (var db = _dbContextFactory.CreateContext())
             {
-                return RedirectToAction("Manage");
+                string provider;
+                string providerUserId;
+
+                if (User.Identity.IsAuthenticated || !OAuthWebSecurity.TryDeserializeProviderUserId(model.ExternalLoginData, out provider, out providerUserId))
+                {
+                    return RedirectToAction("Manage");
+                }
+
+                if (ModelState.IsValid)
+                {
+                    // Insert a new user into the database
+
+                    UserProfile user = db.UserProfiles.Content.FirstOrDefault(u => u.UserName.ToLower() == model.UserName.ToLower());
+                    // Check if user already exists
+                    if (user == null)
+                    {
+                        // Insert name into the profile table
+                        db.UserProfiles.Insert(new UserProfile { UserName = model.UserName });
+                        db.SaveChanges();
+
+                        OAuthWebSecurity.CreateOrUpdateAccount(provider, providerUserId, model.UserName);
+                        OAuthWebSecurity.Login(provider, providerUserId, createPersistentCookie: false);
+
+                        return RedirectToLocal(returnUrl);
+                    }
+                    ModelState.AddModelError("UserName", "User name already exists. Please enter a different user name.");
+                }
+
+                ViewBag.ProviderDisplayName = OAuthWebSecurity.GetOAuthClientData(provider).DisplayName;
+                ViewBag.ReturnUrl = returnUrl;
+                return View(model);
             }
-
-            if (ModelState.IsValid)
-            {
-                // Insert a new user into the database
-
-               UserProfile user = _db.UserProfiles.Content.FirstOrDefault(u => u.UserName.ToLower() == model.UserName.ToLower());
-               // Check if user already exists
-               if (user == null)
-               {
-                   // Insert name into the profile table
-                   _db.UserProfiles.Insert(new UserProfile { UserName = model.UserName });
-                   _db.SaveChanges();
-
-                   OAuthWebSecurity.CreateOrUpdateAccount(provider, providerUserId, model.UserName);
-                   OAuthWebSecurity.Login(provider, providerUserId, createPersistentCookie: false);
-
-                   return RedirectToLocal(returnUrl);
-               }
-               else
-               {
-                   ModelState.AddModelError("UserName", "User name already exists. Please enter a different user name.");
-               }
-            }
-
-            ViewBag.ProviderDisplayName = OAuthWebSecurity.GetOAuthClientData(provider).DisplayName;
-            ViewBag.ReturnUrl = returnUrl;
-            return View(model);
         }
 
         //
@@ -313,18 +312,12 @@ namespace BandSite.Controllers
         public ActionResult RemoveExternalLogins()
         {
             ICollection<OAuthAccount> accounts = OAuthWebSecurity.GetAccountsFromUserName(User.Identity.Name);
-            List<ExternalLogin> externalLogins = new List<ExternalLogin>();
-            foreach (OAuthAccount account in accounts)
-            {
-                AuthenticationClientData clientData = OAuthWebSecurity.GetOAuthClientData(account.Provider);
-
-                externalLogins.Add(new ExternalLogin
+            var externalLogins = (from account in accounts
+                let clientData = OAuthWebSecurity.GetOAuthClientData(account.Provider)
+                select new ExternalLogin
                 {
-                    Provider = account.Provider,
-                    ProviderDisplayName = clientData.DisplayName,
-                    ProviderUserId = account.ProviderUserId,
-                });
-            }
+                    Provider = account.Provider, ProviderDisplayName = clientData.DisplayName, ProviderUserId = account.ProviderUserId,
+                }).ToList();
 
             ViewBag.ShowRemoveButton = externalLogins.Count > 1 || OAuthWebSecurity.HasLocalAccount(WebSecurity.GetUserId(User.Identity.Name));
             return PartialView("_RemoveExternalLoginsPartial", externalLogins);
@@ -333,50 +326,59 @@ namespace BandSite.Controllers
         [HttpPost]
         public ActionResult GetPlaylist()
         {
-            var currentUser = User.Identity.Name;
-            var user = _db.UserProfiles.Content.Where(u => u.UserName == currentUser).FirstOrDefault();
-            if (user != null)
+            using (var db = _dbContextFactory.CreateContext())
             {
-                var playlist = user.Playlists.OrderBy(p => p.Order).Select(p => new { id = p.Song.Id, title = p.Song.Title });
-                if (playlist.Count() > 0)
+                var currentUser = User.Identity.Name;
+                var user = db.UserProfiles.Content.FirstOrDefault(u => u.UserName == currentUser);
+                if (user != null)
                 {
-                    return Json(playlist.ToList());
+                    var playlist = user.Playlists.OrderBy(p => p.Order).Select(p => new { id = p.Song.Id, title = p.Song.Title });
+                    if (playlist.Any())
+                    {
+                        return Json(playlist.ToList());
+                    }
                 }
+                return Json(new object[0]);
             }
-            return Json(new object[0]);
         }
 
         [HttpPost]
         public ActionResult ReorderPlaylist(int songId, int order)
         {
-            var currentUser = User.Identity.Name;
-            var user = _db.UserProfiles.Content.Where(u => u.UserName == currentUser).FirstOrDefault();
-            if (user != null)
+            using (var db = _dbContextFactory.CreateContext())
             {
-                var playlist = user.Playlists.Where(p => (p.SongId == songId)&&(p.UserId == user.Id)).FirstOrDefault();
-                if ((playlist != null) && (order <= user.Playlists.Count))
+                var currentUser = User.Identity.Name;
+                var user = db.UserProfiles.Content.FirstOrDefault(u => u.UserName == currentUser);
+                if (user != null)
                 {
-                    if (order > playlist.Order)
+                    var playlist = user.Playlists.FirstOrDefault(p => (p.SongId == songId) && (p.UserId == user.Id));
+                    if ((playlist != null) && (order <= user.Playlists.Count))
                     {
-                        foreach (var pl in _db.Playlists.Content.Where(p => (p.Order > playlist.Order) && (p.Order <= order))) { pl.Order--; }
-                        playlist.Order = order;
-                    }
-                    else
-                    {
+                        if (order > playlist.Order)
+                        {
+                            foreach (var pl in db.PlaylistItems.Content.Where(p => (p.Order > playlist.Order) && (p.Order <= order))) { pl.Order--; }
+                            playlist.Order = order;
+                        }
+                        else
+                        {
 
-                        foreach (var pl in _db.Playlists.Content.Where(p => (p.Order >= order) && (p.Order < playlist.Order))) { pl.Order++; }
-                        playlist.Order = order;
+                            foreach (var pl in db.PlaylistItems.Content.Where(p => (p.Order >= order) && (p.Order < playlist.Order))) { pl.Order++; }
+                            playlist.Order = order;
+                        }
+                        db.SaveChanges();
+                        return Json(new { status = "success" });
                     }
-                    _db.SaveChanges();
-                    return Json(new { status = "success" });
                 }
+                return Json(new { status = "fail", error = "user not found" });
             }
-            return Json(new { status = "fail", error = "user not found" });
         }
 
         public ActionResult GetUserslist()
         {
-            return Json(_db.UserProfiles.Content.Where(u => u.UserName != User.Identity.Name).Select(u => new { name = u.UserName }).ToList(), JsonRequestBehavior.AllowGet);
+            using (var db = _dbContextFactory.CreateContext())
+            {
+                return Json(db.UserProfiles.Content.Where(u => u.UserName != User.Identity.Name).Select(u => new { name = u.UserName }).ToList(), JsonRequestBehavior.AllowGet);
+            }
         }
 
         #region Helpers
@@ -386,10 +388,7 @@ namespace BandSite.Controllers
             {
                 return Redirect(returnUrl);
             }
-            else
-            {
-                return RedirectToAction("Index", "Home");
-            }
+            return RedirectToAction("Index", "Home");
         }
 
         public enum ManageMessageId
@@ -454,11 +453,5 @@ namespace BandSite.Controllers
             }
         }
         #endregion
-
-        protected override void Dispose(bool disposing)
-        {
-            _db.Dispose();
-            base.Dispose(disposing);
-        }
     }
 }

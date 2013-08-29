@@ -1,11 +1,6 @@
-﻿using BandSite.Models.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Web;
+﻿using System.Data.Entity;
 
-namespace BandSite.Models.Implementations
+namespace BandSite.Models.DataLayer
 {
     public class DbContextEfFactory: IDbContextFactory
     {
@@ -29,7 +24,8 @@ namespace BandSite.Models.Implementations
 
         protected void SetInitializer()
         {
-            Database.SetInitializer<DbContextEf>(new DropCreateDatabaseAlways<DbContextEf>());
+            Database.SetInitializer<DbContextEf>(new DropCreateDatabaseIfModelChanges<DbContextEf>());
+            using (CreateContext()) { }
         }
 
         public IDbContext CreateContext()

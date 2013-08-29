@@ -207,26 +207,25 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\AccountModels.cs" />
-    <Compile Include="Models\AddAlbumModel.cs" />
-    <Compile Include="Models\AddSongModel.cs" />
-    <Compile Include="Models\Chat.cs" />
-    <Compile Include="Models\CreateSong.cs" />
-    <Compile Include="Models\DeleteAlbumModel.cs" />
-    <Compile Include="Models\DeleteSongModel.cs" />
-    <Compile Include="Models\Implementations\Album.cs" />
-    <Compile Include="Models\Implementations\DbContextEf.cs" />
-    <Compile Include="Models\Implementations\DbContextEfFactory.cs" />
-    <Compile Include="Models\Implementations\Message.cs" />
-    <Compile Include="Models\Implementations\Playlist.cs" />
-    <Compile Include="Models\Implementations\RepositoryEf.cs" />
-    <Compile Include="Models\Implementations\UserProfile.cs" />
-    <Compile Include="Models\Interfaces\IDbContextFactory.cs" />
-    <Compile Include="Models\Implementations\Song.cs" />
-    <Compile Include="Models\Interfaces\IDbContext.cs" />
-    <Compile Include="Models\Interfaces\IEntity.cs" />
-    <Compile Include="Models\Interfaces\IRepository.cs" />
-    <Compile Include="Models\Uploader.cs" />
+    <Compile Include="Models\Infrostructure\CustomControllerFactory.cs" />
+    <Compile Include="Models\ViewModels\AccountModels.cs" />
+    <Compile Include="Models\ViewModels\SongAlbumRelationModel.cs" />
+    <Compile Include="Models\Functionality\Chat.cs" />
+    <Compile Include="Models\ViewModels\CRUDAlbumModel.cs" />
+    <Compile Include="Models\ViewModels\CRUDSongModel.cs" />
+    <Compile Include="Models\Entities\Album.cs" />
+    <Compile Include="Models\Data Layer\Concrete\DbContextEf.cs" />
+    <Compile Include="Models\Data Layer\Concrete\DbContextEfFactory.cs" />
+    <Compile Include="Models\Entities\Message.cs" />
+    <Compile Include="Models\Entities\PlaylistItem.cs" />
+    <Compile Include="Models\Data Layer\Concrete\RepositoryEf.cs" />
+    <Compile Include="Models\Entities\UserProfile.cs" />
+    <Compile Include="Models\Data Layer\Abstract\IDbContextFactory.cs" />
+    <Compile Include="Models\Entities\Song.cs" />
+    <Compile Include="Models\Data Layer\Abstract\IDbContext.cs" />
+    <Compile Include="Models\Data Layer\Abstract\EntityBase.cs" />
+    <Compile Include="Models\Data Layer\Abstract\IRepository.cs" />
+    <Compile Include="Models\Functionality\Uploader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
