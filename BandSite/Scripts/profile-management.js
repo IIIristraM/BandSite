@@ -98,34 +98,33 @@ function GenerateChat() {
                 $(this).removeClass("user-list-item-highlight");
             }
         });
-    });
+        chat = $.connection.chatHub;
 
-    chat = $.connection.chat;
+        chat.client.addMessage = function (user, message) {
+            $("#msg-list").append("<li class='msg-list-item'><span><b>" + user + " :</b><br>" + message + "</span></li>");
+        };
 
-    chat.client.addMessage = function (user, message) {
-        $("#msg-list").append("<li class='msg-list-item'><span><b>" + user + " :</b><br>" + message + "</span></li>");
-    };
+        chat.client.onOnline = function (usernames) {
+            for (var i = 0; i < usernames.length; i++) {
+                $(".user-list").find(".user-list-item[data-user-name=" + ReplaceSimbols(usernames[i]) + "]").find(".indicator").addClass("user-list-item-online");
+            }
+        };
 
-    chat.client.onOnline = function (usernames) {
-        for (var i = 0; i < usernames.length; i++) {
-            $(".user-list").find(".user-list-item[data-user-name=" + ReplaceSimbols(usernames[i]) + "]").find(".indicator").addClass("user-list-item-online");
-        }
-    };
+        chat.client.onOffline = function (username) {
+            $(".user-list").find(".user-list-item[data-user-name=" + ReplaceSimbols(username) + "]").find(".indicator").removeClass("user-list-item-online");
+        };
 
-    chat.client.onOffline = function (username) {
-        $(".user-list").find(".user-list-item[data-user-name=" + ReplaceSimbols(username) + "]").find(".indicator").removeClass("user-list-item-online");
-    };
+        $.connection.hub.start().done(function () {
+            chat.server.register();
+        });
 
-    $.connection.hub.start().done(function () {
-        chat.server.register();
-    });
-
-    $("#send-btn").click(function () {
-        var message = $("#message-txt").val();
-        var user = $("#user-name").val();
-        $("#msg-list").append("<li class='msg-list-item'><span><b>Me :</b><br>" + message + "</span></li>");
-        chat.server.send(user, message);
-        $("#message-txt").val("");
+        $("#send-btn").click(function () {
+            var message = $("#message-txt").val();
+            var user = $("#user-name").val();
+            $("#msg-list").append("<li class='msg-list-item'><span><b>Me :</b><br>" + message + "</span></li>");
+            chat.server.send(user, message);
+            $("#message-txt").val("");
+        });
     });
 }
 

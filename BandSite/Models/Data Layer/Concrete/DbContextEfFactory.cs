@@ -24,15 +24,15 @@ namespace BandSite.Models.DataLayer
 
         protected void SetInitializer()
         {
-            Database.SetInitializer<DbContextEf>(new DropCreateDatabaseIfModelChanges<DbContextEf>());
+            Database.SetInitializer<DbContext>(null);
             using (CreateContext()) { }
         }
 
         public IDbContext CreateContext()
         {
             var context = new DbContextEf(ConnectionName);
-            context.Database.CreateIfNotExists();
-            context.Database.Initialize(false);
+            //context.Database.CreateIfNotExists();
+            context.Database.Initialize(true);
             return context;
         }
     }

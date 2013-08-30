@@ -8,8 +8,9 @@ using System.Data.SqlClient;
 using System.Configuration;
 using BandSite.Models.DataLayer;
 using BandSite.Models.Entities;
-using BandSite.Models.ViewModels;
 using BandSite.Models.Functionality;
+using BandSite.Models.Hubs;
+using BandSite.Models.ViewModels;
 
 namespace BandSite.Areas.AdministrativeTools.Controllers
 {
@@ -81,8 +82,12 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
                     if (song.UploadFile != null)
                     {
                         newSong.File = new byte[song.UploadFile.InputStream.Length];
+                        var uploaderHub = new UploaderHub();
                         var uploader = new Uploader();
-                        uploader.Upload(newSong.File, song.UploadFile.InputStream, User.Identity.Name);
+                        foreach (var result in uploader.UploadPartial(newSong.File, song.UploadFile.InputStream, User.Identity.Name))
+                        {
+                            uploaderHub.ShowProgress(User.Identity.Name, result);
+                        }
                     }
                     db.Songs.Insert(newSong);
                     db.SaveChanges();
@@ -130,12 +135,12 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
                     var updatedSong = new Song();
                     if (updatedSong.TrySetPropertiesFrom(song))
                     {
-                        if (song.UploadFile != null)
+                        /*if (song.UploadFile != null)
                         {
                             updatedSong.File = new byte[song.UploadFile.InputStream.Length];
-                            var uploader = new Uploader();
+                            var uploader = new UploaderHub();
                             uploader.Upload(updatedSong.File, song.UploadFile.InputStream, User.Identity.Name);
-                        }
+                        }*/
                         db.Songs.Update(song.Id, updatedSong);
                         db.SaveChanges();
                         return Json(new { hash = "action=index&entity=song" });

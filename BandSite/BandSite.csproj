@@ -222,9 +222,12 @@
     <Compile Include="Models\Entities\Song.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Models\Functionality\IChat.cs" />
     <Compile Include="Models\Functionality\Uploader.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Models\Hubs\ChatHub.cs" />
+    <Compile Include="Models\Hubs\UploaderHub.cs" />
     <Compile Include="Models\Infrostructure\CustomControllerFactory.cs" />
     <Compile Include="Models\ViewModels\AccountModels.cs" />
     <Compile Include="Models\ViewModels\CRUDSongModel.cs">

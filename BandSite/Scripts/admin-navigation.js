@@ -136,7 +136,7 @@ function RenderContent() {
 }
 
 $(function () {
-    uploader = $.connection.uploader;
+    uploader = $.connection.uploaderHub;
     $.connection.hub.start();
     uploader.client.showProgress = function (percentage) {
         $(".ajax-loader").find(".progress").empty();
