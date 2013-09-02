@@ -17,7 +17,7 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
     [Authorize]
     public class SongController : Controller
     {
-        private IDbContextFactory _dbContextFactory;
+        private readonly IDbContextFactory _dbContextFactory;
 
         public SongController() {}
 

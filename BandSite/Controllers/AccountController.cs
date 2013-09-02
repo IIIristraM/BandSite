@@ -25,7 +25,7 @@ namespace BandSite.Controllers
             _dbContextFactory = dbContextFactory;
         }
 
-        private IDbContextFactory _dbContextFactory;
+        private readonly IDbContextFactory _dbContextFactory;
         //
         // GET: /Account/Login
 

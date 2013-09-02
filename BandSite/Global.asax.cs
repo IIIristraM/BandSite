@@ -33,7 +33,8 @@ namespace BandSite
         protected void Application_Start()
         {
             //AreaRegistration.RegisterAllAreas();
-            ControllerBuilder.Current.SetControllerFactory(new CustomControllerFactory());
+            //ControllerBuilder.Current.SetControllerFactory(new CustomControllerFactory());
+            DependencyResolver.SetResolver(new IocContainer());
             RouteTable.Routes.MapHubs();
             WebApiConfig.Register(GlobalConfiguration.Configuration);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
