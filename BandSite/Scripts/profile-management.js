@@ -46,10 +46,6 @@ $(function () {
     });    
 
     GenerateChat();
-
-    window.onbeforeunload = function () {
-        chat.server.logout();
-    };
 });
 
 function ReplaceSimbols(string) {
@@ -98,6 +94,7 @@ function GenerateChat() {
                 $(this).removeClass("user-list-item-highlight");
             }
         });
+        
         chat = $.connection.chatHub;
 
         chat.client.addMessage = function (user, message) {
@@ -125,6 +122,10 @@ function GenerateChat() {
             chat.server.send(user, message);
             $("#message-txt").val("");
         });
+        
+        window.onbeforeunload = function () {
+            chat.server.logout();
+        };
     });
 }
 
