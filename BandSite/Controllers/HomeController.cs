@@ -11,9 +11,6 @@ namespace BandSite.Controllers
             return View();
         }
 
-        public HomeController() {}
-        public HomeController(IDbContextFactory dbContextFactory):this() {}
-
         public ActionResult About()
         {
             ViewBag.Message = "Your app description page.";

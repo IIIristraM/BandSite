@@ -18,9 +18,7 @@ namespace BandSite.Controllers
     [InitializeSimpleMembership]
     public class AccountController : Controller
     {
-        public AccountController() {}
-
-        public AccountController(IDbContextFactory dbContextFactory) : this()
+        public AccountController(IDbContextFactory dbContextFactory)
         {
             _dbContextFactory = dbContextFactory;
         }

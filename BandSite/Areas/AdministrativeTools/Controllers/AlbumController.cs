@@ -8,9 +8,7 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
 {
     public class AlbumController : Controller
     {
-        public AlbumController(){}
-
-        public AlbumController(IDbContextFactory dbContextFactory) : this()
+        public AlbumController(IDbContextFactory dbContextFactory)
         {
             _dbContextFactory = dbContextFactory;
         }

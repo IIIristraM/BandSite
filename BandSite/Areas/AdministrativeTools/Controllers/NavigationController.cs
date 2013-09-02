@@ -8,14 +8,6 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
     {
         //
         // GET: /AdministrativeTools/Navigation/
-        public NavigationController()
-        {
-        }
-
-        public NavigationController(IDbContextFactory dbContextFactory) : this()
-        {
-            
-        }
 
         public ActionResult Index()
         {

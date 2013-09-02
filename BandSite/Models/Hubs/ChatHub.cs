@@ -11,7 +11,12 @@ namespace BandSite.Models.Hubs
     public class ChatHub : Hub
     {
         private static readonly ConcurrentDictionary<string, string> ConnectedUsers = new ConcurrentDictionary<string, string>();
-        private  readonly  IChat _chat = new Chat();
+        private  readonly  IChat _chat;
+
+        public ChatHub(IChat chat)
+        {
+            _chat = chat;
+        }
 
         public void Register()
         {

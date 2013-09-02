@@ -19,10 +19,7 @@ namespace BandSite.Areas.AdministrativeTools.Controllers
     {
         private readonly IDbContextFactory _dbContextFactory;
 
-        public SongController() {}
-
         public SongController(IDbContextFactory dbContextFactory)
-            : this()
         {
             _dbContextFactory = dbContextFactory;
         }

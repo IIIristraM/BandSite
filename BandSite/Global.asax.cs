@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using BandSite.Models.Infrostructure;
+using Microsoft.AspNet.SignalR;
 
 namespace BandSite
 {
@@ -33,9 +34,11 @@ namespace BandSite
         protected void Application_Start()
         {
             //AreaRegistration.RegisterAllAreas();
-            //ControllerBuilder.Current.SetControllerFactory(new CustomControllerFactory());
             DependencyResolver.SetResolver(new IocContainer());
-            RouteTable.Routes.MapHubs();
+            RouteTable.Routes.MapHubs(new HubConfiguration
+            {
+                Resolver = new IocContainer()
+            });
             WebApiConfig.Register(GlobalConfiguration.Configuration);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
