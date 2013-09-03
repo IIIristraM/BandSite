@@ -126,9 +126,16 @@ function GenerateChat() {
         
         window.onbeforeunload = function () {
             chat.server.logout();
-            for(var i = 0; i<1000; i++) {}
+            delay();
         };
     });
+}
+
+function delay() {
+    var n = 0;
+    for (var i = 0; i < 10000; i++) {
+        n++;
+    }
 }
 
 function GeneratePlayer() {
