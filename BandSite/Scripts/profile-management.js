@@ -126,7 +126,7 @@ function GenerateChat() {
         
         window.onbeforeunload = function () {
             chat.server.logout();
-            //return "offline!";
+            for(var i = 0; i<1000; i++) {}
         };
     });
 }
