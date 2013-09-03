@@ -56,8 +56,14 @@ namespace BandSite.Models.Hubs
             if (ConnectedUsers.ContainsKey(Context.User.Identity.Name))
             {
                 string value;
-                ConnectedUsers.TryRemove(Context.User.Identity.Name, out value);
-                Clients.Others.onOffline(Context.User.Identity.Name);
+                if (ConnectedUsers.TryRemove(Context.User.Identity.Name, out value))
+                {
+                    Clients.Others.onOffline(Context.User.Identity.Name);
+                }
+                else
+                {
+                    throw new InvalidOperationException("Can't logout");
+                }
             }
         }
     }
