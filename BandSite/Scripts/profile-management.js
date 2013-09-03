@@ -108,6 +108,7 @@ function GenerateChat() {
         };
 
         chat.client.onOffline = function (username) {
+            alert(username);
             $(".user-list").find(".user-list-item[data-user-name=" + ReplaceSimbols(username) + "]").find(".indicator").removeClass("user-list-item-online");
         };
 
