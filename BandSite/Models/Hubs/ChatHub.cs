@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using BandSite.Models.Entities;
 using BandSite.Models.Functionality;
@@ -13,12 +14,18 @@ namespace BandSite.Models.Hubs
         private static readonly ConcurrentDictionary<string, string> ConnectedUsers = new ConcurrentDictionary<string, string>();
         private  readonly  IChat _chat;
 
-        public ChatHub(IChat chat)
+        public override Task OnDisconnected()
         {
-            _chat = chat;
+            if (ConnectedUsers.ContainsKey(Context.User.Identity.Name))
+            {
+                string value;
+                ConnectedUsers.TryRemove(Context.User.Identity.Name, out value);
+                Clients.Others.onOffline(Context.User.Identity.Name);
+            }
+            return base.OnDisconnected();
         }
 
-        public void Register()
+        public override Task OnConnected()
         {
             ConnectedUsers.AddOrUpdate(Context.User.Identity.Name, Context.ConnectionId, (key, oldValue) => Context.ConnectionId);
 
@@ -29,6 +36,12 @@ namespace BandSite.Models.Hubs
             {
                 Clients.Caller.addMessage(msg.UserFrom.UserName, HttpUtility.HtmlEncode(msg.Text));
             }
+            return base.OnConnected();
+        }
+
+        public ChatHub(IChat chat)
+        {
+            _chat = chat;
         }
 
         public void Send(string users, string message)
@@ -48,16 +61,6 @@ namespace BandSite.Models.Hubs
                  {
                      msg.Status =  MessageStatus.Unread.ToString();
                  }
-            }
-        }
-
-        public void Logout()
-        {
-            if (ConnectedUsers.ContainsKey(Context.User.Identity.Name))
-            {
-                string value;
-                ConnectedUsers.TryRemove(Context.User.Identity.Name, out value);
-                Clients.Others.onOffline(Context.User.Identity.Name);
             }
         }
     }

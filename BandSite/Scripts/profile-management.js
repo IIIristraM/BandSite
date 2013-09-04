@@ -112,9 +112,9 @@ function GenerateChat() {
             $(".user-list").find(".user-list-item[data-user-name=" + ReplaceSimbols(username) + "]").find(".indicator").removeClass("user-list-item-online");
         };
 
-        $.connection.hub.start().done(function () {
+        $.connection.hub.start();/*.done(function () {
             chat.server.register();
-        });
+        });*/
 
         $("#send-btn").click(function () {
             var message = $("#message-txt").val();
@@ -124,18 +124,10 @@ function GenerateChat() {
             $("#message-txt").val("");
         });
         
-        window.onbeforeunload = function () {
+        /*window.onbeforeunload = function () {
             chat.server.logout();
-            delay();
-        };
+        };*/
     });
-}
-
-function delay() {
-    var n = 0;
-    for (var i = 0; i < 10000; i++) {
-        n++;
-    }
 }
 
 function GeneratePlayer() {
