@@ -108,13 +108,10 @@ function GenerateChat() {
         };
 
         chat.client.onOffline = function (username) {
-            alert(username);
             $(".user-list").find(".user-list-item[data-user-name=" + ReplaceSimbols(username) + "]").find(".indicator").removeClass("user-list-item-online");
         };
 
-        $.connection.hub.start();/*.done(function () {
-            chat.server.register();
-        });*/
+        $.connection.hub.start();
 
         $("#send-btn").click(function () {
             var message = $("#message-txt").val();
@@ -123,10 +120,6 @@ function GenerateChat() {
             chat.server.send(user, message);
             $("#message-txt").val("");
         });
-        
-        /*window.onbeforeunload = function () {
-            chat.server.logout();
-        };*/
     });
 }
 
