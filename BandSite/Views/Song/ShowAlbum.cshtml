@@ -1,0 +1,28 @@
+﻿@model BandSite.Models.ViewModels.ShowAlbumsModel
+<table class="table table-hover">
+    <thead>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Albums) {
+            <tr>
+                <td>
+                    @using (Html.BeginForm("DeleteAlbum", "Song", FormMethod.Post, new { id = "deleteForm-" + Model.SongId + "-" + item.Id }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="AlbumId" value="@item.Id"/>
+                        <input type="hidden" name="SongId" value="@Model.SongId"/>
+                        @Html.DisplayFor(modelItem => item.Title)
+                    }
+                </td>
+                <td>
+                    <a href="@("#album/details/" + item.Id)"><i class="glyphicon glyphicon-info-sign"></i></a>
+                    @if (Model.Editable)
+                    {
+                         <a href="@("#song/edit/" + Model.SongId)" onclick="$('#deleteForm-' + @Model.SongId + '-' + @item.Id).submit();"><i class="glyphicon glyphicon-remove-circle"></i></a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

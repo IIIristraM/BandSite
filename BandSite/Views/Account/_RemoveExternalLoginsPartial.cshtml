@@ -2,8 +2,9 @@
 
 @if (Model.Count > 0)
 {
-    <h3>Registered external logins</h3>
-    <br>
+    <br><hr><br>
+    <div class="h4">Registered external logins</div>
+    <br/>
     <table>
         <tbody>
         @foreach (var externalLogin in Model)
@@ -13,13 +14,13 @@
                 <td>
                     @if (ViewBag.ShowRemoveButton)
                     {
-                        using (Html.BeginForm("Disassociate", "Account"))
+                        using (Html.BeginForm("Disassociate", "Account", FormMethod.Post, new {id = externalLogin.ProviderDisplayName + "Form"}))
                         {
                             @Html.AntiForgeryToken()
                             <div>
                                 @Html.Hidden("provider", externalLogin.Provider)
                                 @Html.Hidden("providerUserId", externalLogin.ProviderUserId)
-                                <input type="submit" data-sumbit-action-type="delete" value="" title="Remove this @externalLogin.ProviderDisplayName credential from your account" />
+                                <a href="#account/manage" onclick="$('#@(externalLogin.ProviderDisplayName + "Form")').submit()"><i class="glyphicon glyphicon-remove-circle"></i></a>
                             </div>
                         }
                     }

@@ -1,28 +1,17 @@
 ﻿using System.Web.Mvc;
-using BandSite.Models.DataLayer;
-using Microsoft.Ajax.Utilities;
 
 namespace BandSite.Controllers
 {
     public class HomeController : Controller
     {
+        public ActionResult Navigation()
+        {
+            return View();
+        }
+
         public ActionResult Index()
         {
-            return View();
-        }
-
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your app description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
+            return PartialView();
         }
     }
 }

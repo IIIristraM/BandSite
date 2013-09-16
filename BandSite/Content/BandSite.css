@@ -1,0 +1,23 @@
+﻿.action-frame {
+    margin-top: 100px;
+}
+
+.add-button {
+    padding: 8px;
+}
+
+a.link span{
+    padding: 10px;
+}
+
+a.link:hover {
+    text-decoration: none !important;
+}
+
+.google-btn {
+    background: url(../Images/Google.png);
+    width: 48px;
+    height: 48px;
+    background-repeat: no-repeat;
+    display: block;
+}

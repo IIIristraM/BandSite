@@ -4,47 +4,39 @@
     ViewBag.Title = "Log in";
 }
 
-<hgroup class="title">
-    <h1>@ViewBag.Title.</h1>
-</hgroup>
+<div class="container">
+    <div class="panel panel-default">
+        <div class="panel-heading">@ViewBag.Title</div>
+        <div class="panel-body">
+            @using (Html.BeginForm(new { ReturnUrl = ViewBag.ReturnUrl })) {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
 
-<section id="loginForm">
-<h2>Use a local account to log in.</h2>
-@using (Html.BeginForm(new { ReturnUrl = ViewBag.ReturnUrl })) {
-    @Html.AntiForgeryToken()
-    @Html.ValidationSummary(true)
-
-    <fieldset>
-        <legend>Log in Form</legend>
-        <ol>
-            <li>
-                @Html.LabelFor(m => m.UserName)
-                @Html.TextBoxFor(m => m.UserName)
-                @Html.ValidationMessageFor(m => m.UserName)
-            </li>
-            <li>
-                @Html.LabelFor(m => m.Password)
-                @Html.PasswordFor(m => m.Password)
-                @Html.ValidationMessageFor(m => m.Password)
-            </li>
-            <li>
-                @Html.CheckBoxFor(m => m.RememberMe)
-                @Html.LabelFor(m => m.RememberMe, new { @class = "checkbox" })
-            </li>
-        </ol>
-        <input type="submit" value="" />
-    </fieldset>
-    <p>
-        @Html.ActionLink("Register", "Register") if you don't have an account.
-    </p>
-}
-</section>
-
-<section class="social" id="socialLoginForm">
-    <h2>Use another service to log in.</h2>
-    @Html.Action("ExternalLoginsList", new { ReturnUrl = ViewBag.ReturnUrl })
-</section>
-
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
-}
+                <fieldset>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.UserName)
+                        <div> @Html.TextBoxFor(m => m.UserName, new {@class = "form-control"})</div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Password)
+                        <div>@Html.TextBoxFor(m => m.Password, new {@class = "form-control", type = "password"})</div>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            @Html.CheckBoxFor(m => m.RememberMe)
+                            Remember me
+                        </label>
+                    </div>
+                    <input type="submit" value="Log in" class="btn btn-primary"/>
+                    <a href="#account/register"><div class="btn btn-primary">Register</div></a>
+                </fieldset>
+            }
+            <hr/>
+            <div>
+                <div class="h4">Use another service to log in.</div>
+                <br/>
+                <div>@Html.Action("ExternalLoginsList", new { ReturnUrl = ViewBag.ReturnUrl })</div>
+            </div>            
+        </div>
+    </div>
+</div>

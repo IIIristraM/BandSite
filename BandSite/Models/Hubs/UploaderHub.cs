@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.IO;
+﻿using System.Collections.Concurrent;
+using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 
@@ -10,9 +9,10 @@ namespace BandSite.Models.Hubs
     {
         private static readonly ConcurrentDictionary<string, HubConnectionContext> ConnectedUsers = new ConcurrentDictionary<string, HubConnectionContext>();
 
-        public void CreateAnchor()
+        public override Task OnConnected()
         {
             ConnectedUsers.AddOrUpdate(Context.User.Identity.Name, Clients, (key, oldValue) => Clients);
+            return base.OnConnected();
         }
 
         public void ShowProgress(string userName, double percentage)
@@ -25,6 +25,16 @@ namespace BandSite.Models.Hubs
                     context.Caller.showProgress(percentage);
                 }
             }
+        }
+
+        public override Task OnDisconnected()
+        {
+            if (ConnectedUsers.ContainsKey(Context.User.Identity.Name))
+            {
+                HubConnectionContext value;
+                ConnectedUsers.TryRemove(Context.User.Identity.Name, out value);
+            }
+            return base.OnDisconnected();
         }
     }
 }

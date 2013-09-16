@@ -1,0 +1,16 @@
+﻿@model BandSite.Models.ViewModels.SongAlbumRelationModel
+@using (Html.BeginForm("AddAlbum", "Song", FormMethod.Post, new { @class = "form-inline", id = "addForm-" + Model.SongId + "-" + Model.AlbumId }))
+{
+    <input placeholder="Add Album" class="form-control" id="add_album_title" type="text" name="q" data-autocomplete-source="@Url.Action("AlbumsSearch", "Album")"  data-entity-type="song" data-related-entity-type="album"/>
+    <input type="hidden" id="add_song_id" name="SongId" value="@Model.SongId" />
+    <input type="hidden" id="add_album_id" name="AlbumId" value="@Model.AlbumId" />
+    @Html.AntiForgeryToken()
+}
+<br/>
+<a class="add-button" href="@("#song/edit/" + Model.SongId)" onclick="$('#addForm-' + @Model.SongId + '-' + @Model.AlbumId).submit();"><i class="glyphicon glyphicon-plus"></i></a>
+<script type="text/javascript">
+    $(function() {
+        autocompleteConfig();
+    })
+</script>
+

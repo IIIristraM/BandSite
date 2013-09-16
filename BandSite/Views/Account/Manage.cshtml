@@ -1,55 +1,75 @@
 ﻿@model BandSite.Models.ViewModels.LocalPasswordModel
-@{
-    ViewBag.Title = "Manage Profile";
-}
-@section Scripts {
-   @Scripts.Render("~/bundles/jqueryval")
-   @Scripts.Render("~/Scripts/audioPlayer.js")
-   @Scripts.Render("~/Scripts/profile-management.js")
-}
 
-<div id="settings-tabs">
-    <ul>
-        <li><a href="#account-tab">Account Settings</a></li>
-        <li><a href="#playlist-tab">My Playlist</a></li>
-        <li><a href="#chat-tab">ChatHub</a></li>
-    </ul>
-    <div id="account-tab">
+@Scripts.Render("~/Scripts/audioPlayer.js")
+@Scripts.Render("~/Scripts/profile-management.js")
 
-        @(ViewBag.HasLocalPassword ? Html.Partial("_ChangePasswordPartial") : Html.Partial("_SetPasswordPartial"))
-        <br><hr><br>
-        <section id="externalLogins">
-            @Html.Action("RemoveExternalLogins")
-            <h3>Add an external login</h3>
-            @Html.Action("ExternalLoginsList", new { ReturnUrl = ViewBag.ReturnUrl })
-        </section>
-    </div>
-    <div id="playlist-tab">
-        <div class="search-icon float-left"></div>
-        <div class="float-left">
-             <input class="search-field" id="add_song_title" type="text" name="q" 
-                    data-autocomplete-source="@Url.RouteUrl("AdministrativeTools_default",new {controller = "Song", action = "SongsSearch"})"
-                    data-related-entity-type="song"/>
-             <input type="hidden" id="add_song_id" />
+<div id="settings-tabs" class="container">
+    <div class="row">
+        <div class="col-lg-2">
+            <ul class="nav nav-stacked nav-pills">
+                <li class="active">
+                    <a href="#account-tab" data-toggle="tab">Account Settings</a>
+                </li>
+                <li>
+                    <a href="#playlist-tab" data-toggle="tab">My Playlist</a>
+                </li>
+                <li>
+                    <a href="#chat-tab" data-toggle="tab">Chat</a>
+                </li>
+            </ul>
         </div>
-        <div class="listen-btn"></div>
-        <div class="populate-btn"></div>
-        <div class="clear-fix"></div>
-        <br><br>
-        <div id="player"></div>
-    </div>
-    <div id="chat-tab">
-        <div class="float-left">
-             <ul class="user-list"></ul>
-        </div>
-        <div class="float-left">
-            <div class="msg-content">
-                <ul id="msg-list" class="msg-list"></ul>
+        <div class="col-lg-8 col-lg-offset-2 tab-content">
+            <div id="account-tab" class="tab-pane active fade in">
+                @if (!String.IsNullOrEmpty(ViewBag.StatusMessage))
+                {
+                    <div class="modal fade" tabindex="-1" role="dialog" id="statusModal">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                    <div class="modal-title">Message</div>
+                                </div>
+                                <div class="modal-body">@ViewBag.StatusMessage</div>
+                            </div>
+                        </div>
+                    </div>
+                    <script>$('#statusModal').modal({show: true})</script>
+                }
+                @(ViewBag.HasLocalPassword ? Html.Partial("_ChangePasswordPartial") : Html.Partial("_SetPasswordPartial"))
+                @Html.Action("RemoveExternalLogins")
+                <br><hr><br>
+                <div class="h4">Add an external login</div>
+                <br/>
+                @Html.Action("ExternalLoginsList", new { ReturnUrl = ViewBag.ReturnUrl })
             </div>
-            <input id="user-name" type="hidden" />
-            <div><textarea id="message-txt" class="message-txt"></textarea></div>
-            <div><input id="send-btn" type="button" value="send"/></div>
+            <div id="playlist-tab" class="tab-pane fade">
+                <div class="search-icon float-left"></div>
+                <div class="float-left">
+                    <input class="search-field" id="add_song_title" type="text" name="q" 
+                           data-autocomplete-source="song/SongsSearch"
+                           data-related-entity-type="song"/>
+                    <input type="hidden" id="add_song_id" />
+                </div>
+                <div class="listen-btn"></div>
+                <div class="populate-btn"></div>
+                <div class="clear-fix"></div>
+                <br><br>
+                <div id="player"></div>
+            </div>
+            <div id="chat-tab" class="tab-pane fade">
+                <div class="float-left">
+                    <ul class="user-list"></ul>
+                </div>
+                <div class="float-left">
+                    <div class="msg-content">
+                        <ul id="msg-list" class="msg-list"></ul>
+                    </div>
+                    <input id="user-name" type="hidden" />
+                    <div><textarea id="message-txt" class="message-txt"></textarea></div>
+                    <div><input id="send-btn" type="button" value="send"/></div>
+                </div>
+                <div class="clear-fix"></div>
+            </div>
         </div>
-        <div class="clear-fix"></div>
     </div>
 </div>

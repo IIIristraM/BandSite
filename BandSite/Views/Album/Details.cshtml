@@ -1,0 +1,16 @@
+﻿@model BandSite.Models.ViewModels.CRUDAlbumModel
+<div class="container">
+    <p class="h4">@Html.DisplayNameFor(model => model.Title)</p>
+    <p>@Html.DisplayFor(model => model.Title)</p>
+    <br>
+    <p class="h4">@Html.DisplayNameFor(model => model.Published)</p>
+    <p style="white-space:pre-wrap">@Html.DisplayFor(model => model.Published)</p>
+    <br>
+    <p class="h4">@Html.DisplayNameFor(model => model.Description)</p>
+    <p style="white-space:pre-wrap">@Html.DisplayFor(model => model.Description)</p>
+    <br>
+    <p class="h4">Contains songs</p>
+    @Html.Partial("ShowSong", new BandSite.Models.ViewModels.ShowSongsModel {Songs = ViewBag.Songs, AlbumId = Model.Id})
+    <br>
+    <a href="@("#album/edit/" + Model.Id)"><i class="glyphicon glyphicon-edit"></i></a>
+</div>

@@ -12,7 +12,9 @@ namespace BandSite.Models.DataLayer
         {
             if (source != null)
             {
-                return source.GetType().GetProperties().Aggregate(false, (current, property) => TrySetProperty(source, property.Name, ignoreNulls) || current);
+                return source.GetType()
+                             .GetProperties()
+                             .Aggregate(false, (current, property) => TrySetProperty(source, property.Name, ignoreNulls) || current);
             }
             return false;
         }

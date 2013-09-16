@@ -1,0 +1,22 @@
+﻿@model BandSite.Models.ViewModels.CRUDSongModel
+<div class="container">
+    <p class="h3">A you shure ?</p>
+    <br>
+    <br>
+    <p class="h4">@Html.DisplayNameFor(model => model.Title)</p>
+    <p>@Html.DisplayFor(model => model.Title)</p>
+    <br>
+    <p class="h4">@Html.DisplayNameFor(model => model.Text)</p>
+    <p style="white-space:pre-wrap">@Html.DisplayFor(model => model.Text)</p>
+    <br>
+    <p class="h4">Published in</p>
+    @Html.Partial("ShowAlbum", new BandSite.Models.ViewModels.ShowAlbumsModel {Albums = ViewBag.Albums, SongId = Model.Id})
+    <br>
+    @using (Html.BeginForm()) 
+    {
+        @Html.AntiForgeryToken()
+        <p>
+            <input type="submit" value="Ok" class="btn btn-primary"/>
+        </p>
+    }
+</div>

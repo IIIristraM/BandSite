@@ -1,25 +1,19 @@
-﻿<div class="login-area">
-@if (Request.IsAuthenticated) {
-        <div class="float-left">
-        @Html.RouteLink("UserName", "Default", routeValues: new { controller = "Account", action="Manage" }, htmlAttributes: new { @class = "username", title = "Manage", username = User.Identity.Name })
-        @using (Html.BeginRouteForm(routeName: "Default", 
-                                    routeValues: new { controller = "Account", action = "LogOff" }, 
-                                    method: FormMethod.Post, 
-                                    htmlAttributes: new { id = "logoutForm" }))
+﻿@if (Request.IsAuthenticated)
+{
+        using(Html.BeginRouteForm(routeName: "Default",
+            routeValues: new {controller = "Account", action = "LogOff"},
+            method: FormMethod.Post,
+            htmlAttributes: new {id = "logoutForm" }))
         {
             @Html.AntiForgeryToken()
-            <a href="javascript:document.getElementById('logoutForm').submit()" id="logoutLink"></a>
+            <p class="navbar-text pull-right"><a href="#home/index" onclick="$('#logoutForm').submit()"><i class="glyphicon glyphicon-log-out"></i></a></p>
         }
-        </div>
-    <div class="float-left">
-        <div class="admin-tools-button"></div>
-    </div>
-} else {
-        <ul>
-            <li>@Html.RouteLink("Register", "Default", routeValues: new { controller = "Account", action="Register" }, htmlAttributes: new { id = "registerLink" })</li>
-            <li>@Html.RouteLink("Log in", "Default", routeValues: new { controller = "Account", action="Login", returnUrl = Request.Url.AbsolutePath }, htmlAttributes: new { id = "loginLink" })</li>
-        </ul>
+        <p class="navbar-text pull-right"><a id="accountLink" class="link" href="#account/manage"><i class="glyphicon glyphicon-user"></i><span>@User.Identity.Name</span></a></p>
 }
-        <div style="clear:both; visibility:hidden;"></div>
-</div>
+else
+{
+    <p class="navbar-text pull-right"><a href="#account/login"><i class="glyphicon glyphicon-log-in"></i></a></p>
+    <p class="navbar-text pull-right"><a href="#account/register"><i class="glyphicon glyphicon-plus"></i></a></p>
+}
+
 

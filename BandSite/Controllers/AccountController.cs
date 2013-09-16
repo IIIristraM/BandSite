@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Transactions;
+using System.Web.Helpers;
 using System.Web.Mvc;
 using System.Web.Security;
 using DotNetOpenAuth.AspNet;
@@ -24,6 +25,13 @@ namespace BandSite.Controllers
         }
 
         private readonly IDbContextFactory _dbContextFactory;
+
+        [AllowAnonymous]
+        public ActionResult Index()
+        {
+            return PartialView("_LoginPartial");
+        }
+
         //
         // GET: /Account/Login
 
@@ -31,7 +39,7 @@ namespace BandSite.Controllers
         public ActionResult Login(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
-            return View();
+            return PartialView();
         }
 
         //
@@ -44,12 +52,12 @@ namespace BandSite.Controllers
         {
             if (ModelState.IsValid && WebSecurity.Login(model.UserName, model.Password, persistCookie: model.RememberMe))
             {
-                return RedirectToLocal(returnUrl);
+                return Json(new {hash = "#home/index"});
             }
 
             // If we got this far, something failed, redisplay form
             ModelState.AddModelError("", "The user name or password provided is incorrect.");
-            return View(model);
+            return PartialView(model);
         }
 
         //
@@ -60,8 +68,7 @@ namespace BandSite.Controllers
         public ActionResult LogOff()
         {
             WebSecurity.Logout();
-
-            return RedirectToAction("Index", "Home");
+            return Json(new { hash = "#home/index" });
         }
 
         //
@@ -70,7 +77,7 @@ namespace BandSite.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
-            return View();
+            return PartialView();
         }
 
         //
@@ -88,7 +95,7 @@ namespace BandSite.Controllers
                 {
                     WebSecurity.CreateUserAndAccount(model.UserName, model.Password);
                     WebSecurity.Login(model.UserName, model.Password);
-                    return RedirectToAction("Index", "Home");
+                    return Json(new { hash = "#home/index" });
                 }
                 catch (MembershipCreateUserException e)
                 {
@@ -97,7 +104,7 @@ namespace BandSite.Controllers
             }
 
             // If we got this far, something failed, redisplay form
-            return View(model);
+            return PartialView(model);
         }
 
         //
@@ -140,8 +147,8 @@ namespace BandSite.Controllers
                 : message == ManageMessageId.RemoveLoginSuccess ? "The external login was removed."
                 : "";
             ViewBag.HasLocalPassword = OAuthWebSecurity.HasLocalAccount(WebSecurity.GetUserId(User.Identity.Name));
-            ViewBag.ReturnUrl = Url.Action("Manage");
-            return View();
+            ViewBag.ReturnUrl = "~/#account/manage";
+            return PartialView();
         }
 
         //
@@ -153,7 +160,7 @@ namespace BandSite.Controllers
         {
             bool hasLocalAccount = OAuthWebSecurity.HasLocalAccount(WebSecurity.GetUserId(User.Identity.Name));
             ViewBag.HasLocalPassword = hasLocalAccount;
-            ViewBag.ReturnUrl = Url.Action("Manage");
+            ViewBag.ReturnUrl = "~/#account/manage";
             if (hasLocalAccount)
             {
                 if (ModelState.IsValid)
@@ -201,7 +208,7 @@ namespace BandSite.Controllers
             }
 
             // If we got this far, something failed, redisplay form
-            return View(model);
+            return PartialView(model);
         }
 
         //
@@ -224,7 +231,7 @@ namespace BandSite.Controllers
             AuthenticationResult result = OAuthWebSecurity.VerifyAuthentication(Url.Action("ExternalLoginCallback", new { ReturnUrl = returnUrl }));
             if (!result.IsSuccessful)
             {
-                return RedirectToAction("ExternalLoginFailure");
+                return Redirect("~/#account/ExternalLoginFailure");
             }
 
             if (OAuthWebSecurity.Login(result.Provider, result.ProviderUserId, createPersistentCookie: false))
@@ -240,9 +247,22 @@ namespace BandSite.Controllers
             }
             // User is new, ask for their desired membership name
             string loginData = OAuthWebSecurity.SerializeProviderUserId(result.Provider, result.ProviderUserId);
-            ViewBag.ProviderDisplayName = OAuthWebSecurity.GetOAuthClientData(result.Provider).DisplayName;
-            ViewBag.ReturnUrl = returnUrl;
-            return View("ExternalLoginConfirmation", new RegisterExternalLoginModel { UserName = result.UserName, ExternalLoginData = loginData });
+            return Redirect("~/#account/ExternalLoginConfirmation?loginData=" + loginData);
+        }
+
+        [AllowAnonymous]
+        public ActionResult ExternalLoginConfirmation(string loginData)
+        {
+            if (loginData.IndexOf("/") == loginData.Length - 1)
+            {
+                loginData = loginData.Substring(0, loginData.Length - 1);
+            }
+            string provider;
+            string providerUserId;
+            OAuthWebSecurity.TryDeserializeProviderUserId(loginData, out provider, out providerUserId);
+            ViewBag.ProviderDisplayName = OAuthWebSecurity.GetOAuthClientData(provider).DisplayName;
+            ViewBag.ReturnUrl = "";
+            return PartialView("ExternalLoginConfirmation", new RegisterExternalLoginModel { UserName = "", ExternalLoginData = loginData });
         }
 
         //
@@ -260,7 +280,7 @@ namespace BandSite.Controllers
 
                 if (User.Identity.IsAuthenticated || !OAuthWebSecurity.TryDeserializeProviderUserId(model.ExternalLoginData, out provider, out providerUserId))
                 {
-                    return RedirectToAction("Manage");
+                    return Redirect("~/#account/Manage");
                 }
 
                 if (ModelState.IsValid)
@@ -285,7 +305,7 @@ namespace BandSite.Controllers
 
                 ViewBag.ProviderDisplayName = OAuthWebSecurity.GetOAuthClientData(provider).DisplayName;
                 ViewBag.ReturnUrl = returnUrl;
-                return View(model);
+                return PartialView(model);
             }
         }
 
@@ -295,7 +315,7 @@ namespace BandSite.Controllers
         [AllowAnonymous]
         public ActionResult ExternalLoginFailure()
         {
-            return View();
+            return PartialView();
         }
 
         [AllowAnonymous]
@@ -386,7 +406,7 @@ namespace BandSite.Controllers
             {
                 return Redirect(returnUrl);
             }
-            return RedirectToAction("Index", "Home");
+            return Redirect("~/#home/index");
         }
 
         public enum ManageMessageId
