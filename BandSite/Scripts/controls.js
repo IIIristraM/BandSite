@@ -35,4 +35,5 @@ function configNavbar() {
 
 $(function() {
     configNavbar();
-})
+});
+

@@ -5,13 +5,13 @@ var chat;
 
 $(function () {
     autocompleteConfig();
-    GeneratePlayer();
+    generatePlayer();
 
     $("#playlist-tab").find(".listen-btn").click(function () {
         if (player !== undefined) {
             var id = $("#playlist-tab").find("#add_song_id").val();
             if (id !== "") {
-                var url = "/AdministrativeTools/Song/GetStream/" + id;
+                var url = "/Song/GetStream/" + id;
                 var title = $("#playlist-tab").find("#add_song_title").val();
                 var $player = $("#" + player.id);
                 var $audio = $player.find("audio");
@@ -33,23 +33,23 @@ $(function () {
         var id = $("#playlist-tab").find("#add_song_id").val();        
         if ((id !== "") && (player !== undefined)) {
             var title = $("#playlist-tab").find("#add_song_title").val();
-            var url = "/AdministrativeTools/Song/GetStream/" + id;
+            var url = "/Song/GetStream/" + id;
             var guid;
             if (player.getAudio().attr("data-song-guid") !== undefined) guid = player.getAudio().attr("data-song-guid");
             player.addPlaylistItem(title, url, guid);
             player.bindPlayList();
             $.ajax({
-                url: "/AdministrativeTools/Song/PopulateUsersPlaylist?userId=-1&songId=" + id,
+                url: "/Song/PopulateUsersPlaylist?userId=-1&songId=" + id,
                 cache: false,
                 type: "POST"
             });
         }
     });    
 
-    GenerateChat();
+    generateChat();
 });
 
-function ReplaceSimbols(string) {
+function replaceSimbols(string) {
     string = string.replace(/'/, "_");
     string = string.replace(/\./, "_");
     string = string.replace(/\s/, "_");
@@ -57,7 +57,7 @@ function ReplaceSimbols(string) {
     return string;
 }
 
-function GenerateChat() {
+function generateChat() {
     $.ajax({
         url: "/Account/GetUserslist",
         type: "GET",
@@ -66,7 +66,7 @@ function GenerateChat() {
         var html = "";
         for (var i = 0; i < usersList.length; i++) {
             html = html +
-                   "<li class='user-list-item ui-state-default' data-user-name='" + ReplaceSimbols(usersList[i].name) + "'>" +
+                   "<li class='user-list-item ui-state-default' data-user-name='" + replaceSimbols(usersList[i].name) + "'>" +
                         "<div class='float-left'>" + 
                              "<span>" +
                                    usersList[i].name +
@@ -104,12 +104,12 @@ function GenerateChat() {
 
         chat.client.onOnline = function (usernames) {
             for (var i = 0; i < usernames.length; i++) {
-                $(".user-list").find(".user-list-item[data-user-name=" + ReplaceSimbols(usernames[i]) + "]").find(".indicator").addClass("user-list-item-online");
+                $(".user-list").find(".user-list-item[data-user-name=" + replaceSimbols(usernames[i]) + "]").find(".indicator").addClass("user-list-item-online");
             }
         };
 
         chat.client.onOffline = function (username) {
-            $(".user-list").find(".user-list-item[data-user-name=" + ReplaceSimbols(username) + "]").find(".indicator").removeClass("user-list-item-online");
+            $(".user-list").find(".user-list-item[data-user-name=" + replaceSimbols(username) + "]").find(".indicator").removeClass("user-list-item-online");
         };
 
         $.connection.hub.start();
@@ -124,7 +124,7 @@ function GenerateChat() {
     });
 }
 
-function GeneratePlayer() {
+function generatePlayer() {
     $.ajax({
         url: "/Account/GetPlaylist/",
         cache: false,
@@ -139,7 +139,7 @@ function GeneratePlayer() {
             var url = $("#player").find(".play-list").find(".play-list-item[data-song-guid=" + guid + "]").attr("data-song-url");
             var id = url.substr(url.lastIndexOf("/") + 1);
             $.ajax({
-                url: "/AdministrativeTools/Song/RemoveFromUsersPlaylist?userId=-1&songId=" + id,
+                url: "/Song/RemoveFromUsersPlaylist?userId=-1&songId=" + id,
                 cache: false,
                 type: "POST"
             });

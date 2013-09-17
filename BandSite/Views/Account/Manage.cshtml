@@ -1,6 +1,5 @@
 ﻿@model BandSite.Models.ViewModels.LocalPasswordModel
 
-@Scripts.Render("~/Scripts/audioPlayer.js")
 @Scripts.Render("~/Scripts/profile-management.js")
 
 <div id="settings-tabs" class="container">
@@ -43,16 +42,15 @@
                 @Html.Action("ExternalLoginsList", new { ReturnUrl = ViewBag.ReturnUrl })
             </div>
             <div id="playlist-tab" class="tab-pane fade">
-                <div class="search-icon float-left"></div>
-                <div class="float-left">
-                    <input class="search-field" id="add_song_title" type="text" name="q" 
+                <div class="form-group">
+                    <i class="search-icon glyphicon glyphicon-search"></i>
+                    <input class="search-field form-control" id="add_song_title" type="text" name="q" 
                            data-autocomplete-source="song/SongsSearch"
                            data-related-entity-type="song"/>
                     <input type="hidden" id="add_song_id" />
+                    <a href="#account/manage"><i class="listen-btn glyphicon glyphicon-headphones"></i></a>
+                    <a href="#account/manage"><i class="populate-btn glyphicon glyphicon-plus"></i></a>
                 </div>
-                <div class="listen-btn"></div>
-                <div class="populate-btn"></div>
-                <div class="clear-fix"></div>
                 <br><br>
                 <div id="player"></div>
             </div>

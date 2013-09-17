@@ -20,7 +20,7 @@ function generateGUID() {
 function AudioPlayer(options) {
     this.id = options.id;
     this.playlist = options.playlist;
-    for (var i = 0; i < this.playlist.length; i++) this.playlist[i].url = "/AdministrativeTools/Song/GetStream/" + this.playlist[i].id;
+    for (var i = 0; i < this.playlist.length; i++) this.playlist[i].url = "/Song/GetStream/" + this.playlist[i].id;
     this.defaultGUID = generateGUID();
     this.currentVolume = 1.0;
 }
@@ -70,7 +70,7 @@ AudioPlayer.prototype.addPlaylistItem = function (title, url, guid) {
                  "<span>" +
                       title +
                  "</span>" +
-                 "<div class='remove-item'></div>" +
+                 "<i class='remove-item glyphicon glyphicon-trash'></i>" +
             "</li>"
         );
     }
@@ -88,7 +88,7 @@ AudioPlayer.prototype.generatePlaylistMarkup = function () {
                         "<span>" +
                             this.playlist[i].title +
                         "</span>" +
-                        "<div class='remove-item'></div>" +
+                        "<i class='remove-item glyphicon glyphicon-trash'></i>" +
                     "</li>";
     }
     return audiolist;
@@ -105,7 +105,7 @@ AudioPlayer.prototype.generateMarkup = function () {
         title = this.playlist[0].title;
     }
     $("#" + this.id).html(
-       "<audio src='/AdministrativeTools/Song/GetStream/" + id + "'></audio>" +
+       "<audio src='/Song/GetStream/" + id + "'></audio>" +
        "<div class='song-control-panel' data-song-guid='" + this.defaultGUID + "'>" +
            "<hr>" +
            "<div class='song-title'>" + title + "</div>" +
@@ -113,11 +113,11 @@ AudioPlayer.prototype.generateMarkup = function () {
                 "<div class='time-slider'></div>" +
                 "<div class='time-label'></div>" +
            "</div>" +
-           "<div class='back-btn'></div>" +
-           "<div class='play-btn' data-state='play'></div>" +
-           "<div class='forward-btn'></div>" +
-           "<div class='loop-btn' data-state='once'></div>" +
-           "<div class='volume-btn' data-state='normal'></div>" +
+           "<a href='#account/manage'><i class='back-btn glyphicon glyphicon-step-backward'></i></a>" +
+           "<a href='#account/manage'><i class='play-btn glyphicon glyphicon-play' data-state='play'></i></a>" +
+           "<a href='#account/manage'><i class='forward-btn glyphicon glyphicon-step-forward'></i></a>" +
+           "<a href='#account/manage'><i class='loop-btn glyphicon glyphicon-arrow-right' data-state='once'></i></a>" +
+           "<a href='#account/manage'><i class='volume-btn glyphicon glyphicon-volume-up' data-state='normal'></i></a>" +
            "<div class='volume-slider'></div>" +
            "<div style='clear:both; visibility:hidden;'></div>" +
            "<hr>" +
@@ -197,11 +197,15 @@ AudioPlayer.prototype.playSong = function (btn) {
             if (this.getAudio().get(0).readyState !== 0) {
                 $audio.get(0).play();
                 $btn.attr("data-state", "pause");
+                $btn.removeClass("glyphicon-play");
+                $btn.addClass("glyphicon-pause");
             }
         }
         else if ($btn.attr("data-state") === "pause") {
             $audio.get(0).pause();
             $btn.attr("data-state", "play");
+            $btn.addClass("glyphicon-play");
+            $btn.removeClass("glyphicon-pause");
         }
 };
 
@@ -249,17 +253,25 @@ AudioPlayer.prototype.changeLoopState = function (btn) {
     var $btn = $(btn);
     if ($btn.attr("data-state") === "once") {
         $btn.attr("data-state", "songloop");
+        $btn.removeClass("glyphicon-arrow-right");
+        $btn.addClass("glyphicon-repeat");
     }
     else if ($btn.attr("data-state") === "songloop") {
         if (this.playlist.length > 1) {
             $btn.attr("data-state", "listloop");
+            $btn.removeClass("glyphicon-repeat");
+            $btn.addClass("glyphicon-refresh");
         }
         else {
             $btn.attr("data-state", "once");
+            $btn.removeClass("glyphicon-repeat");
+            $btn.addClass("glyphicon-arrow-right");
         }
     }
     else if ($btn.attr("data-state") === "listloop") {
         $btn.attr("data-state", "once");
+        $btn.removeClass("glyphicon-refresh");
+        $btn.addClass("glyphicon-arrow-right");
     }
 };
 
@@ -284,11 +296,15 @@ AudioPlayer.prototype.checkMute = function (btn) {
     var $player = $("#" + this.id);
     if ($btn.attr("data-state") === "normal") {
         $btn.attr("data-state", "mute");
+        $btn.removeClass("glyphicon-volume-up");
+        $btn.addClass("glyphicon-volume-off");
         this.getAudio().get(0).volume = 0;
         $player.find(".volume-slider").slider("value", 0);
     }
     else if ($btn.attr("data-state") === "mute") {
         $btn.attr("data-state", "normal");
+        $btn.addClass("glyphicon-volume-up");
+        $btn.removeClass("glyphicon-volume-off");
         this.getAudio().get(0).volume = this.currentVolume;
         $player.find(".volume-slider").slider("value", this.currentVolume * 100);
     }
