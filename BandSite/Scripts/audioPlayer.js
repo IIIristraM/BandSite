@@ -46,6 +46,9 @@ AudioPlayer.prototype.removePlaylistItem = function (guid) {
         $player.find(".song-title").empty();
         $player.find(".song-title").html("No songs in list");
     }
+    else if (guid === this.defaultGUID) {
+        this.defaultGUID = $("#" + this.id).find(".play-list-item").first().attr("data-song-guid");
+    }
 };
 
 AudioPlayer.prototype.addPlaylistItem = function (title, url, guid) {
@@ -113,11 +116,11 @@ AudioPlayer.prototype.generateMarkup = function () {
                 "<div class='time-slider'></div>" +
                 "<div class='time-label'></div>" +
            "</div>" +
-           "<a href='#account/manage'><i class='back-btn glyphicon glyphicon-step-backward'></i></a>" +
-           "<a href='#account/manage'><i class='play-btn glyphicon glyphicon-play' data-state='play'></i></a>" +
-           "<a href='#account/manage'><i class='forward-btn glyphicon glyphicon-step-forward'></i></a>" +
-           "<a href='#account/manage'><i class='loop-btn glyphicon glyphicon-arrow-right' data-state='once'></i></a>" +
-           "<a href='#account/manage'><i class='volume-btn glyphicon glyphicon-volume-up' data-state='normal'></i></a>" +
+           "<i class='back-btn glyphicon glyphicon-step-backward'></i>" +
+           "<i class='play-btn glyphicon glyphicon-play' data-state='play'></i>" +
+           "<i class='forward-btn glyphicon glyphicon-step-forward'></i>" +
+           "<i class='loop-btn glyphicon glyphicon-arrow-right' data-state='once'></i>" +
+           "<i class='volume-btn glyphicon glyphicon-volume-up' data-state='normal'></i>" +
            "<div class='volume-slider'></div>" +
            "<div style='clear:both; visibility:hidden;'></div>" +
            "<hr>" +

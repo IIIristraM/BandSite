@@ -10,9 +10,6 @@
                     <a href="#account-tab" data-toggle="tab">Account Settings</a>
                 </li>
                 <li>
-                    <a href="#playlist-tab" data-toggle="tab">My Playlist</a>
-                </li>
-                <li>
                     <a href="#chat-tab" data-toggle="tab">Chat</a>
                 </li>
             </ul>
@@ -40,19 +37,6 @@
                 <div class="h4">Add an external login</div>
                 <br/>
                 @Html.Action("ExternalLoginsList", new { ReturnUrl = ViewBag.ReturnUrl })
-            </div>
-            <div id="playlist-tab" class="tab-pane fade">
-                <div class="form-group">
-                    <i class="search-icon glyphicon glyphicon-search"></i>
-                    <input class="search-field form-control" id="add_song_title" type="text" name="q" 
-                           data-autocomplete-source="song/SongsSearch"
-                           data-related-entity-type="song"/>
-                    <input type="hidden" id="add_song_id" />
-                    <a href="#account/manage"><i class="listen-btn glyphicon glyphicon-headphones"></i></a>
-                    <a href="#account/manage"><i class="populate-btn glyphicon glyphicon-plus"></i></a>
-                </div>
-                <br><br>
-                <div id="player"></div>
             </div>
             <div id="chat-tab" class="tab-pane fade">
                 <div class="float-left">

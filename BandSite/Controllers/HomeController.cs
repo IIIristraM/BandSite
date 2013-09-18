@@ -13,5 +13,10 @@ namespace BandSite.Controllers
         {
             return PartialView();
         }
+
+        public ActionResult Playlist()
+        {
+            return PartialView();
+        }
     }
 }
