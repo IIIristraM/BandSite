@@ -1,16 +1,18 @@
 ﻿@model BandSite.Models.ViewModels.SongAlbumRelationModel
-@using (Html.BeginForm("AddSong", "Album", FormMethod.Post, new { @class = "form-inline", id = "addForm-" + Model.SongId + "-" + Model.AlbumId }))
-{
-    <input placeholder="Add Song" class="form-control" id="add_song_title" type="text" name="q" data-autocomplete-source="@Url.Action("SongsSearch", "Song")"  data-entity-type="album" data-related-entity-type="song"/>
-    <input type="hidden" id="add_song_id" name="SongId" value="@Model.SongId" />
-    <input type="hidden" id="add_album_id" name="AlbumId" value="@Model.AlbumId" />
-    @Html.AntiForgeryToken()
-}
-<br/>
-<a class="add-button" href="@("#album/edit/" + Model.AlbumId)" onclick="$('#addForm-' + @Model.SongId + '-' + @Model.AlbumId).submit();"><i class="glyphicon glyphicon-plus"></i></a>
-<script type="text/javascript">
-    $(function () {
-        autocompleteConfig();
-    })
-</script>
+<div id="addSongPanel">
+    @using (Html.BeginForm("AddSong", "Album", FormMethod.Post, new { @class = "form-inline", id = "addForm-" + Model.SongId + "-" + Model.AlbumId }))
+          {
+              <input placeholder="Add Song" class="form-control" id="add_song_title" type="text" name="q" data-autocomplete-source="@Url.Action("SongsSearch", "Song")"  data-entity-type="album" data-related-entity-type="song"/>
+              <input type="hidden" id="add_song_id" name="SongId" value="@Model.SongId" />
+              <input type="hidden" id="add_album_id" name="AlbumId" value="@Model.AlbumId" />
+              @Html.AntiForgeryToken()
+          }
+    <br/>
+    <a class="add-button" href="@("#album/edit/" + Model.AlbumId)" onclick="$('#addForm-' + @Model.SongId + '-' + @Model.AlbumId).submit();"><i class="glyphicon glyphicon-plus"></i></a>
+    <script type="text/javascript">
+        $(function () {
+            autocompleteConfig('#addSongPanel', 'body');
+        })
+    </script>
+</div>
 

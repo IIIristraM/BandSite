@@ -6,6 +6,7 @@
 
 .player-container {
     width: 700px !important;
+    height: 300px;
 }
 
 .song-control-panel .play-btn,
@@ -123,4 +124,16 @@
 
 .play-list .remove-item{
     margin-left: 660px;
+}
+
+.search-results .ui-widget-content a{
+    color: #428bca !important;
+}
+
+.search-results .ui-widget-content a.ui-state-focus {
+    color: white !important;
+    background: #428bca !important;
+    border: none !important;
+    -ms-opacity: 0.8;
+    opacity: 0.8;
 }

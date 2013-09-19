@@ -44,6 +44,7 @@ i {
 }
 
 .tooltip.in {
+    -ms-opacity: 1 !important;
     opacity: 1 !important;
 }
 
@@ -51,7 +52,24 @@ i {
   border-bottom-color: lightgrey !important;
 }
 
+.tooltip.right .tooltip-arrow {
+  border-right-color: lightgrey !important;
+}
+
 .navbar-devider {
     width: 200px;
     visibility: hidden;
+}
+
+.ui-widget-content a.ui-state-focus {
+    color: white !important;
+    background: #428bca !important;
+    border: none !important;
+    -ms-opacity: 0.8;
+    opacity: 0.8;
+}
+
+.navbar li span {
+    display: inline-block;
+    cursor: pointer;
 }
