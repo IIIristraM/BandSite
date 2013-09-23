@@ -6,12 +6,7 @@ namespace BandSite.Models.DataLayer
 {
     public class DbContextEf : DbContext, IDbContext
     {
-         #if DEBUG
-               public DbContextEf() : this("BandSiteDB-Debug") {}
-         #else
-               public DbContextEf() : this("BandSiteDB") {}
-         #endif
-
+        public DbContextEf() : this("DefaultConnection") {}
 
         public DbContextEf(string connectionName)
             : base("name=" + connectionName)

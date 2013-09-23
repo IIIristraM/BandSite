@@ -21,11 +21,7 @@ namespace BandSite
             { 
                 if (_dbFactory == null) 
                 { 
-                   #if DEBUG
-                       _dbFactory = new DbContextEfFactory("BandSiteDB-Debug"); 
-                   #else
-                       _dbFactory = new DbContextEfFactory("BandSiteDB"); 
-                   #endif
+                    _dbFactory = new DbContextEfFactory("DefaultConnection"); 
                 }
                 return _dbFactory;
             }

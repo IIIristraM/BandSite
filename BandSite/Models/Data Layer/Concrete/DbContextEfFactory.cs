@@ -14,11 +14,7 @@ namespace BandSite.Models.DataLayer
 
         public DbContextEfFactory()
         { 
-            #if DEBUG
-                 ConnectionName = "BandSiteDB-Debug";
-            #else
-                 ConnectionName = "BandSiteDB";
-            #endif
+            ConnectionName = "DefaultConnection";
             SetInitializer();
         }
 

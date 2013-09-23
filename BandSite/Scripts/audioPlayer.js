@@ -122,7 +122,7 @@ AudioPlayer.prototype.generateMarkup = function () {
            "<i class='loop-btn glyphicon glyphicon-arrow-right' data-state='once'></i>" +
            "<i class='volume-btn glyphicon glyphicon-volume-up' data-state='normal'></i>" +
            "<div class='volume-slider'></div>" +
-           "<div style='clear:both; visibility:hidden;'></div>" +
+           "<div class='clear-fix'></div>" +
            "<hr>" +
        "</div>" +
        "<br><br>" +

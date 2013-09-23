@@ -73,3 +73,12 @@ i {
     display: inline-block;
     cursor: pointer;
 }
+
+.clear-fix {
+    clear: both;
+    visibility: hidden;
+}
+
+.float-left {
+    float: left;
+}

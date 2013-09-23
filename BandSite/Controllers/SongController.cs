@@ -242,11 +242,7 @@ namespace BandSite.Controllers
                 var song = query.FirstOrDefault();
                 if (song != null)
                 {
-#if DEBUG
-                    var scsb = new SqlConnectionStringBuilder(ConfigurationManager.ConnectionStrings["BandSiteDB-Debug"].ConnectionString);
-#else
-                    SqlConnectionStringBuilder scsb = new SqlConnectionStringBuilder(ConfigurationManager.ConnectionStrings["BandSiteDB"].ConnectionString);
-#endif
+                    var scsb = new SqlConnectionStringBuilder(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString);
                     var conn = new SqlConnection(scsb.ConnectionString);
                     conn.Open();
                     var cmd = new SqlCommand(query.ToString(), conn);
