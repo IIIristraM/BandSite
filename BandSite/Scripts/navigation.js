@@ -1,9 +1,9 @@
 ﻿$(function () {
-    window.onhashchange = function () {
+    window.addEventListener("hashchange", function () {
         if (location.hash.indexOf("/") !== -1) {
             loadContent();
         }
-    };
+    });
     (location.hash === "") ? location.hash = "#home/index" : loadContent();
 });
 
@@ -13,7 +13,7 @@ function loadContent() {
         // ../controller/action/id[optional]
         url: "/" + params[0] +
              "/" + params[1] +
-             "/" + (params[2] !== undefined ? params[2] : ""),
+             (params[2] !== undefined ? "/" + params[2] : ""),
         cache: false
     }).done(function (content) {
         renderContent(content);

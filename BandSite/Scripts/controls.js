@@ -6,9 +6,16 @@ function generatePlayer() {
         cache: false,
         type: "POST"
     }).done(function (playlist) {
-        var options = {
-            playlist: playlist
-        };
+        
+        if (Object.prototype.toString.call(playlist) === '[object Array]') {
+            var options = {
+                playlist: playlist
+            };
+        } else {
+            var options = {
+                playlist: []
+            };
+        }
 
         player = $("#player").audioPlayer(options);
 
@@ -139,21 +146,10 @@ function palylistTabConfig(container) {
         listenBtnConfig(container);
         populateBtnConfig(container);
     });
-}
-
-function configNavbar() {
-    $(".nav.navbar-nav li").click(function() {
-        $(".nav.navbar-nav").find(".active").removeClass("active");
-        $(this).addClass("active");
-    });
-    palylistTabConfig("#playlist-tab-bottom");
-}
-
-$(function() {
-    configNavbar();
+    
     $(window).resize(function () {
         if ($(window).width() < 768) {
-            $("#playlist-tab-bottom").each(function() {
+            $("#playlist-tab-bottom").each(function () {
                 $("#playlist-tab-bottom").parent().find(".tooltip").remove();
                 $("#playlist-tab-bottom").parent().append("<span id='playlist-tab-right' data-placement='right'>Playlist</span>");
                 $("#playlist-tab-bottom").remove();
@@ -165,6 +161,42 @@ $(function() {
                 $("#playlist-tab-right").parent().append("<span id='playlist-tab-bottom' data-placement='bottom'>Playlist</span>");
                 $("#playlist-tab-right").remove();
                 palylistTabConfig("#playlist-tab-bottom");
+            });
+        }
+    });
+}
+
+function configNavbar() {
+    $(".nav.navbar-nav li").click(function() {
+        $(".nav.navbar-nav").find(".active").removeClass("active");
+        $(this).addClass("active");
+    });
+    palylistTabConfig("#playlist-tab-bottom");
+}
+
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.href);
+    return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+$(function() {
+    configNavbar();
+    window.addEventListener("hashchange", function () {
+        var updatePlaylist = getParameterByName("updatePlaylist");
+        if (updatePlaylist) {
+            $("#playlist-tab-bottom").each(function () {
+                $("#playlist-tab-bottom").parent().find(".tooltip").remove();
+                $("#playlist-tab-bottom").parent().append("<span id='playlist-tab-bottom' data-placement='bottom'>Playlist</span>");
+                $("#playlist-tab-bottom").remove();
+                palylistTabConfig("#playlist-tab-bottom");
+            });
+            $("#playlist-tab-right").each(function () {
+                $("#playlist-tab-right").parent().find(".tooltip").remove();
+                $("#playlist-tab-right").parent().append("<span id='playlist-tab-right' data-placement='right'>Playlist</span>");
+                $("#playlist-tab-right").remove();
+                palylistTabConfig("#playlist-tab-right");
             });
         }
     });

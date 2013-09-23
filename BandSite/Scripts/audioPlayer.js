@@ -73,7 +73,7 @@ AudioPlayer.prototype.addPlaylistItem = function (title, url, guid) {
                  "<span>" +
                       title +
                  "</span>" +
-                 "<i class='remove-item glyphicon glyphicon-trash'></i>" +
+                 "<i class='remove-item glyphicon glyphicon-trash'></i><div class='clear-fix'></div>" +
             "</li>"
         );
     }
@@ -91,7 +91,7 @@ AudioPlayer.prototype.generatePlaylistMarkup = function () {
                         "<span>" +
                             this.playlist[i].title +
                         "</span>" +
-                        "<i class='remove-item glyphicon glyphicon-trash'></i>" +
+                        "<i class='remove-item glyphicon glyphicon-trash'></i><div class='clear-fix'></div>" +
                     "</li>";
     }
     return audiolist;
@@ -111,10 +111,10 @@ AudioPlayer.prototype.generateMarkup = function () {
        "<audio src='/Song/GetStream/" + id + "'></audio>" +
        "<div class='song-control-panel' data-song-guid='" + this.defaultGUID + "'>" +
            "<hr>" +
-           "<div class='song-title'>" + title + "</div>" +
            "<div class='time-line'>" +
-                "<div class='time-slider'></div>" +
+                "<div class='song-title'>" + title + "</div>" +
                 "<div class='time-label'></div>" +
+                "<div class='time-slider'></div>" +
            "</div>" +
            "<i class='back-btn glyphicon glyphicon-step-backward'></i>" +
            "<i class='play-btn glyphicon glyphicon-play' data-state='play'></i>" +
@@ -125,7 +125,7 @@ AudioPlayer.prototype.generateMarkup = function () {
            "<div class='clear-fix'></div>" +
            "<hr>" +
        "</div>" +
-       "<br><br>" +
+       "<br/>" +
        "<ul class='play-list'>" +
            audiolist +
        "</ul>"

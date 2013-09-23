@@ -1,23 +1,22 @@
 ﻿.song-control-panel{
-    width: 700px;
+    width: 515px;
     line-height: normal !important;
     text-align: left;
 }
 
 .player-container {
-    width: 700px !important;
-    height: 300px;
+    width: 515px !important;
+    height: 317px;
+    overflow: hidden;
 }
 
 .song-control-panel .play-btn,
 .song-control-panel .loop-btn,
-.song-control-panel .song-title,
-.song-control-panel .time-label,
 .song-control-panel .back-btn,
 .song-control-panel .forward-btn,
 .song-control-panel .volume-btn {
     float: left;
-    padding: 5px;
+    padding: 10px 0;
     color: #428bca;
 }
 
@@ -32,25 +31,26 @@
     }
 
 .song-control-panel .song-title{
-    width: 215px;
-    margin-right: 5px;
-    padding-left: 17px;
+    color: #428bca;
+    float: left;
+    width: 220px;
+    padding: 0 10px;
 }
 
 .song-control-panel .time-line{
     float: left;
-    width: 180px;
-    margin-right: 35px;
+    width: 280px;
+    padding: 0px 15px;
 }
 
 .song-control-panel .time-line .time-slider{
     float:left;
-    width: 120px;
-    margin-right: 15px;
-    margin-top: 7px;
+    width: 235px;
+    margin: 7px 10px 0 10px;
 }
 
 .song-control-panel .time-line .time-label{
+    color: #428bca;
     float:left;
     width: 30px;
 }
@@ -59,10 +59,14 @@
     margin-right: 35px;
 }
 
+ .song-control-panel .back-btn {
+      margin-left: 35px;
+ }
+
 .song-control-panel .volume-slider{
     float: left;
     width: 45px;
-    margin-top: 10px;
+    margin-top: 15px;
     margin-left: 5px;
     height: 7px;
 }
@@ -88,9 +92,18 @@
     border: 2px solid #428bca !important;
 }
 
-.play-list{ list-style-type: none; margin: 0; padding: 0; width: 680px; }
-.play-list li{ margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1em;}
-.play-list li span{ position: absolute; margin-left: -2px; }
+.play-list{ list-style-type: none; margin: 0; padding: 0; width: 505px; height: 155px; overflow-y: scroll; text-align: left;}
+.play-list li{ margin: 0 0 3px 3px; padding-left: 1.5em; font-size: 1em;}
+    .play-list li span {
+        margin-left: -2px;
+        margin-top: 5px;
+        margin-bottom: 5px;
+        float: left;
+        width: 440px;
+    }
+.play-list-item {
+    width: 483px;
+}
 .play-list-item:hover {
     -ms-opacity: 0.6;
     opacity: 0.6;
@@ -108,7 +121,7 @@
 .search-icon,
 .listen-btn,
 .populate-btn {
-    padding: 8px 12px;
+    padding: 8px 8px;
     float:left;
     color: #428bca;
 }
@@ -118,12 +131,13 @@
 }
 
 .search-field {
-    width: 570px;
+    width: 400px;
     float: left;
 }
 
 .play-list .remove-item{
-    margin-left: 660px;
+    float: left;
+    padding: 5px 0;
 }
 
 .search-results .ui-widget-content a{

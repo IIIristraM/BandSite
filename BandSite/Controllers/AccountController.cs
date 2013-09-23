@@ -52,7 +52,7 @@ namespace BandSite.Controllers
         {
             if (ModelState.IsValid && WebSecurity.Login(model.UserName, model.Password, persistCookie: model.RememberMe))
             {
-                return Json(new {hash = "#home/index"});
+                return Json(new {hash = "#home/index?updatePlaylist=true"});
             }
 
             // If we got this far, something failed, redisplay form
@@ -68,7 +68,7 @@ namespace BandSite.Controllers
         public ActionResult LogOff()
         {
             WebSecurity.Logout();
-            return Json(new { hash = "#home/index" });
+            return Json(new { hash = "#home/index?updatePlaylist=true" });
         }
 
         //
@@ -298,7 +298,7 @@ namespace BandSite.Controllers
                         OAuthWebSecurity.CreateOrUpdateAccount(provider, providerUserId, model.UserName);
                         OAuthWebSecurity.Login(provider, providerUserId, createPersistentCookie: false);
 
-                        return RedirectToLocal(returnUrl);
+                        return Json(new {hash = "#account/manage"});
                     }
                     ModelState.AddModelError("UserName", "User name already exists. Please enter a different user name.");
                 }

@@ -186,13 +186,29 @@ namespace BandSite.Controllers
             }
         }
 
+        [AllowAnonymous]
         public ActionResult SongsSearch(string term)
         {
-            using (var db = _dbContextFactory.CreateContext())
+            if (Request.IsAuthenticated)
             {
-                var songs = db.Songs.Content.Where(s => s.Title.Contains(term)).Select(s => new { label = s.Title, value = s.Id }).ToList();
+                using (var db = _dbContextFactory.CreateContext())
+                {
+                    var songs =
+                        db.Songs.Content.Where(s => s.Title.Contains(term))
+                            .Select(s => new {label = s.Title, value = s.Id})
+                            .ToList();
+                    return Json(songs, JsonRequestBehavior.AllowGet);
+                }
+            }
+            else
+            {
+                var songs = new object[]
+                {
+                    new {label = "You need to log in", value = ""}
+                };
                 return Json(songs, JsonRequestBehavior.AllowGet);
             }
+           
         }
 
         [HttpPost]
