@@ -1,0 +1,28 @@
+﻿.offline {
+    visibility: hidden;
+}
+
+.contact-list {
+    margin: 5px 5px;
+    height: 205px;
+}
+
+.dialog-tab {
+    height: 300px;
+    overflow-y: scroll;
+    padding: 5px 10px;
+}
+
+.contact-list span {
+    margin-left: 5px;
+}
+
+.text-area {
+    padding: 0 5px;
+}
+
+.contact-scroller {
+     overflow-y: scroll;
+     height: 212px;
+}
+

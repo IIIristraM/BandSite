@@ -20,7 +20,6 @@ function generateGUID() {
 function AudioPlayer(options) {
     this.id = options.id;
     this.playlist = options.playlist;
-    for (var i = 0; i < this.playlist.length; i++) this.playlist[i].url = "/Song/GetStream/" + this.playlist[i].id;
     this.defaultGUID = generateGUID();
     this.currentVolume = 1.0;
 }
@@ -80,6 +79,8 @@ AudioPlayer.prototype.addPlaylistItem = function (title, url, guid) {
 };
 
 AudioPlayer.prototype.generatePlaylistMarkup = function () {
+    var _this = this;
+    for (var i = 0; i < this.playlist.length; i++) this.playlist[i].url = "/Song/GetStream/" + this.playlist[i].id;
     var guid = this.defaultGUID;
     var audiolist = "";
     for (var i = 0; i < this.playlist.length; i++) {
@@ -94,13 +95,18 @@ AudioPlayer.prototype.generatePlaylistMarkup = function () {
                         "<i class='remove-item glyphicon glyphicon-trash'></i><div class='clear-fix'></div>" +
                     "</li>";
     }
-    return audiolist;
+    $("#" + this.id).find(".play-list").html(audiolist);
+    $("#" + this.id).find(".play-list").sortable({
+        update: function (event, ui) {
+            _this.defaultGUID = $("#" + _this.id).find(".play-list-item").first().attr("data-song-guid");
+            _this.updatePlaylistOrder(event, ui);
+        }
+    });
+    this.bindPlayList();
 };
 
 AudioPlayer.prototype.generateMarkup = function () {
-    var _this = this;
     $("#" + this.id).empty();
-    var audiolist = this.generatePlaylistMarkup();
     var title = "No songs in list";
     var id = "";
     if (this.playlist.length > 0) {
@@ -126,16 +132,9 @@ AudioPlayer.prototype.generateMarkup = function () {
            "<hr>" +
        "</div>" +
        "<br/>" +
-       "<ul class='play-list'>" +
-           audiolist +
-       "</ul>"
+       "<ul class='play-list'></ul>"
     );
-    $("#" + this.id).find(".play-list").sortable({
-        update: function (event, ui) {
-            _this.defaultGUID = $("#" + _this.id).find(".play-list-item").first().attr("data-song-guid");
-            _this.updatePlaylistOrder(event, ui);
-        }
-    });
+    this.generatePlaylistMarkup();
 };
 
 AudioPlayer.prototype.updatePlaylistOrder = function () {
@@ -410,8 +409,6 @@ AudioPlayer.prototype.bindEvents = function () {
 
     this.getAudio().get(0).addEventListener("timeupdate", function () { _this.renderProgress(); });
     this.getAudio().get(0).addEventListener("ended", function () { _this.checkLoop(); });
-
-    this.bindPlayList();
 
     $player.find(".volume-slider").slider({
         range: "min",

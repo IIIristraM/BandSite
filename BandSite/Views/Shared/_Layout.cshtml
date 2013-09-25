@@ -9,6 +9,7 @@
         @Styles.Render("~/Content/bootstrap/bootstrap.css")
         @Styles.Render("~/Content/bootstrap/bootstrap-theme.css")
         @Styles.Render("~/Content/audioPlayer.css")
+        @Styles.Render("~/Content/chat.css")
         @Scripts.Render("~/bundles/jquery")
         @Scripts.Render("http://code.jquery.com/ui/1.10.3/jquery-ui.js")
         @Scripts.Render("~/bundles/jqueryval")
@@ -17,6 +18,7 @@
         @Scripts.Render("~/signalr/hubs")
         @Scripts.Render("~/Scripts/bootstrap.js")
         @Scripts.Render("~/Scripts/audioPlayer.js")
+        @Scripts.Render("~/Scripts/chat.js")
         @Scripts.Render("~/Scripts/controls.js")
         @Scripts.Render("~/Scripts/navigation.js")
     </head>
@@ -31,6 +33,7 @@
             </ul>
             <div id="login-area"></div>
         </div>
+        <div id="chat"></div>
         @RenderBody()
     </body>
 </html>

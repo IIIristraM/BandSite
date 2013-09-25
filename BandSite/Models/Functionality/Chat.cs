@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Web.UI.WebControls;
+using BandSite.Models.DataLayer;
 using BandSite.Models.Entities;
 using System;
 using System.Linq;
@@ -7,27 +9,33 @@ namespace BandSite.Models.Functionality
 {
     public class Chat : IChat
     {
-        public IEnumerable<Message> GetUnreadMessages(string userName)
+        private readonly IDbContextFactory _dbContextFactory;
+
+        public Chat(IDbContextFactory dbContextFactory)
         {
-            using (var db = MvcApplication.DbFactory.CreateContext())
+            _dbContextFactory = dbContextFactory;
+        }
+
+        public IEnumerable<Message> GetHistory(string caller, string user)
+        {
+            using (var db = _dbContextFactory.CreateContext())
             {
-                var user = db.UserProfiles.Content.FirstOrDefault(u => u.UserName == userName);
-                if (user != null)
+                foreach (var msg in db.Messages.Content
+                                               .Where(m => ((m.UserFrom.UserName == caller) && (m.UserTo.UserName == user)) ||
+                                                           ((m.UserFrom.UserName == user) && (m.UserTo.UserName == caller)))
+                                               .OrderBy(m => m.Published).ToList())
                 {
-                    var unreadMsgs = user.UnreadMessages();
-                    foreach (var msg in unreadMsgs)
-                    {
+                    yield return msg;
+                    if ((msg.Status == MessageStatus.Unread.ToString()) && (msg.UserTo.UserName == caller))
                         msg.Status = MessageStatus.Read.ToString();
-                        yield return msg;
-                    }
-                    db.SaveChanges();
                 }
+                db.SaveChanges();
             }
         }
 
-        public IEnumerable<Message> Send(string userFromName, string[] usersToNames, string message)
+        public IEnumerable<Message> AddMessage(string userFromName, string[] usersToNames, string message)
         {
-            using (var db = MvcApplication.DbFactory.CreateContext())
+            using (var db = _dbContextFactory.CreateContext())
             {
                 var userFrom = db.UserProfiles.Content.FirstOrDefault(u => u.UserName == userFromName);
                 if (userFrom != null)

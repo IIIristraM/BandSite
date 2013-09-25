@@ -10,7 +10,7 @@ namespace BandSiteTests
     public class DataLayerTests
     {
         private readonly IDbContextFactory _db = //new FakeDbContextFactory();
-                                                 new DbContextEfFactory("BandSiteDB-Test");
+                                                 new DbContextEfFactory("Test");
 
         #region Song Repository
 

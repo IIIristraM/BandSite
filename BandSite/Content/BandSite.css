@@ -82,3 +82,16 @@ i {
 .float-left {
     float: left;
 }
+
+.float-right {
+    float: right;
+}
+
+#chat {
+    position: fixed;
+    left: 0px;
+    top: 130px;
+    z-index: 999;
+    width: 15%;
+    min-width: 180px;
+}

@@ -1,57 +1,25 @@
 ﻿@model BandSite.Models.ViewModels.LocalPasswordModel
 
-@Scripts.Render("~/Scripts/profile-management.js")
-
 <div id="settings-tabs" class="container">
-    <div class="row">
-        <div class="col-lg-2">
-            <ul class="nav nav-stacked nav-pills">
-                <li class="active">
-                    <a href="#account-tab" data-toggle="tab">Account Settings</a>
-                </li>
-                <li>
-                    <a href="#chat-tab" data-toggle="tab">Chat</a>
-                </li>
-            </ul>
-        </div>
-        <div class="col-lg-8 col-lg-offset-2 tab-content">
-            <div id="account-tab" class="tab-pane active fade in">
-                @if (!String.IsNullOrEmpty(ViewBag.StatusMessage))
-                {
-                    <div class="modal fade" tabindex="-1" role="dialog" id="statusModal">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                                    <div class="modal-title">Message</div>
-                                </div>
-                                <div class="modal-body">@ViewBag.StatusMessage</div>
-                            </div>
-                        </div>
-                    </div>
-                    <script>$('#statusModal').modal({show: true})</script>
-                }
-                @(ViewBag.HasLocalPassword ? Html.Partial("_ChangePasswordPartial") : Html.Partial("_SetPasswordPartial"))
-                @Html.Action("RemoveExternalLogins")
-                <br><hr><br>
-                <div class="h4">Add an external login</div>
-                <br/>
-                @Html.Action("ExternalLoginsList", new { ReturnUrl = ViewBag.ReturnUrl })
-            </div>
-            <div id="chat-tab" class="tab-pane fade">
-                <div class="float-left">
-                    <ul class="user-list"></ul>
-                </div>
-                <div class="float-left">
-                    <div class="msg-content">
-                        <ul id="msg-list" class="msg-list"></ul>
-                    </div>
-                    <input id="user-name" type="hidden" />
-                    <div><textarea id="message-txt" class="message-txt"></textarea></div>
-                    <div><input id="send-btn" type="button" value="send"/></div>
-                </div>
-                <div class="clear-fix"></div>
-            </div>
-        </div>
-    </div>
+    @if (!String.IsNullOrEmpty(ViewBag.StatusMessage))
+          {
+              <div class="modal fade" tabindex="-1" role="dialog" id="statusModal">
+                  <div class="modal-dialog">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                              <div class="modal-title">Message</div>
+                          </div>
+                          <div class="modal-body">@ViewBag.StatusMessage</div>
+                      </div>
+                  </div>
+              </div>
+              <script>$('#statusModal').modal({show: true})</script>
+          }
+    @(ViewBag.HasLocalPassword ? Html.Partial("_ChangePasswordPartial") : Html.Partial("_SetPasswordPartial"))
+    @Html.Action("RemoveExternalLogins")
+    <br><hr><br>
+    <div class="h4">Add an external login</div>
+    <br/>
+    @Html.Action("ExternalLoginsList", new { ReturnUrl = ViewBag.ReturnUrl }) 
 </div>

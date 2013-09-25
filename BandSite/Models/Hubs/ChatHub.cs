@@ -13,6 +13,7 @@ namespace BandSite.Models.Hubs
     {
         private static readonly ConcurrentDictionary<string, string> ConnectedUsers = new ConcurrentDictionary<string, string>();
         private  readonly  IChat _chat;
+        private readonly string _dateTemplate;
 
         public override Task OnDisconnected()
         {
@@ -20,7 +21,8 @@ namespace BandSite.Models.Hubs
             {
                 string value;
                 ConnectedUsers.TryRemove(Context.User.Identity.Name, out value);
-                Clients.Others.onOffline(Context.User.Identity.Name);
+                Clients.Others.contactOffline(Context.User.Identity.Name);
+                Clients.Caller.logout();
             }
             return base.OnDisconnected();
         }
@@ -29,38 +31,40 @@ namespace BandSite.Models.Hubs
         {
             ConnectedUsers.AddOrUpdate(Context.User.Identity.Name, Context.ConnectionId, (key, oldValue) => Context.ConnectionId);
 
-            Clients.Others.onOnline(new[] { Context.User.Identity.Name });
-            Clients.Caller.onOnline(ConnectedUsers.Select(u => u.Key).ToArray());
-
-            foreach (var msg in _chat.GetUnreadMessages(Context.User.Identity.Name))
-            {
-                Clients.Caller.addMessage(msg.UserFrom.UserName, HttpUtility.HtmlEncode(msg.Text));
-            }
+            Clients.Others.contactOnline(new[] { Context.User.Identity.Name });
+            Clients.Caller.login(ConnectedUsers.Select(u => u.Key).ToArray());
+           
             return base.OnConnected();
+        }
+
+        public void LoadHistoryWith(string user)
+        {
+            foreach (var msg in _chat.GetHistory(Context.User.Identity.Name, user))
+            {
+                Clients.Caller.addMessage(user, msg.UserFrom.UserName, HttpUtility.HtmlEncode(msg.Text), msg.Published.Value.ToString(_dateTemplate));
+            }
         }
 
         public ChatHub(IChat chat)
         {
             _chat = chat;
+            _dateTemplate = "dd-MMM  HH:mm";
         }
 
-        public void Send(string users, string message)
+        public void AddMessage(string users, string message)
         {
             var list = users.Split(new[] { '#' }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var msg in _chat.Send(Context.User.Identity.Name, list, message))
+            foreach (var msg in _chat.AddMessage(Context.User.Identity.Name, list, message))
             {
-                 if (ConnectedUsers.ContainsKey(msg.UserTo.UserName))
-                 {
-                     string connectionId;
-                     if (ConnectedUsers.TryGetValue(msg.UserTo.UserName, out connectionId))
-                     {
-                         Clients.Client(connectionId).addMessage(Context.User.Identity.Name, HttpUtility.HtmlEncode(message));
-                     }
-                 }
-                 else
-                 {
-                     msg.Status =  MessageStatus.Unread.ToString();
-                 }
+                if (!ConnectedUsers.ContainsKey(msg.UserTo.UserName))
+                {
+                    msg.Status = MessageStatus.Unread.ToString();
+                }
+                else
+                {
+                    Clients.Client(ConnectedUsers[msg.UserTo.UserName]).addMessage(Context.User.Identity.Name, Context.User.Identity.Name, HttpUtility.HtmlEncode(message), msg.Published.Value.ToString(_dateTemplate));
+                }
+                Clients.Caller.addMessage(users, Context.User.Identity.Name, HttpUtility.HtmlEncode(message), msg.Published.Value.ToString(_dateTemplate));
             }
         }
     }

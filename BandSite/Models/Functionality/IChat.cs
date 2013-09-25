@@ -5,7 +5,7 @@ namespace BandSite.Models.Functionality
 {
     public interface IChat
     {
-        IEnumerable<Message> GetUnreadMessages(string userName);
-        IEnumerable<Message> Send(string userFromName, string[] usersToNames, string message);
+        IEnumerable<Message> GetHistory(string caller, string user);
+        IEnumerable<Message> AddMessage(string userFromName, string[] usersToNames, string message);
     }
 }

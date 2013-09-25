@@ -13,20 +13,6 @@ namespace BandSite
 
     public class MvcApplication : System.Web.HttpApplication
     {
-        private static IDbContextFactory _dbFactory;
-
-        public static IDbContextFactory DbFactory 
-        {
-            get 
-            { 
-                if (_dbFactory == null) 
-                { 
-                    _dbFactory = new DbContextEfFactory("DefaultConnection"); 
-                }
-                return _dbFactory;
-            }
-        }
-
         protected void Application_Start()
         {
             //AreaRegistration.RegisterAllAreas();
