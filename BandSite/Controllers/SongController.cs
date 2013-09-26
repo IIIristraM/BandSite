@@ -247,6 +247,7 @@ namespace BandSite.Controllers
             }
         }
 
+        [AllowAnonymous]
         public FileStreamResult GetStream(int id)
         {
             using (var db = _dbContextFactory.CreateContext())
@@ -254,6 +255,7 @@ namespace BandSite.Controllers
                 Response.Headers.Add("Accept-Ranges", "bytes");
                 Response.Cache.SetCacheability(HttpCacheability.Public);
                 Response.Cache.SetMaxAge(new TimeSpan(0, 10, 0));
+                //Response.Cache.SetSlidingExpiration(true);
                 var query = db.Songs.Content.Where(s => s.Id == id).Select(s => s.File);
                 var song = query.FirstOrDefault();
                 if (song != null)

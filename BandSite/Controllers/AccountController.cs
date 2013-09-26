@@ -342,6 +342,7 @@ namespace BandSite.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public ActionResult GetPlaylist()
         {
             using (var db = _dbContextFactory.CreateContext())

@@ -114,7 +114,7 @@ AudioPlayer.prototype.generateMarkup = function () {
         title = this.playlist[0].title;
     }
     $("#" + this.id).html(
-       "<audio src='/Song/GetStream/" + id + "'></audio>" +
+       "<audio src='" + ((id !== "") ? ("/Song/GetStream/" + id) : "") + "'></audio>" +
        "<div class='song-control-panel' data-song-guid='" + this.defaultGUID + "'>" +
            "<hr>" +
            "<div class='time-line'>" +
