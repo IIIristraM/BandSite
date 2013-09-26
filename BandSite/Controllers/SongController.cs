@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using System.IO;
@@ -252,10 +253,6 @@ namespace BandSite.Controllers
         {
             using (var db = _dbContextFactory.CreateContext())
             {
-                Response.Headers.Add("Accept-Ranges", "bytes");
-                Response.Cache.SetCacheability(HttpCacheability.Public);
-                Response.Cache.SetMaxAge(new TimeSpan(0, 10, 0));
-                //Response.Cache.SetSlidingExpiration(true);
                 var query = db.Songs.Content.Where(s => s.Id == id).Select(s => s.File);
                 var song = query.FirstOrDefault();
                 if (song != null)
@@ -272,7 +269,8 @@ namespace BandSite.Controllers
                     if (reader.Read())
                     {
                         Stream content = new SqlReaderStream(reader, 0);
-                        return File(content, "audio/mp3");
+                        SetResponse(song.Length);
+                        return File(content, "audio/mp3"); 
                     }
                     return null;
                 }
@@ -336,6 +334,24 @@ namespace BandSite.Controllers
                     return Json(new { status = "fail", error = "song not found" });
                 }
                 return Json(new { status = "fail", error = "user not found" });
+            }
+        }
+
+        private void SetResponse(int contentLength)
+        {
+            Response.Headers.Add("Accept-Ranges", "bytes");
+
+            var range = Request.Headers["Range"];
+            if (!String.IsNullOrEmpty(range) &&
+                (range.IndexOf("-") == range.Length - 1))
+            {
+                var left = range.IndexOf("=") + 1;
+                var right = range.IndexOf("-");
+                int startPoint = Int32.Parse(range.Substring(left, right - left));
+
+                Response.Headers.Add("Content-Range", "bytes " + startPoint + "-" + (contentLength - 1) + "/" + contentLength);
+                Response.Headers.Add("Content-Length", (contentLength - startPoint).ToString());
+                Response.StatusCode = (int)HttpStatusCode.PartialContent;
             }
         }
     }
