@@ -268,8 +268,7 @@ namespace BandSite.Controllers
                                                               CommandBehavior.CloseConnection);
                     if (reader.Read())
                     {
-                        Stream content = new SqlReaderStream(reader, 0);
-                        SetResponse(song.Length);
+                        Stream content = new SqlReaderStream(reader, 0, SetResponseAndGetPosition(song.Length));
                         return File(content, "audio/mp3"); 
                     }
                     return null;
@@ -337,7 +336,7 @@ namespace BandSite.Controllers
             }
         }
 
-        private void SetResponse(int contentLength)
+        private int SetResponseAndGetPosition(int contentLength)
         {
             Response.Headers.Add("Accept-Ranges", "bytes");
 
@@ -352,7 +351,9 @@ namespace BandSite.Controllers
                 Response.Headers.Add("Content-Range", "bytes " + startPoint + "-" + (contentLength - 1) + "/" + contentLength);
                 Response.Headers.Add("Content-Length", (contentLength - startPoint).ToString());
                 Response.StatusCode = (int)HttpStatusCode.PartialContent;
+                return startPoint;
             }
+            return 0;
         }
     }
 
@@ -364,10 +365,11 @@ namespace BandSite.Controllers
 
         public SqlReaderStream(
             SqlDataReader reader,
-            int columnIndex)
+            int columnIndex, int position)
         {
             _reader = reader;
             _columnIndex = columnIndex;
+            _position = position;
         }
 
         public override long Position
