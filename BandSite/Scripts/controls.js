@@ -204,9 +204,6 @@ $(function() {
         if (updateContacts === "online") {
             chat.login();
         }
-        else if (updateContacts === "offline") {
-            chat.logout();
-        }
     });
     chat = $("#chat").chat();
 });

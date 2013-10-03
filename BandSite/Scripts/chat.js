@@ -78,10 +78,9 @@ Chat.prototype._addContact = function (contact) {
 };
 
 Chat.prototype.logout = function () {
-    /*$.connection.hub.stop();
+    $.connection.hub.stop();
     $("#" + this.id).find(".contact-list").empty();
-    $("#" + this.id).find(".tab-content").empty();*/
-    this._chat.server.logout();
+    $("#" + this.id).find(".tab-content").empty();
 };
 
 Chat.prototype.login = function() {

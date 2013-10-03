@@ -34,11 +34,6 @@ namespace BandSite.Models.Hubs
             return base.OnConnected();
         }
 
-        public void Logout()
-        {
-            var i = 0;
-        }
-
         public void LoadHistoryWith(string user)
         {
             foreach (var msg in _chat.GetHistory(Context.User.Identity.Name, user))
