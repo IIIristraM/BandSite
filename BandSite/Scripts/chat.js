@@ -81,7 +81,7 @@ Chat.prototype.logout = function () {
     /*$.connection.hub.stop();
     $("#" + this.id).find(".contact-list").empty();
     $("#" + this.id).find(".tab-content").empty();*/
-    self._chat.server.logout();
+    this._chat.server.logout();
 };
 
 Chat.prototype.login = function() {
