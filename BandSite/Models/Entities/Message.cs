@@ -7,7 +7,7 @@ namespace BandSite.Models.Entities
     {
         Unread = 0,
         Read = 1,
-        Write = 2
+        Undelivered = 2
     }
 
     public class Message : EntityBase
@@ -24,6 +24,8 @@ namespace BandSite.Models.Entities
 
         public virtual UserProfile UserTo { get; set; }
 
-        public virtual string Status { get; set; }
+        public virtual MessageStatus Status { get; set; }
+
+        public virtual Guid Guid { get; set; }
     }
 }

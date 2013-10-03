@@ -26,3 +26,24 @@
      height: 212px;
 }
 
+.chat .panel-body{
+    padding: 0 0 5px 0;
+}
+
+.chat hr{
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.chat .panel-heading{
+    text-align: center;
+}
+
+.undelivered{
+    background: lightgray;
+}
+
+.unread{
+    background: lightblue;
+}
+

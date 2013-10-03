@@ -26,8 +26,6 @@ namespace BandSite.Models.Functionality
                                                .OrderBy(m => m.Published).ToList())
                 {
                     yield return msg;
-                    if ((msg.Status == MessageStatus.Unread.ToString()) && (msg.UserTo.UserName == caller))
-                        msg.Status = MessageStatus.Read.ToString();
                 }
                 db.SaveChanges();
             }
@@ -48,10 +46,11 @@ namespace BandSite.Models.Functionality
                             var msg = new Message
                             {
                                 Text = message,
-                                Status = MessageStatus.Read.ToString(),
+                                Status = MessageStatus.Undelivered,
                                 Published = DateTime.Now,
                                 UserFrom = userFrom,
-                                UserTo = userTo
+                                UserTo = userTo,
+                                Guid = Guid.NewGuid()
                             };
                             db.Messages.Insert(msg);
                             yield return msg;

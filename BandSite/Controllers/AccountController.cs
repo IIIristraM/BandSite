@@ -52,7 +52,7 @@ namespace BandSite.Controllers
         {
             if (ModelState.IsValid && WebSecurity.Login(model.UserName, model.Password, persistCookie: model.RememberMe))
             {
-                return Json(new { hash = "#home/index?updatePlaylist=true&updateContacts=true" });
+                return Json(new { hash = "#home/index?updatePlaylist=true&updateContacts=online" });
             }
 
             // If we got this far, something failed, redisplay form
@@ -68,7 +68,7 @@ namespace BandSite.Controllers
         public ActionResult LogOff()
         {
             WebSecurity.Logout();
-            return Json(new { hash = "#home/index?updatePlaylist=true&updateContacts=true" });
+            return Json(new { hash = "#home/index?updatePlaylist=true&updateContacts=offline" });
         }
 
         //
@@ -95,7 +95,7 @@ namespace BandSite.Controllers
                 {
                     WebSecurity.CreateUserAndAccount(model.UserName, model.Password);
                     WebSecurity.Login(model.UserName, model.Password);
-                    return Json(new { hash = "#home/index?updatePlaylist=true&updateContacts=true" });
+                    return Json(new { hash = "#home/index?updatePlaylist=true&updateContacts=online" });
                 }
                 catch (MembershipCreateUserException e)
                 {
@@ -280,7 +280,7 @@ namespace BandSite.Controllers
 
                 if (User.Identity.IsAuthenticated || !OAuthWebSecurity.TryDeserializeProviderUserId(model.ExternalLoginData, out provider, out providerUserId))
                 {
-                    return Redirect("~/#account/Manage?updatePlaylist=true&updateContacts=true");
+                    return Redirect("~/#account/Manage?updatePlaylist=true&updateContacts=online");
                 }
 
                 if (ModelState.IsValid)
@@ -298,7 +298,7 @@ namespace BandSite.Controllers
                         OAuthWebSecurity.CreateOrUpdateAccount(provider, providerUserId, model.UserName);
                         OAuthWebSecurity.Login(provider, providerUserId, createPersistentCookie: false);
 
-                        return Json(new { hash = "#account/manage?updatePlaylist=true&updateContacts=true" });
+                        return Json(new { hash = "#account/manage?updatePlaylist=true&updateContacts=online" });
                     }
                     ModelState.AddModelError("UserName", "User name already exists. Please enter a different user name.");
                 }
@@ -419,7 +419,7 @@ namespace BandSite.Controllers
             {
                 return Redirect(returnUrl);
             }
-            return Redirect("~/#home/index?updatePlaylist=true&updateContacts=true");
+            return Redirect("~/#home/index?updatePlaylist=true&updateContacts=online");
         }
 
         public enum ManageMessageId

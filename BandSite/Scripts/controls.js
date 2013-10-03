@@ -7,13 +7,13 @@ function generatePlayer() {
         cache: false,
         type: "POST"
     }).done(function (playlist) {
-        
+        var options = {};
         if (Object.prototype.toString.call(playlist) === '[object Array]') {
-            var options = {
+            options = {
                 playlist: playlist
             };
         } else {
-            var options = {
+            options = {
                 playlist: []
             };
         }
@@ -179,7 +179,7 @@ function getParameterByName(name) {
     name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
         results = regex.exec(location.href);
-    return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
 $(function() {
@@ -201,10 +201,12 @@ $(function() {
                 player.generatePlaylistMarkup();
             });
         }
-        if (updateContacts) {
+        if (updateContacts === "online") {
             chat.login();
         }
-        //location.href = location.href.substr(0, (location.href.indexOf("?") != -1) ? location.href.indexOf("?") : location.href.length - 1);
+        else if (updateContacts === "offline") {
+            chat.logout();
+        }
     });
     chat = $("#chat").chat();
 });

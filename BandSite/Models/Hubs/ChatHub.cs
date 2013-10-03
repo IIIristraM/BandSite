@@ -17,6 +17,18 @@ namespace BandSite.Models.Hubs
 
         public override Task OnDisconnected()
         {
+            Logout();
+            return base.OnDisconnected();
+        }
+
+        public override Task OnConnected()
+        {
+            Login();
+            return base.OnConnected();
+        }
+
+        public void Logout()
+        {
             if (ConnectedUsers.ContainsKey(Context.User.Identity.Name))
             {
                 string value;
@@ -24,24 +36,40 @@ namespace BandSite.Models.Hubs
                 Clients.Others.contactOffline(Context.User.Identity.Name);
                 Clients.Caller.logout();
             }
-            return base.OnDisconnected();
         }
 
-        public override Task OnConnected()
+        public void Login()
         {
             ConnectedUsers.AddOrUpdate(Context.User.Identity.Name, Context.ConnectionId, (key, oldValue) => Context.ConnectionId);
 
             Clients.Others.contactOnline(new[] { Context.User.Identity.Name });
             Clients.Caller.login(ConnectedUsers.Select(u => u.Key).ToArray());
-           
-            return base.OnConnected();
         }
 
         public void LoadHistoryWith(string user)
         {
             foreach (var msg in _chat.GetHistory(Context.User.Identity.Name, user))
             {
-                Clients.Caller.addMessage(user, msg.UserFrom.UserName, HttpUtility.HtmlEncode(msg.Text), msg.Published.Value.ToString(_dateTemplate));
+                if (msg.Status.ToString() == MessageStatus.Undelivered.ToString())
+                {
+                    msg.Status = MessageStatus.Unread;
+                    if (ConnectedUsers.ContainsKey(msg.UserFrom.UserName))
+                    {
+                        Clients.Client(ConnectedUsers[msg.UserFrom.UserName]).messageDelivered(msg.Guid.ToString());
+                    }
+                }
+
+                Clients.Caller.addMessage(user, 
+                                          msg.UserFrom.UserName,
+                                          new
+                                          {
+                                              guid = msg.Guid.ToString(),
+                                              text = HttpUtility.HtmlEncode(msg.Text),
+                                              date = msg.Published.Value.ToString(_dateTemplate),
+                                              status = ((msg.UserFrom.UserName != Context.User.Identity.Name) || 
+                                                       (msg.Status == MessageStatus.Undelivered))
+                                                       ? msg.Status.ToString() : ""
+                                          });
             }
         }
 
@@ -56,15 +84,27 @@ namespace BandSite.Models.Hubs
             var list = users.Split(new[] { '#' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var msg in _chat.AddMessage(Context.User.Identity.Name, list, message))
             {
-                if (!ConnectedUsers.ContainsKey(msg.UserTo.UserName))
+                if (ConnectedUsers.ContainsKey(msg.UserTo.UserName))
                 {
-                    msg.Status = MessageStatus.Unread.ToString();
+                    msg.Status = MessageStatus.Unread;
+                    Clients.Client(ConnectedUsers[msg.UserTo.UserName]).addMessage(Context.User.Identity.Name, 
+                                                                                   Context.User.Identity.Name, 
+                                                                                   new {
+                                                                                       guid = msg.Guid.ToString(),
+                                                                                       text = HttpUtility.HtmlEncode(msg.Text),
+                                                                                       date = msg.Published.Value.ToString(_dateTemplate),
+                                                                                       status = msg.Status.ToString()
+                                                                                   });
                 }
-                else
-                {
-                    Clients.Client(ConnectedUsers[msg.UserTo.UserName]).addMessage(Context.User.Identity.Name, Context.User.Identity.Name, HttpUtility.HtmlEncode(message), msg.Published.Value.ToString(_dateTemplate));
-                }
-                Clients.Caller.addMessage(users, Context.User.Identity.Name, HttpUtility.HtmlEncode(message), msg.Published.Value.ToString(_dateTemplate));
+                Clients.Caller.addMessage(users, 
+                                          Context.User.Identity.Name,
+                                          new
+                                          {
+                                              guid = msg.Guid.ToString(),
+                                              text = HttpUtility.HtmlEncode(msg.Text),
+                                              date = msg.Published.Value.ToString(_dateTemplate),
+                                              status = (msg.Status == MessageStatus.Undelivered) ? msg.Status.ToString() : ""
+                                          });
             }
         }
     }

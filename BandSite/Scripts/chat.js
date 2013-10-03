@@ -27,7 +27,7 @@ function Chat(options) {
                                    "<button class='btn btn-primary'>Send</button></div>" +
                                  "</div>" +
                               "</div>";
-    this._contactListItemTemplate = "<a class='list-group-item' data-toggle='tab'><i class='offline glyphicon glyphicon-user float-left'></i><span></span></a>";
+    this._contactListItemTemplate = "<a class='list-group-item' data-toggle='tab'><i class='offline glyphicon glyphicon-user float-left'></i><span></span><span class='badge'></span></a>";
     this._contactDialogTabTemplate = "<div class='tab-pane fade in'></div>";
 
     this._generateChatMarkup();
@@ -39,10 +39,6 @@ Chat.prototype._generateChatMarkup = function() {
     $("#" + this.id).html(this._containerTemplate);
     this._$sendBtn = $("#" + this.id).find(".btn.btn-primary");
     this._$messageTb = $("#" + this.id).find("textarea");
-    $("#" + this.id).find(".panel-body").css("padding", "0 0 5px 0");
-    $("#" + this.id).find("hr").css("margin-top", "5px");
-    $("#" + this.id).find("hr").css("margin-bottom", "5px");
-    $("#" + this.id).find(".panel-heading").css("text-align", "center");
     $("#" + this.id).find(".contact-list").sortable();
 };
 
@@ -55,11 +51,11 @@ Chat.prototype._markAsOffline = function (contact) {
 };
 
 Chat.prototype._setDefaultContact = function() {
-    var $item = $("#" + this.id).find(".contact-list a").first();
-    $item.addClass("active");
-    this._currentContact = $item.attr("data-contact");
-    $item = $($item.attr("href"));
-    $item.addClass("active");    
+    var $contact = $("#" + this.id).find(".contact-list a").first();
+    $contact.addClass("active");
+    this._currentContact = $contact.attr("data-contact");
+    $dialog = $($contact.attr("href"));
+    $dialog.addClass("active");
 };
 
 Chat.prototype._addContact = function (contact) {
@@ -68,12 +64,13 @@ Chat.prototype._addContact = function (contact) {
     var $item = $("#" + this.id).find(".contact-list a").last();
     var guid = generateGUID();
     $item.attr("href", "#" + guid);
-    $item.find("span").html(contact);
+    $item.find("span").first().html(contact);
     $item.attr("data-contact", contact);
     $item.click(function () {
         self._currentContact = $(this).attr("data-contact");
         $(this).parent().find(".active").removeClass("active");
         $(this).addClass("active");
+        self.resetUnreadMsgCount(contact); //maybe create an other trigger
     });
 
     $("#" + this.id).find(".tab-content").prepend(this._contactDialogTabTemplate);
@@ -81,17 +78,47 @@ Chat.prototype._addContact = function (contact) {
     $item.attr("id", guid);
 };
 
+Chat.prototype.logout = function () {
+    this._chat.server.logout();
+};
+
 Chat.prototype.login = function() {
-    this._chat.client.login();
+    this._chat.server.login();
+};
+
+Chat.prototype.increaseUnreadMsgCount = function (tab) {
+    var $badge = $("#" + this.id).find("a[data-contact=" + tab + "] .badge");
+    var count = 0;
+    if ($badge.html() !== "")
+        count = parseInt($badge.html(), 10);
+    $badge.html(count + 1);
+};
+
+//maybe create more complex logic
+Chat.prototype.resetUnreadMsgCount = function (tab) {
+    var $badge = $("#" + this.id).find("a[data-contact=" + tab + "] .badge");
+    $badge.html("");
 };
 
 Chat.prototype._addHubClientMethods = function () {
     var self = this;
     var methodCollection = this._chat.client;
-    methodCollection.addMessage = function (tab, contact, message, data) {
+    methodCollection.messageDelivered = function (guid) {
+        $("#" + self.id).find("p[data-msg-guid=" + guid + "]").removeClass("undelivered");
+    }
+    methodCollection.addMessage = function (tab, contact, message) {
         var tabId = $("#" + self.id).find("a[data-contact=" + tab + "]").attr("href");
         var dialogTab = $(tabId);
-        dialogTab.prepend("<p><b>" + contact + " [" + data + "]:</b><br><span>" + message + "</span></p>");
+        var $msg = dialogTab.prepend("<p data-msg-guid='" + message.guid + "'><b>" + contact + " [" + message.date + "]:</b><br><span>" + message.text + "</span></p>");
+        switch (message.status) {
+            case "Undelivered":
+                $msg.find("p").first().addClass("undelivered");
+                break;
+            case "Unread":
+                $msg.find("p").first().addClass("unread");
+                self.increaseUnreadMsgCount(tab);
+                break;
+        }
     };
     methodCollection.login = function (contactsOnline) {
         $.ajax({
@@ -105,13 +132,16 @@ Chat.prototype._addHubClientMethods = function () {
                 self._addContact(allContacts[i].name);
                 self._chat.server.loadHistoryWith(allContacts[i].name);
             }
-            for (i = 0; i < (contactsOnline !== undefined) ? contactsOnline.length : 0; i++) {
+            var onlineCount = (contactsOnline !== undefined) ? contactsOnline.length : 0;
+            for (i = 0; i < onlineCount; i++) {
                 self._markAsOnline(contactsOnline[i]);
             }
             self._setDefaultContact();
         });
     };
     methodCollection.logout = function () {
+        $("#" + self.id).find(".contact-list").empty();
+        $("#" + self.id).find(".tab-content").empty();
     };
     methodCollection.contactOnline = function (contact) {
         self._markAsOnline(contact);
@@ -126,6 +156,7 @@ Chat.prototype._bindSendBtnClickHandler = function () {
     var self = this;
     this._$sendBtn.click(function() {
         self._chat.server.addMessage(self._currentContact, self._$messageTb.val());
+        self._$messageTb.val("");
     });
 };
 

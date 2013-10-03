@@ -350,7 +350,7 @@ namespace BandSiteTests
                     Published = DateTime.Now,
                     UserFrom = userFrom,
                     UserTo = userTo,
-                    Status = MessageStatus.Unread.ToString()
+                    Status = MessageStatus.Unread
                 };
                 var oldCount = context.Messages.Content.Count();
 
@@ -380,7 +380,7 @@ namespace BandSiteTests
                 var update = new Message
                 {
                     Text = "xxxxxxxxxxxxxxx",
-                    Status = MessageStatus.Read.ToString()
+                    Status = MessageStatus.Undelivered
                 };
 
                 context.Messages.Update(message.Id, update);

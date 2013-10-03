@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 using System.IO;
@@ -251,6 +253,12 @@ namespace BandSite.Controllers
         [AllowAnonymous]
         public FileStreamResult GetStream(int id)
         {
+            Response.Headers.Add("Accept-Ranges", "bytes");
+            Response.StatusCode = (int)HttpStatusCode.PartialContent;
+            Response.Cache.SetCacheability(HttpCacheability.Public);
+            Response.Cache.SetMaxAge(new TimeSpan(1, 0, 0));
+            Response.Cache.SetSlidingExpiration(true);
+
             using (var db = _dbContextFactory.CreateContext())
             {
                 var query = db.Songs.Content.Where(s => s.Id == id).Select(s => s.File);
@@ -268,7 +276,12 @@ namespace BandSite.Controllers
                                                               CommandBehavior.CloseConnection);
                     if (reader.Read())
                     {
-                        Stream content = new SqlReaderStream(reader, 0, SetResponseAndGetPosition(song.Length));
+                        var range = GetRange(song.Length);
+                        Stream content = new SqlReaderStream(reader, 0, range[0]);
+
+                        Response.Headers.Add("Content-Range", "bytes " + range[0] + "-" + (range[1] - 1) + "/" + song.Length);
+                        Response.Headers.Add("Content-Length", (range[1] - range[0]).ToString(CultureInfo.InvariantCulture));
+
                         return File(content, "audio/mp3"); 
                     }
                     return null;
@@ -336,24 +349,22 @@ namespace BandSite.Controllers
             }
         }
 
-        private int SetResponseAndGetPosition(int contentLength)
+        private int[] GetRange(int contentLength)
         {
-            Response.Headers.Add("Accept-Ranges", "bytes");
+            var range = new int[2];
+            range[1] = contentLength;
 
-            var range = Request.Headers["Range"];
-            if (!String.IsNullOrEmpty(range) &&
-                (range.IndexOf("-") == range.Length - 1))
+            var rangeHeader = Request.Headers["Range"];
+            if (!String.IsNullOrEmpty(rangeHeader))
             {
-                var left = range.IndexOf("=") + 1;
-                var right = range.IndexOf("-");
-                int startPoint = Int32.Parse(range.Substring(left, right - left));
-
-                Response.Headers.Add("Content-Range", "bytes " + startPoint + "-" + (contentLength - 1) + "/" + contentLength);
-                Response.Headers.Add("Content-Length", (contentLength - startPoint).ToString());
-                Response.StatusCode = (int)HttpStatusCode.PartialContent;
-                return startPoint;
+                Match match = Regex.Match(rangeHeader, "=(\\d+)-(\\d*)"); 
+                range[0] = Int32.Parse(match.Groups[1].Captures[0].Value);
+                range[1] = ((match.Groups[2].Captures.Count == 1) && (!String.IsNullOrEmpty(match.Groups[2].Captures[0].Value)))
+                    ? Int32.Parse(match.Groups[2].Captures[0].Value)
+                    : contentLength;
             }
-            return 0;
+
+            return range;
         }
     }
 

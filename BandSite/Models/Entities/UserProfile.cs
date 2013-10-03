@@ -35,17 +35,17 @@ namespace BandSite.Models.Entities
 
         public IEnumerable<Message> UnreadMessages()
         {
-            return InputMessages.Where(m => m.Status == MessageStatus.Unread.ToString()).ToList();
+            return InputMessages.Where(m => m.Status == MessageStatus.Unread).ToList();
         }
 
         public IEnumerable<Message> ReadMessages()
         {
-            return InputMessages.Where(m => m.Status == MessageStatus.Read.ToString()).ToList();
+            return InputMessages.Where(m => m.Status == MessageStatus.Read).ToList();
         }
 
         public IEnumerable<Message> ReadMessages(int count)
         {
-            return InputMessages.Where(m => m.Status == MessageStatus.Read.ToString()).Take(count).ToList();
+            return InputMessages.Where(m => m.Status == MessageStatus.Read).Take(count).ToList();
         }
     }
 }

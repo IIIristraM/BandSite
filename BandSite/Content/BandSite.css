@@ -39,7 +39,7 @@ i {
   max-width: 800px !important;
   color: black !important;
   background-color:white !important;
-  border: 1px lightgrey solid;
+  border: 1px lightgray solid;
   padding: 20px 0 !important;
 }
 
@@ -49,11 +49,11 @@ i {
 }
 
 .tooltip.bottom .tooltip-arrow {
-  border-bottom-color: lightgrey !important;
+  border-bottom-color: lightgray !important;
 }
 
 .tooltip.right .tooltip-arrow {
-  border-right-color: lightgrey !important;
+  border-right-color: lightgray !important;
 }
 
 .navbar-devider {
@@ -94,4 +94,8 @@ i {
     z-index: 999;
     width: 15%;
     min-width: 180px;
+}
+
+textarea{
+    resize: vertical !important;
 }
