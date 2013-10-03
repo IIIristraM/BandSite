@@ -17,33 +17,21 @@ namespace BandSite.Models.Hubs
 
         public override Task OnDisconnected()
         {
-            Logout();
-            return base.OnDisconnected();
-        }
-
-        public override Task OnConnected()
-        {
-            Login();
-            return base.OnConnected();
-        }
-
-        public void Logout()
-        {
             if (ConnectedUsers.ContainsKey(Context.User.Identity.Name))
             {
                 string value;
                 ConnectedUsers.TryRemove(Context.User.Identity.Name, out value);
                 Clients.Others.contactOffline(Context.User.Identity.Name);
-                Clients.Caller.logout();
             }
+            return base.OnDisconnected();
         }
 
-        public void Login()
+        public override Task OnConnected()
         {
             ConnectedUsers.AddOrUpdate(Context.User.Identity.Name, Context.ConnectionId, (key, oldValue) => Context.ConnectionId);
-
             Clients.Others.contactOnline(new[] { Context.User.Identity.Name });
             Clients.Caller.login(ConnectedUsers.Select(u => u.Key).ToArray());
+            return base.OnConnected();
         }
 
         public void LoadHistoryWith(string user)

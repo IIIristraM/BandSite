@@ -78,11 +78,13 @@ Chat.prototype._addContact = function (contact) {
 };
 
 Chat.prototype.logout = function () {
-    this._chat.server.logout();
+    $.connection.hub.stop();
+    $("#" + this.id).find(".contact-list").empty();
+    $("#" + this.id).find(".tab-content").empty();
 };
 
 Chat.prototype.login = function() {
-    this._chat.server.login();
+    $.connection.hub.start();
 };
 
 Chat.prototype.increaseUnreadMsgCount = function (tab) {
@@ -147,10 +149,6 @@ Chat.prototype._addHubClientMethods = function () {
             }
             self._setDefaultContact();
         });
-    };
-    methodCollection.logout = function () {
-        $("#" + self.id).find(".contact-list").empty();
-        $("#" + self.id).find(".tab-content").empty();
     };
     methodCollection.contactOnline = function (contact) {
         self._markAsOnline(contact);
