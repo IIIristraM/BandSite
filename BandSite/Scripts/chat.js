@@ -70,7 +70,6 @@ Chat.prototype._addContact = function (contact) {
         self._currentContact = $(this).attr("data-contact");
         $(this).parent().find(".active").removeClass("active");
         $(this).addClass("active");
-        self.resetUnreadMsgCount(contact); //maybe create an other trigger
     });
 
     $("#" + this.id).find(".tab-content").prepend(this._contactDialogTabTemplate);
@@ -94,10 +93,12 @@ Chat.prototype.increaseUnreadMsgCount = function (tab) {
     $badge.html(count + 1);
 };
 
-//maybe create more complex logic
-Chat.prototype.resetUnreadMsgCount = function (tab) {
+Chat.prototype.decreaseUnreadMsgCount = function (tab) {
     var $badge = $("#" + this.id).find("a[data-contact=" + tab + "] .badge");
-    $badge.html("");
+    var count = "";
+    if ($badge.html() !== "")
+        count = parseInt($badge.html(), 10) - 1;
+    $badge.html(count);
 };
 
 Chat.prototype._addHubClientMethods = function () {
@@ -105,18 +106,26 @@ Chat.prototype._addHubClientMethods = function () {
     var methodCollection = this._chat.client;
     methodCollection.messageDelivered = function (guid) {
         $("#" + self.id).find("p[data-msg-guid=" + guid + "]").removeClass("undelivered");
-    }
+    };
     methodCollection.addMessage = function (tab, contact, message) {
         var tabId = $("#" + self.id).find("a[data-contact=" + tab + "]").attr("href");
         var dialogTab = $(tabId);
-        var $msg = dialogTab.prepend("<p data-msg-guid='" + message.guid + "'><b>" + contact + " [" + message.date + "]:</b><br><span>" + message.text + "</span></p>");
+        var $dialog = dialogTab.prepend("<p data-msg-guid='" + message.guid + "'><b>" + contact + " [" + message.date + "]:</b><br><span>" + message.text + "</span></p>");
         switch (message.status) {
             case "Undelivered":
-                $msg.find("p").first().addClass("undelivered");
+                $dialog.find("p").first().addClass("undelivered");
                 break;
             case "Unread":
-                $msg.find("p").first().addClass("unread");
+                $dialog.find("p").first().addClass("unread");
                 self.increaseUnreadMsgCount(tab);
+                setTimeout(function () {
+                    var $msg = $("#" + self.id).find("p[data-msg-guid=" + message.guid + "]");
+                    var $list = $("#" + self.id).find(".dialog-tab");
+                    if (($msg.offset().top < $list.offset().top + $list.height() - 10) && ($msg.offset().top > $list.offset().top)) {
+                        $msg = $msg.removeClass("unread");
+                        self.decreaseUnreadMsgCount(tab);
+                    }
+                }, 2500);
                 break;
         }
     };
@@ -154,9 +163,11 @@ Chat.prototype._addHubClientMethods = function () {
 
 Chat.prototype._bindSendBtnClickHandler = function () {
     var self = this;
-    this._$sendBtn.click(function() {
-        self._chat.server.addMessage(self._currentContact, self._$messageTb.val());
-        self._$messageTb.val("");
+    this._$sendBtn.click(function () {
+        if (self._$messageTb.val() !== "") {
+            self._chat.server.addMessage(self._currentContact, self._$messageTb.val());
+            self._$messageTb.val("");
+        }
     });
 };
 
