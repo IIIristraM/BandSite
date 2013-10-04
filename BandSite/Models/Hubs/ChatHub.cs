@@ -6,35 +6,49 @@ using System.Web;
 using BandSite.Models.Entities;
 using BandSite.Models.Functionality;
 using Microsoft.AspNet.SignalR;
+using System.Collections.Generic;
 
 namespace BandSite.Models.Hubs
 {
     public class ChatHub : Hub
     {
-        private static readonly ConcurrentDictionary<string, string> ConnectedUsers = new ConcurrentDictionary<string, string>();
+        private static readonly ConcurrentDictionary<string, List<string>> ConnectedUsers = new ConcurrentDictionary<string, List<string>>();
         private  readonly  IChat _chat;
         private readonly string _dateTemplate;
+        private readonly int _macConnectionsPerUser;
+
+        public ChatHub(IChat chat)
+        {
+            _chat = chat;
+            _dateTemplate = "dd-MMM  HH:mm";
+            _macConnectionsPerUser = 3;
+        }
 
         public override Task OnDisconnected()
         {
             if (ConnectedUsers.ContainsKey(Context.User.Identity.Name))
             {
-                string value;
-                ConnectedUsers.TryRemove(Context.User.Identity.Name, out value);
-                Clients.Others.contactOffline(Context.User.Identity.Name);
+                var list = ConnectedUsers[Context.User.Identity.Name];
+                if (list.Count > 1)
+                {
+                    list.Remove(Context.ConnectionId);
+                }
+                else
+                {
+                    List<string> value;
+                    ConnectedUsers.TryRemove(Context.User.Identity.Name, out value);
+                    Clients.Others.contactOffline(Context.User.Identity.Name);
+                }
             }
             return base.OnDisconnected();
         }
 
-        public override Task OnReconnected()
-        {
-            return base.OnReconnected();
-        }
-
         public override Task OnConnected()
         {
-            ConnectedUsers.AddOrUpdate(Context.User.Identity.Name, Context.ConnectionId, (key, oldValue) => Context.ConnectionId);
-            Clients.Others.contactOnline(new[] { Context.User.Identity.Name });
+            var list = ConnectedUsers.GetOrAdd(Context.User.Identity.Name, new List<string>());
+            list.Add(Context.ConnectionId);
+            if (list.Count > 3) list.RemoveAt(0);
+            Clients.Others.contactOnline(Context.User.Identity.Name);
             Clients.Caller.login(ConnectedUsers.Select(u => u.Key).ToArray());
             return base.OnConnected();
         }
@@ -43,12 +57,15 @@ namespace BandSite.Models.Hubs
         {
             foreach (var msg in _chat.GetHistory(Context.User.Identity.Name, user))
             {
-                if (msg.Status.ToString() == MessageStatus.Undelivered.ToString())
+                if ((msg.Status == MessageStatus.Undelivered) && (msg.UserTo.UserName == Context.User.Identity.Name))
                 {
                     msg.Status = MessageStatus.Unread;
                     if (ConnectedUsers.ContainsKey(msg.UserFrom.UserName))
                     {
-                        Clients.Client(ConnectedUsers[msg.UserFrom.UserName]).messageDelivered(msg.Guid.ToString());
+                        foreach (var conn in ConnectedUsers[msg.UserFrom.UserName])
+                        {
+                            Clients.Client(conn).messageDelivered(msg.Guid.ToString());
+                        }
                     }
                 }
 
@@ -66,12 +83,6 @@ namespace BandSite.Models.Hubs
             }
         }
 
-        public ChatHub(IChat chat)
-        {
-            _chat = chat;
-            _dateTemplate = "dd-MMM  HH:mm";
-        }
-
         public void AddMessage(string users, string message)
         {
             var list = users.Split(new[] { '#' }, StringSplitOptions.RemoveEmptyEntries);
@@ -80,24 +91,31 @@ namespace BandSite.Models.Hubs
                 if (ConnectedUsers.ContainsKey(msg.UserTo.UserName))
                 {
                     msg.Status = MessageStatus.Unread;
-                    Clients.Client(ConnectedUsers[msg.UserTo.UserName]).addMessage(Context.User.Identity.Name, 
-                                                                                   Context.User.Identity.Name, 
-                                                                                   new {
-                                                                                       guid = msg.Guid.ToString(),
-                                                                                       text = HttpUtility.HtmlEncode(msg.Text),
-                                                                                       date = msg.Published.Value.ToString(_dateTemplate),
-                                                                                       status = msg.Status.ToString()
-                                                                                   });
+                    foreach (var conn in ConnectedUsers[msg.UserTo.UserName])
+                    {
+                        Clients.Client(conn).addMessage(Context.User.Identity.Name,
+                                                        Context.User.Identity.Name,
+                                                        new
+                                                        {
+                                                            guid = msg.Guid.ToString(),
+                                                            text = HttpUtility.HtmlEncode(msg.Text),
+                                                            date = msg.Published.Value.ToString(_dateTemplate),
+                                                            status = msg.Status.ToString()
+                                                        });
+                    }
                 }
-                Clients.Caller.addMessage(users, 
-                                          Context.User.Identity.Name,
-                                          new
-                                          {
-                                              guid = msg.Guid.ToString(),
-                                              text = HttpUtility.HtmlEncode(msg.Text),
-                                              date = msg.Published.Value.ToString(_dateTemplate),
-                                              status = (msg.Status == MessageStatus.Undelivered) ? msg.Status.ToString() : ""
-                                          });
+                foreach (var conn in ConnectedUsers[Context.User.Identity.Name])
+                {
+                    Clients.Client(conn).addMessage(users,
+                                              Context.User.Identity.Name,
+                                              new
+                                              {
+                                                  guid = msg.Guid.ToString(),
+                                                  text = HttpUtility.HtmlEncode(msg.Text),
+                                                  date = msg.Published.Value.ToString(_dateTemplate),
+                                                  status = (msg.Status == MessageStatus.Undelivered) ? msg.Status.ToString() : ""
+                                              });
+                }
             }
         }
     }
