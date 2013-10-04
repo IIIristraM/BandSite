@@ -156,6 +156,21 @@ Chat.prototype._addHubClientMethods = function () {
     methodCollection.contactOffline = function (contact) {
         self._markAsOffline(contact);
     };
+    methodCollection.disconnect = function () {
+        $("body").append("<div class='disconnect-msg modal fade' tabindex='-1' role='dialog'>" +
+                                    "<div class='modal-dialog'>" +
+                                        "<div class='modal-content'>" +
+                                            "<div class='modal-header'>" +
+                                                "<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>×</button>" +
+                                                "<div class='modal-title'>Alert (connections number is over limit)</div>" +
+                                            "</div>" +
+                                            "<div class='modal-body'>This tab has been disconnected from chat</div>" +
+                                        "</div>" +
+                                    "</div>" +
+                                "</div>");
+        $("body").find(".disconnect-msg").modal({ show: true });
+        self.logout();
+    };
 };
 
 Chat.prototype._bindSendBtnClickHandler = function () {

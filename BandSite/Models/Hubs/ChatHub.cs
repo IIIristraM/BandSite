@@ -47,7 +47,11 @@ namespace BandSite.Models.Hubs
         {
             var list = ConnectedUsers.GetOrAdd(Context.User.Identity.Name, new List<string>());
             list.Add(Context.ConnectionId);
-            if (list.Count > 3) list.RemoveAt(0);
+            if (list.Count > 3) 
+            {
+                Clients.Client(list[0]).disconnect();
+                list.RemoveAt(0); 
+            }
             Clients.Others.contactOnline(Context.User.Identity.Name);
             Clients.Caller.login(ConnectedUsers.Select(u => u.Key).ToArray());
             return base.OnConnected();
