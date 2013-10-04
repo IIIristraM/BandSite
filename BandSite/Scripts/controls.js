@@ -188,23 +188,39 @@ $(function() {
         var updatePlaylist = getParameterByName("updatePlaylist");
         var updateContacts = getParameterByName("updateContacts");
         if (updatePlaylist) {
-            $.ajax({
-                url: "/Account/GetPlaylist/",
-                cache: false,
-                type: "POST"
-            }).done(function(playlist) {
-                if (Object.prototype.toString.call(playlist) === '[object Array]') {
-                    player.playlist = playlist;
-                } else {
-                    player.playlist = [];
-                }
-                player.generatePlaylistMarkup();
-            });
+            getPlaylist();
         }
         if (updateContacts === "online") {
             chat.login();
         }
     });
     chat = $("#chat").chat();
+    $.ajax({
+        url: "/Account/CheckAuthentication/",
+        cache: false
+    }).done(function (isAuth) {
+        if (isAuth) {
+            chat.login();
+        }
+    });
 });
+
+function getPlaylist()
+{
+    $.ajax({
+        url: "/Account/GetPlaylist/",
+        cache: false,
+        type: "POST"
+    }).done(function (playlist) {
+        if (Object.prototype.toString.call(playlist) === '[object Array]') {
+            player.playlist = playlist;
+        } else {
+            player.playlist = [];
+        }
+        player.generatePlaylistMarkup();
+    });
+}
+
+   
+
 

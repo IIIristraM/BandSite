@@ -156,7 +156,6 @@ Chat.prototype._addHubClientMethods = function () {
     methodCollection.contactOffline = function (contact) {
         self._markAsOffline(contact);
     };
-    $.connection.hub.start();
 };
 
 Chat.prototype._bindSendBtnClickHandler = function () {

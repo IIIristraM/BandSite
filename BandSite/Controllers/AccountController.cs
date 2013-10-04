@@ -38,8 +38,12 @@ namespace BandSite.Controllers
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
-            ViewBag.ReturnUrl = returnUrl;
-            return PartialView();
+            if (!Request.IsAuthenticated)
+            {
+                ViewBag.ReturnUrl = returnUrl;
+                return PartialView();
+            }
+            return Json(new { hash = "~/#account/Manage"}, JsonRequestBehavior.AllowGet);
         }
 
         //
@@ -410,6 +414,16 @@ namespace BandSite.Controllers
             {
                 return Json(new object[] { new { name = "you need to log in" } }, JsonRequestBehavior.AllowGet);
             }        
+        }
+
+        [AllowAnonymous]
+        public ActionResult CheckAuthentication()
+        {
+            if (Request.IsAuthenticated)
+            {
+                return Json(true, JsonRequestBehavior.AllowGet);
+            }
+            return Json(false, JsonRequestBehavior.AllowGet);
         }
 
         #region Helpers
