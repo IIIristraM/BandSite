@@ -18,6 +18,7 @@
         @Scripts.Render("~/signalr/hubs")
         @Scripts.Render("~/Scripts/bootstrap.js")
         @Scripts.Render("~/Scripts/audioPlayer.js")
+        @Scripts.Render("~/Scripts/jquery.ba-throttle-debounce.js")
         @Scripts.Render("~/Scripts/chat.js")
         @Scripts.Render("~/Scripts/controls.js")
         @Scripts.Render("~/Scripts/navigation.js")
@@ -33,7 +34,9 @@
             </ul>
             <div id="login-area"></div>
         </div>
-        <div id="chat" class="chat"></div>
-        @RenderBody()
+        <div class="main-container">
+            <div id="chat" class="chat"></div>
+            @RenderBody()
+        </div>
     </body>
 </html>

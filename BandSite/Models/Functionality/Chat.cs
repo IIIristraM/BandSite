@@ -60,5 +60,19 @@ namespace BandSite.Models.Functionality
                 }
             }
         }
+
+        public IEnumerable<Message> MarkReadMessages(string[] msgGuids)
+        {
+            using (var db = _dbContextFactory.CreateContext())
+            {
+                var guids = msgGuids.Select(g => new Guid(g)).ToList();
+                foreach (var msg in db.Messages.Content.Where(m => guids.Contains(m.Guid)))
+                {
+                    msg.Status = MessageStatus.Read;
+                    yield return msg;
+                }
+                db.SaveChanges();
+            }
+        }
     }
 }

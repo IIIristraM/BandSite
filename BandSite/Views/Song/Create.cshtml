@@ -1,31 +1,23 @@
 ﻿@model BandSite.Models.ViewModels.CRUDSongModel
 
 <div class="container">
-    @using (Html.BeginForm(null, null, FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal" }))
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { enctype = "multipart/form-data"}))
     {
         @Html.AntiForgeryToken()
         <div class="form-group">
-            @Html.LabelFor(model => model.Title, new {@class = "col-lg-2 control-label"})
-            <div class="col-lg-10">
-                @Html.TextBoxFor(model => model.Title, new {@class = "form-control"})
-            </div>
+            @Html.LabelFor(model => model.Title, new {@class = "control-label"})
+            @Html.TextBoxFor(model => model.Title, new {@class = "form-control"})
         </div>
         <div class="form-group">
-            @Html.LabelFor(model => model.Text, new {@class = "col-lg-2 control-label"})
-            <div class="col-lg-10">
-                 @Html.TextAreaFor(model => model.Text, new {@class = "form-control"})
-            </div>
+            @Html.LabelFor(model => model.Text, new {@class = "control-label"})
+            @Html.TextAreaFor(model => model.Text, new {@class = "form-control"})
         </div> 
         <div class="form-group">
-            @Html.LabelFor(model => model.UploadFile, new {@class = "col-lg-2 control-label"})
-            <div class="col-lg-10">
-                @Html.TextBoxFor(model => model.UploadFile, new { type = "file", @class = "form-control"})
-            </div>
+            @Html.LabelFor(model => model.UploadFile, new {@class = "control-label"})
+            @Html.TextBoxFor(model => model.UploadFile, new { type = "file", @class = "form-control"})
         </div>
         <div class="form-group">
-             <div class="col-lg-10 col-lg-offset-2">
-                 <input type="submit" value="Ok" class="btn btn-primary"/>
-             </div>
+            <input type="submit" value="Ok" class="btn btn-primary"/>
         </div>
     }
 </div>

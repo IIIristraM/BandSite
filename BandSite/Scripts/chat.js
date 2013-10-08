@@ -19,8 +19,9 @@ function Chat(options) {
                                  "<div class='panel-heading'>Contacts</div>" +
                                  "<div class='panel-body'>" +
                                    "<div class='contact-scroller'><div class='list-group contact-list'></div></div>" +
+                                   "<hr><hr>" +
                                    "<div class='tab-content dialog-tab'></div>" +
-                                   "<hr>" +
+                                   "<hr><hr>" +
                                    "<div class='text-area'><div class='form-group'>" +
                                          "<textarea class='form-control' />" +
                                    "</div>" +
@@ -28,18 +29,36 @@ function Chat(options) {
                                  "</div>" +
                               "</div>";
     this._contactListItemTemplate = "<a class='list-group-item' data-toggle='tab'><i class='offline glyphicon glyphicon-user float-left'></i><span></span><span class='badge'></span></a>";
-    this._contactDialogTabTemplate = "<div class='tab-pane fade in'></div>";
+    this._contactDialogTabTemplate = "<div class='tab-pane fade in list-group'></div>";
 
     this._generateChatMarkup();
     this._bindSendBtnClickHandler();
     this._addHubClientMethods();
 }
 
-Chat.prototype._generateChatMarkup = function() {
+Chat.prototype._generateChatMarkup = function () {
+    var self = this;
     $("#" + this.id).html(this._containerTemplate);
     this._$sendBtn = $("#" + this.id).find(".btn.btn-primary");
     this._$messageTb = $("#" + this.id).find("textarea");
     $("#" + this.id).find(".contact-list").sortable();
+
+    $("#" + this.id).find(".dialog-tab").scroll($.debounce(750, function () {
+        self._checkUnreadMessages(self._currentContact, 750);
+    }));
+
+    $("#" + this.id).find(".panel-heading").click(function () {
+        if (self._isCompact !== true) {
+            $("#" + self.id).find(".panel-body").css("display", "none");
+            $(this).parent().addClass("rotate");
+            self._isCompact = true;
+        }
+        else {
+            $("#" + self.id).find(".panel-body").css("display", "block");
+            $(this).parent().removeClass("rotate");
+            self._isCompact = false;
+        }
+    });
 };
 
 Chat.prototype._markAsOnline = function(contact) {
@@ -70,6 +89,7 @@ Chat.prototype._addContact = function (contact) {
         self._currentContact = $(this).attr("data-contact");
         $(this).parent().find(".active").removeClass("active");
         $(this).addClass("active");
+        self._checkUnreadMessages(self._currentContact, 1500);
     });
 
     $("#" + this.id).find(".tab-content").prepend(this._contactDialogTabTemplate);
@@ -98,7 +118,7 @@ Chat.prototype.increaseUnreadMsgCount = function (tab) {
 Chat.prototype.decreaseUnreadMsgCount = function (tab) {
     var $badge = $("#" + this.id).find("a[data-contact=" + tab + "] .badge");
     var count = "";
-    if ($badge.html() !== "")
+    if (parseInt($badge.html(), 10) > 1)
         count = parseInt($badge.html(), 10) - 1;
     $badge.html(count);
 };
@@ -107,27 +127,25 @@ Chat.prototype._addHubClientMethods = function () {
     var self = this;
     var methodCollection = this._chat.client;
     methodCollection.messageDelivered = function (guid) {
-        $("#" + self.id).find("p[data-msg-guid=" + guid + "]").removeClass("undelivered");
+        $("#" + self.id).find("a[data-msg-guid=" + guid + "]").removeClass("undelivered");
     };
     methodCollection.addMessage = function (tab, contact, message) {
         var tabId = $("#" + self.id).find("a[data-contact=" + tab + "]").attr("href");
         var dialogTab = $(tabId);
-        var $dialog = dialogTab.prepend("<p data-msg-guid='" + message.guid + "'><b>" + contact + " [" + message.date + "]:</b><br><span>" + message.text + "</span></p>");
+        var $dialog = dialogTab.prepend("<a href='" + location.hash + "' class='list-group-item' data-msg-guid='" + message.guid + "'>" +
+                                           "<b class='list-group-item-heading'>" + contact + " [" + message.date + "]:<i class='glyphicon glyphicon-refresh float-right'></i><i class='glyphicon glyphicon-exclamation-sign float-right'></i></b>" +
+                                           "<p class='list-group-item-text'>" +
+                                              "<span>" + message.text + "</span>" +
+                                           "</p>" +
+                                        "</a>");
         switch (message.status) {
             case "Undelivered":
-                $dialog.find("p").first().addClass("undelivered");
+                $dialog.find("a").first().addClass("undelivered");
                 break;
             case "Unread":
-                $dialog.find("p").first().addClass("unread");
+                $dialog.find("a").first().addClass("unread");
                 self.increaseUnreadMsgCount(tab);
-                setTimeout(function () {
-                    var $msg = $("#" + self.id).find("p[data-msg-guid=" + message.guid + "]");
-                    var $list = $("#" + self.id).find(".dialog-tab");
-                    if (($msg.offset().top < $list.offset().top + $list.height() - 10) && ($msg.offset().top > $list.offset().top)) {
-                        $msg = $msg.removeClass("unread");
-                        self.decreaseUnreadMsgCount(tab);
-                    }
-                }, 2500);
+                self._checkUnreadMessages(self._currentContact, 1500);
                 break;
         }
     };
@@ -158,18 +176,25 @@ Chat.prototype._addHubClientMethods = function () {
     };
     methodCollection.disconnect = function () {
         $("body").append("<div class='disconnect-msg modal fade' tabindex='-1' role='dialog'>" +
-                                    "<div class='modal-dialog'>" +
-                                        "<div class='modal-content'>" +
-                                            "<div class='modal-header'>" +
-                                                "<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>×</button>" +
-                                                "<div class='modal-title'>Alert (connections number is over limit)</div>" +
-                                            "</div>" +
-                                            "<div class='modal-body'>This tab has been disconnected from chat</div>" +
-                                        "</div>" +
-                                    "</div>" +
-                                "</div>");
+                             "<div class='modal-dialog'>" +
+                                 "<div class='modal-content'>" +
+                                     "<div class='modal-header'>" +
+                                         "<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>×</button>" +
+                                         "<div class='modal-title'>Alert (connections number is over limit)</div>" +
+                                     "</div>" +
+                                     "<div class='modal-body'>This tab has been disconnected from chat</div>" +
+                                 "</div>" +
+                             "</div>" +
+                         "</div>");
         $("body").find(".disconnect-msg").modal({ show: true });
         self.logout();
+    };
+    methodCollection.markReadMessage = function (guid) {
+        var $msg = $("#" + self.id).find("a[data-msg-guid=" + guid + "]");
+        $msg.removeClass("unread");
+        var tabId = $msg.parents(".tab-pane").attr("id");
+        var tab = $("#" + self.id).find("a[href=#" + tabId + "]").attr("data-contact");
+        self.decreaseUnreadMsgCount(tab);
     };
 };
 
@@ -181,6 +206,25 @@ Chat.prototype._bindSendBtnClickHandler = function () {
             self._$messageTb.val("");
         }
     });
+};
+
+Chat.prototype._checkUnreadMessages = function (tab, delay) {
+    var self = this;
+    var tabId = $("#" + self.id).find("a[data-contact=" + tab + "]").attr("href");
+    var msgArray = [];
+    var arrInd = 0;
+   
+    setTimeout(function () {
+        $(tabId).find("a.unread").each(function () {
+            var $msg = $(this);
+            var $list = $("#" + self.id).find(".dialog-tab");
+            if (($msg.offset().top < $list.offset().top + $list.height() - 10) && ($msg.offset().top > $list.offset().top)) {
+                msgArray[arrInd] = $msg.attr("data-msg-guid");
+                arrInd++;
+            }    
+        });
+        self._chat.server.markReadMessages(msgArray);
+    }, delay);
 };
 
 jQuery.prototype.chat = function () {

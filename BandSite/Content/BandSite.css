@@ -1,5 +1,39 @@
-﻿.action-frame {
-    margin-top: 100px;
+﻿body{
+    min-width: 587px;
+    width: 100%;
+}
+
+.main-container {
+    width:100%;
+}
+
+.action-frame {
+    position: relative;
+    top: 30px;
+    margin-left: 290px;
+}
+
+#chat {
+    position: relative;
+    top: 30px;
+    min-width: 50px;
+    max-width: 280px;
+    float: left;
+}
+
+@media (max-width: 1200px){
+    .main-container {
+        display: table;
+    }
+    .action-frame{
+        display: table-cell;
+        margin: 0 0;
+        width: 100%;
+    }
+    #chat{
+        display: table-cell;
+        float: none;
+    }
 }
 
 .add-button {
@@ -85,15 +119,6 @@ i {
 
 .float-right {
     float: right;
-}
-
-#chat {
-    position: fixed;
-    left: 0px;
-    top: 130px;
-    z-index: 999;
-    width: 15%;
-    min-width: 180px;
 }
 
 textarea{

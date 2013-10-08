@@ -4,13 +4,14 @@
 
 .contact-list {
     margin: 5px 5px;
-    height: 205px;
 }
 
 .dialog-tab {
+    min-height: 300px;
     height: 300px;
     overflow-y: scroll;
     padding: 5px 10px;
+    resize: vertical;
 }
 
 .contact-list span {
@@ -23,31 +24,61 @@
 
 .contact-scroller {
      overflow-y: scroll;
-     height: 212px;
+     min-height: 170px;
+     height: 170px;
+     resize: vertical;
 }
 
-.chat .panel-body{
+.chat .panel-body {
     padding: 0 0 5px 0;
 }
 
-.chat hr{
+.chat hr {
     margin-top: 5px;
     margin-bottom: 5px;
 }
 
-.chat .panel-heading{
+.chat .panel-heading {
     text-align: center;
 }
 
-.undelivered{
-    background: lightgray;
-}
-
-.unread{
-    background: lightblue;
-}
-
-.disconnect-msg .modal-header{
+.disconnect-msg .modal-header {
     background: #ff7171;
+}
+
+.chat p {
+    white-space: pre-line;
+    -ms-word-wrap: break-word;
+    word-wrap: break-word;
+}
+
+.dialog-tab .glyphicon-refresh {
+    display: none;
+}
+
+.dialog-tab .glyphicon-exclamation-sign {
+    display: none;
+}
+
+.dialog-tab .undelivered .glyphicon-refresh{
+    display: block;
+}
+
+.dialog-tab .unread .glyphicon-exclamation-sign {
+    display: block;
+}
+
+.rotate {
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    transform: rotate(-90deg);
+
+    -webkit-transform-origin: 44px 44px;
+    -moz-transform-origin: 44px 44px;
+    -ms-transform-origin: 44px 44px;
+    -o-transform-origin: 44px 44px;
+    transform-origin: 44px 44px;
 }
 

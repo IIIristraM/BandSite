@@ -111,14 +111,25 @@ namespace BandSite.Models.Hubs
                 foreach (var conn in ConnectedUsers[Context.User.Identity.Name])
                 {
                     Clients.Client(conn).addMessage(users,
-                                              Context.User.Identity.Name,
-                                              new
-                                              {
-                                                  guid = msg.Guid.ToString(),
-                                                  text = HttpUtility.HtmlEncode(msg.Text),
-                                                  date = msg.Published.Value.ToString(_dateTemplate),
-                                                  status = (msg.Status == MessageStatus.Undelivered) ? msg.Status.ToString() : ""
-                                              });
+                                                    Context.User.Identity.Name,
+                                                    new
+                                                    {
+                                                        guid = msg.Guid.ToString(),
+                                                        text = HttpUtility.HtmlEncode(msg.Text),
+                                                        date = msg.Published.Value.ToString(_dateTemplate),
+                                                        status = (msg.Status == MessageStatus.Undelivered) ? msg.Status.ToString() : ""
+                                                    });
+                }
+            }
+        }
+
+        public void MarkReadMessages(string[] msgGuids)
+        {
+            foreach (var msg in _chat.MarkReadMessages(msgGuids))
+            {
+                foreach (var conn in ConnectedUsers[Context.User.Identity.Name])
+                {
+                    Clients.Client(conn).markReadMessage(msg.Guid.ToString());
                 }
             }
         }
