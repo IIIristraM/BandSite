@@ -33,6 +33,10 @@
     padding: 0 0 5px 0;
 }
 
+.chat .panel{
+    min-width: 280px;
+}
+
 .chat hr {
     margin-top: 5px;
     margin-bottom: 5px;
@@ -79,6 +83,10 @@
     -moz-transform-origin: 44px 44px;
     -ms-transform-origin: 44px 44px;
     -o-transform-origin: 44px 44px;
-    transform-origin: 44px 44px;
+    transform-origin: 44px 44px;    
+}
+
+.chat .panel.rotate{
+    min-width: 50px;
 }
 

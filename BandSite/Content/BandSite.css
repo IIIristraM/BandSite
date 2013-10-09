@@ -16,7 +16,6 @@
 #chat {
     position: relative;
     top: 30px;
-    min-width: 50px;
     max-width: 280px;
     float: left;
 }
