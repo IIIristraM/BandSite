@@ -53,7 +53,7 @@ namespace BandSite.Models.Hubs
                 list.RemoveAt(0); 
             }
             Clients.Others.contactOnline(Context.User.Identity.Name);
-            Clients.Caller.login(ConnectedUsers.Select(u => u.Key).ToArray());
+            Clients.Caller.login(Context.User.Identity.Name, ConnectedUsers.Select(u => u.Key).ToArray());
             return base.OnConnected();
         }
 

@@ -42,10 +42,6 @@
     margin-bottom: 5px;
 }
 
-.chat .panel-heading {
-    text-align: center;
-}
-
 .disconnect-msg .modal-header {
     background: #ff7171;
 }
@@ -72,21 +68,33 @@
     display: block;
 }
 
-.rotate {
-    -webkit-transform: rotate(-90deg);
-    -moz-transform: rotate(-90deg);
-    -ms-transform: rotate(-90deg);
-    -o-transform: rotate(-90deg);
-    transform: rotate(-90deg);
-
-    -webkit-transform-origin: 44px 44px;
-    -moz-transform-origin: 44px 44px;
-    -ms-transform-origin: 44px 44px;
-    -o-transform-origin: 44px 44px;
-    transform-origin: 44px 44px;    
+.chat .panel.compact{
+    width: 160px;
+    min-width: 160px;
 }
 
-.chat .panel.rotate{
-    min-width: 50px;
+.minimize-btn {
+    margin: 0 0;
+    cursor: pointer;
+    display: none;
+    float: right;
+}
+
+@media (max-width: 1199px) {
+    .minimize-btn {
+        display: block;
+    }
+}
+
+.chat a.list-group-item .list-group-item-heading{
+    color: #428bca;
+}
+
+.chat a.list-group-item .list-group-item-heading.my-msg{
+    color: #333333;
+}
+
+.badge.conversations-badge {
+    margin: 0 20px 0 10px;
 }
 

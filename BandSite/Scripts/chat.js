@@ -10,13 +10,18 @@
 
 function Chat(options) {
     this.id = options.id;
+    this._unreadConversations = 0;
     this._chat = $.connection.chatHub;
     this._$sendBtn = undefined;
     this._$messageTb = undefined;
     this._currentContact = undefined;
-    this._contacts = undefined;
+    this._contacts = [];
     this._containerTemplate = "<div class='panel panel-default'>" +
-                                 "<div class='panel-heading'>Contacts</div>" +
+                                 "<div class='panel-heading'>" +
+                                         "<span>Contacts<span>" +
+                                         "<span class='badge conversations-badge'></span>" +
+                                         "<a><i class='minimize-btn glyphicon glyphicon glyphicon-arrow-left'></i></a>" +
+                                 "</div>" +
                                  "<div class='panel-body'>" +
                                    "<div class='contact-scroller'><div class='list-group contact-list'></div></div>" +
                                    "<hr><hr>" +
@@ -28,7 +33,7 @@ function Chat(options) {
                                    "<button class='btn btn-primary'>Send</button></div>" +
                                  "</div>" +
                               "</div>";
-    this._contactListItemTemplate = "<a class='list-group-item' data-toggle='tab'><i class='offline glyphicon glyphicon-user float-left'></i><span></span><span class='badge'></span></a>";
+    this._contactListItemTemplate = "<a class='list-group-item' data-toggle='tab'><i class='offline glyphicon glyphicon-user'></i><span></span><span class='badge'></span></a>";
     this._contactDialogTabTemplate = "<div class='tab-pane fade in list-group'></div>";
 
     this._generateChatMarkup();
@@ -47,18 +52,29 @@ Chat.prototype._generateChatMarkup = function () {
         self._checkUnreadMessages(self._currentContact, 750);
     }));
 
-    $("#" + this.id).find(".panel-heading").click(function () {
-        if (self._isCompact !== true) {
-            $("#" + self.id).find(".panel-body").css("display", "none");
-            $(this).parent().addClass("rotate");
-            self._isCompact = true;
-        }
-        else {
-            $("#" + self.id).find(".panel-body").css("display", "block");
-            $(this).parent().removeClass("rotate");
-            self._isCompact = false;
-        }
+    $("#" + this.id).find(".minimize-btn").click(function () {
+        self._resize();
     });
+    $(window).resize(function () {
+       if (($(this).width() >= 1200) && self._isCompact) self._resize();
+    });
+};
+
+Chat.prototype._resize = function () {
+    if (this._isCompact !== true) {
+        $("#" + this.id).find(".panel-body").css("display", "none");
+        $("#" + this.id).find(".panel").addClass("compact");
+        $("#" + this.id).find(".minimize-btn").removeClass("glyphicon-arrow-left");
+        $("#" + this.id).find(".minimize-btn").addClass("glyphicon-arrow-right");
+        this._isCompact = true;
+    }
+    else {
+        $("#" + this.id).find(".panel-body").css("display", "block");
+        $("#" + this.id).find(".panel").removeClass("compact");
+        $("#" + this.id).find(".minimize-btn").addClass("glyphicon-arrow-left");
+        $("#" + this.id).find(".minimize-btn").removeClass("glyphicon-arrow-right");
+        this._isCompact = false;
+    }
 };
 
 Chat.prototype._markAsOnline = function(contact) {
@@ -79,6 +95,9 @@ Chat.prototype._setDefaultContact = function() {
 
 Chat.prototype._addContact = function (contact) {
     var self = this;
+    this._contacts[contact] = {
+        unreadMsgCount: 0
+    };
     $("#" + this.id).find(".contact-list").append(this._contactListItemTemplate);
     var $item = $("#" + this.id).find(".contact-list a").last();
     var guid = generateGUID();
@@ -109,18 +128,25 @@ Chat.prototype.login = function() {
 
 Chat.prototype.increaseUnreadMsgCount = function (tab) {
     var $badge = $("#" + this.id).find("a[data-contact=" + tab + "] .badge");
-    var count = 0;
-    if ($badge.html() !== "")
-        count = parseInt($badge.html(), 10);
-    $badge.html(count + 1);
+    if (this._contacts[tab].unreadMsgCount === 0) {
+        this._unreadConversations++;
+        $(".conversations-badge").html(this._unreadConversations);
+    }
+    this._contacts[tab].unreadMsgCount++;
+    $badge.html(this._contacts[tab].unreadMsgCount);
 };
 
 Chat.prototype.decreaseUnreadMsgCount = function (tab) {
     var $badge = $("#" + this.id).find("a[data-contact=" + tab + "] .badge");
-    var count = "";
-    if (parseInt($badge.html(), 10) > 1)
-        count = parseInt($badge.html(), 10) - 1;
-    $badge.html(count);
+    this._contacts[tab].unreadMsgCount--;
+    if (this._contacts[tab].unreadMsgCount > 0) {
+        $badge.html(this._contacts[tab].unreadMsgCount);
+    }
+    else {
+        this._unreadConversations--;
+        $(".conversations-badge").html((this._unreadConversations > 0) ? this._unreadConversations : "");
+        $badge.html("");
+    }
 };
 
 Chat.prototype._addHubClientMethods = function () {
@@ -133,7 +159,11 @@ Chat.prototype._addHubClientMethods = function () {
         var tabId = $("#" + self.id).find("a[data-contact=" + tab + "]").attr("href");
         var dialogTab = $(tabId);
         var $dialog = dialogTab.prepend("<a href='" + location.hash + "' class='list-group-item' data-msg-guid='" + message.guid + "'>" +
-                                           "<b class='list-group-item-heading'>" + contact + " [" + message.date + "]:<i class='glyphicon glyphicon-refresh float-right'></i><i class='glyphicon glyphicon-exclamation-sign float-right'></i></b>" +
+                                           "<b class='list-group-item-heading " + ((contact === self._currentUser) ? "my-msg" : "") + "'>" +
+                                                contact + " [" + message.date + "]:" +
+                                                "<i class='glyphicon glyphicon-refresh float-right'></i>" +
+                                                "<i class='glyphicon glyphicon-exclamation-sign float-right'></i>" +
+                                           "</b>" +
                                            "<p class='list-group-item-text'>" +
                                               "<span>" + message.text + "</span>" +
                                            "</p>" +
@@ -149,12 +179,13 @@ Chat.prototype._addHubClientMethods = function () {
                 break;
         }
     };
-    methodCollection.login = function (contactsOnline) {
+    methodCollection.login = function (me, contactsOnline) {
         $.ajax({
             url: "/Account/GetUserslist",
             type: "GET",
             cache: false
         }).done(function (allContacts) {
+            self._currentUser = me;
             $("#" + self.id).find(".contact-list").empty();
             $("#" + self.id).find(".tab-content").empty();
             for (var i = 0; i < allContacts.length; i++) {
