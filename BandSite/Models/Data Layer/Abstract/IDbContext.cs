@@ -10,6 +10,7 @@ namespace BandSite.Models.DataLayer
         IRepository<UserProfile> UserProfiles { get; set; }
         IRepository<PlaylistItem> PlaylistItems { get; set; }
         IRepository<Message> Messages { get; set; }
+        IRepository<Conference> Conferences { get; set; }
 
         int SaveChanges();
     }

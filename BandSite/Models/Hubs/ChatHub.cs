@@ -64,12 +64,12 @@ namespace BandSite.Models.Hubs
                 if ((msg.Status == MessageStatus.Undelivered) && (msg.UserTo.UserName == Context.User.Identity.Name))
                 {
                     msg.Status = MessageStatus.Unread;
-                    if (ConnectedUsers.ContainsKey(msg.UserFrom.UserName))
+                }
+                if (ConnectedUsers.ContainsKey(user))
+                {
+                    foreach (var conn in ConnectedUsers[user])
                     {
-                        foreach (var conn in ConnectedUsers[msg.UserFrom.UserName])
-                        {
-                            Clients.Client(conn).messageDelivered(msg.Guid.ToString());
-                        }
+                        Clients.Client(conn).messagesDelivered(Context.User.Identity.Name);
                     }
                 }
 
@@ -90,14 +90,16 @@ namespace BandSite.Models.Hubs
         public void AddMessage(string users, string message)
         {
             var list = users.Split(new[] { '#' }, StringSplitOptions.RemoveEmptyEntries);
+            MessageStatus callbackStatus = MessageStatus.Undelivered;
             foreach (var msg in _chat.AddMessage(Context.User.Identity.Name, list, message))
             {
-                if (ConnectedUsers.ContainsKey(msg.UserTo.UserName))
+                if (ConnectedUsers.ContainsKey(msg.UserTo.UserName) && (msg.UserTo.UserName != Context.User.Identity.Name))
                 {
                     msg.Status = MessageStatus.Unread;
+                    callbackStatus = MessageStatus.Unread;
                     foreach (var conn in ConnectedUsers[msg.UserTo.UserName])
                     {
-                        Clients.Client(conn).addMessage(Context.User.Identity.Name,
+                        Clients.Client(conn).addMessage((list.Length == 1) ? Context.User.Identity.Name : users,
                                                         Context.User.Identity.Name,
                                                         new
                                                         {
@@ -108,19 +110,19 @@ namespace BandSite.Models.Hubs
                                                         });
                     }
                 }
-                foreach (var conn in ConnectedUsers[Context.User.Identity.Name])
-                {
-                    Clients.Client(conn).addMessage(users,
-                                                    Context.User.Identity.Name,
-                                                    new
-                                                    {
-                                                        guid = msg.Guid.ToString(),
-                                                        text = HttpUtility.HtmlEncode(msg.Text),
-                                                        date = msg.Published.Value.ToString(_dateTemplate),
-                                                        status = (msg.Status == MessageStatus.Undelivered) ? msg.Status.ToString() : ""
-                                                    });
-                }
             }
+            foreach (var conn in ConnectedUsers[Context.User.Identity.Name])
+            {
+                Clients.Client(conn).addMessage(users,
+                                                Context.User.Identity.Name,
+                                                new
+                                                {
+                                                    guid = Guid.NewGuid().ToString(),
+                                                    text = HttpUtility.HtmlEncode(message),
+                                                    date = DateTime.Now.ToString(_dateTemplate),
+                                                    status = (callbackStatus == MessageStatus.Undelivered) ? callbackStatus.ToString() : ""
+                                                });
+            }     
         }
 
         public void MarkReadMessages(string[] msgGuids)
@@ -130,6 +132,21 @@ namespace BandSite.Models.Hubs
                 foreach (var conn in ConnectedUsers[Context.User.Identity.Name])
                 {
                     Clients.Client(conn).markReadMessage(msg.Guid.ToString());
+                }
+            }
+        }
+
+        public void CreateConference(string title, string[] users)
+        {
+            _chat.CreateConference(title, users);
+            foreach (var user in users)
+            {
+                if (ConnectedUsers.ContainsKey(user))
+                {
+                    foreach (var conn in ConnectedUsers[user])
+                    {
+                        Clients.Client(conn).createConference(title, users);
+                    }
                 }
             }
         }

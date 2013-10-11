@@ -214,6 +214,7 @@
     <Compile Include="Models\Entities\Album.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Models\Entities\Conference.cs" />
     <Compile Include="Models\Entities\Message.cs">
       <SubType>Code</SubType>
     </Compile>

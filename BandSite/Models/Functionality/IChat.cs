@@ -8,5 +8,6 @@ namespace BandSite.Models.Functionality
         IEnumerable<Message> GetHistory(string caller, string user);
         IEnumerable<Message> AddMessage(string userFromName, string[] usersToNames, string message);
         IEnumerable<Message> MarkReadMessages(string[] msgGuids);
+        void CreateConference(string Title, string[] users);
     }
 }

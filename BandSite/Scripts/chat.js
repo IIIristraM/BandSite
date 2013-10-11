@@ -152,8 +152,10 @@ Chat.prototype.decreaseUnreadMsgCount = function (tab) {
 Chat.prototype._addHubClientMethods = function () {
     var self = this;
     var methodCollection = this._chat.client;
-    methodCollection.messageDelivered = function (guid) {
-        $("#" + self.id).find("a[data-msg-guid=" + guid + "]").removeClass("undelivered");
+    methodCollection.messagesDelivered = function (tab) {
+        var tabId = $("#" + self.id).find("a[data-contact=" + tab + "]").attr("href");
+        var dialogTab = $(tabId);
+        dialogTab.find(".undelivered").removeClass("undelivered");
     };
     methodCollection.addMessage = function (tab, contact, message) {
         var tabId = $("#" + self.id).find("a[data-contact=" + tab + "]").attr("href");
@@ -229,6 +231,11 @@ Chat.prototype._addHubClientMethods = function () {
     };
 };
 
+//need to write
+Chat.prototype._createConference = function (title, users) {
+
+};
+//--------------------
 Chat.prototype._bindSendBtnClickHandler = function () {
     var self = this;
     this._$sendBtn.click(function () {

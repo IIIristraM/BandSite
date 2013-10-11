@@ -27,5 +27,9 @@ namespace BandSite.Models.Entities
         public virtual MessageStatus Status { get; set; }
 
         public virtual Guid Guid { get; set; }
+
+        public virtual int? ConferenceId { get; set; }
+
+        public virtual Conference Conference { get; set; }
     }
 }

@@ -9,8 +9,9 @@ namespace BandSite.Models.Entities
         private ICollection<PlaylistItem> _playlists;
         private ICollection<Message> _inputMessages;
         private ICollection<Message> _outputMessages;
+        private ICollection<Conference> _conferences;
 
-        public string UserName { get; set; }
+        public virtual string UserName { get; set; }
         public virtual ICollection<PlaylistItem> Playlists
         {
             get
@@ -30,6 +31,13 @@ namespace BandSite.Models.Entities
             get
             {
                 return _outputMessages ?? (_outputMessages = (new HashSet<Message>()));
+            }
+        }
+        public virtual ICollection<Conference> Conferences
+        {
+            get
+            {
+                return _conferences ?? (_conferences = (new HashSet<Conference>()));
             }
         }
 

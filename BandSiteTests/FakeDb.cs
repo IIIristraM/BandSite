@@ -105,6 +105,20 @@ namespace BandSiteTests
             }
         };
 
+        private readonly static List<Conference> _conferences = new List<Conference>
+        {
+            new Conference
+            {
+                Id = 1,
+                Title = "Kubana"
+            },
+            new Conference
+            {
+                Id = 2,
+                Title = "Univer"
+            }
+        };
+
         public bool Disposed { get; set; }
 
         public FakeDbContext()
@@ -114,6 +128,7 @@ namespace BandSiteTests
             UserProfiles = new FakeRepository<UserProfile>(_userProfiles);
             Messages = new FakeRepository<Message>(_messages);
             PlaylistItems = new FakeRepository<PlaylistItem>(_playlistItems);
+            Conferences = new FakeRepository<Conference>(_conferences);
             Disposed = false;
         }
 
@@ -127,6 +142,8 @@ namespace BandSiteTests
 
         public IRepository<BandSite.Models.Entities.Message> Messages { get; set; }
 
+        public IRepository<BandSite.Models.Entities.Conference> Conferences { get; set; }
+
         public int SaveChanges()
         {
             return -1;
@@ -139,6 +156,7 @@ namespace BandSiteTests
             UserProfiles = null;
             PlaylistItems = null;
             Messages = null;
+            Conferences = null;
             Disposed = true;
         }
     }

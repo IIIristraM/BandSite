@@ -16,6 +16,7 @@ namespace BandSite.Models.DataLayer
             ((IDbContext)this).UserProfiles = new RepositoryEf<UserProfile>(UserProfiles);
             ((IDbContext)this).PlaylistItems = new RepositoryEf<PlaylistItem>(PlaylistItems);
             ((IDbContext)this).Messages = new RepositoryEf<Message>(Messages);
+            ((IDbContext)this).Conferences = new RepositoryEf<Conference>(Conferences);
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -25,13 +26,21 @@ namespace BandSite.Models.DataLayer
             modelBuilder.Entity<Song>().HasKey(s => s.Id);
             modelBuilder.Entity<PlaylistItem>().HasKey(p => p.Id);
             modelBuilder.Entity<Message>().HasKey(m => m.Id);
+            modelBuilder.Entity<Conference>().HasKey(m => m.Id);
 
             modelBuilder.Entity<Album>()
                         .HasMany(a => a.Songs)
                         .WithMany(s => s.Albums)
                         .Map(t => t.MapLeftKey("AlbumId")
-                        .MapRightKey("SongId")
-                        .ToTable("SongAlbum"));
+                                   .MapRightKey("SongId")
+                                   .ToTable("SongAlbum"));
+
+            modelBuilder.Entity<Conference>()
+                        .HasMany(c => c.Users)
+                        .WithMany(u => u.Conferences)
+                        .Map(t => t.MapLeftKey("ConferenceId")
+                                   .MapRightKey("UserId")
+                                   .ToTable("UserProfileConference"));
 
             modelBuilder.Entity<Message>()
                         .HasRequired(m => m.UserFrom)
@@ -44,6 +53,11 @@ namespace BandSite.Models.DataLayer
                         .WithMany(u => u.InputMessages)
                         .HasForeignKey(m => m.UserToId)
                         .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Message>()
+                        .HasOptional(m => m.Conference)
+                        .WithMany(c => c.Messages)
+                        .HasForeignKey(m => m.ConferenceId);
         }
 
         public DbSet<Album> Albums { get; set; }
@@ -51,6 +65,7 @@ namespace BandSite.Models.DataLayer
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<PlaylistItem> PlaylistItems { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<Conference> Conferences { get; set; }
 
         #region IDbContext Implementation
 
@@ -59,6 +74,7 @@ namespace BandSite.Models.DataLayer
         IRepository<UserProfile> IDbContext.UserProfiles { get; set; }
         IRepository<PlaylistItem> IDbContext.PlaylistItems { get; set; }
         IRepository<Message> IDbContext.Messages { get; set; }
+        IRepository<Conference> IDbContext.Conferences { get; set; }
 
         int IDbContext.SaveChanges()
         {

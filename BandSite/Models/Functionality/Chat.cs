@@ -21,8 +21,9 @@ namespace BandSite.Models.Functionality
             using (var db = _dbContextFactory.CreateContext())
             {
                 foreach (var msg in db.Messages.Content
-                                               .Where(m => ((m.UserFrom.UserName == caller) && (m.UserTo.UserName == user)) ||
-                                                           ((m.UserFrom.UserName == user) && (m.UserTo.UserName == caller)))
+                                               .Where(m => (((m.UserFrom.UserName == caller) && (m.UserTo.UserName == user)) ||
+                                                           ((m.UserFrom.UserName == user) && (m.UserTo.UserName == caller))) &&
+                                                           (m.ConferenceId == null))
                                                .OrderBy(m => m.Published).ToList())
                 {
                     yield return msg;
@@ -70,6 +71,21 @@ namespace BandSite.Models.Functionality
                 {
                     msg.Status = MessageStatus.Read;
                     yield return msg;
+                }
+                db.SaveChanges();
+            }
+        }
+
+        public void CreateConference(string Title, string[] users)
+        {
+            using (var db = _dbContextFactory.CreateContext())
+            {
+                var conf = db.Conferences.Insert(new Conference() { 
+                    Title = Title
+                });
+                foreach (var user in db.UserProfiles.Content.Where(u => users.Contains(u.UserName)))
+                {
+                    conf.Users.Add(user);
                 }
                 db.SaveChanges();
             }
