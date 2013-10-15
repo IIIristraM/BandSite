@@ -16,16 +16,22 @@
                             @Html.DisplayFor(modelItem => item.Title)
                         </td>
                         <td>
-                            <a href="@("#song/edit/" + item.Id)"><i class="glyphicon glyphicon-edit"></i></a>
-                            <a href="@("#song/details/" + item.Id)"><i class="glyphicon glyphicon-info-sign"></i></a>
-                            <a href="@("#song/delete/" + item.Id)"><i class="glyphicon glyphicon-remove-circle"></i></a>
+                             <a href="@("#song/details/" + item.Id)"><i class="glyphicon glyphicon-info-sign"></i></a>
+                             @if (User.IsInRole("Administrator"))
+                             { 
+                                 <a href="@("#song/edit/" + item.Id)"><i class="glyphicon glyphicon-edit"></i></a>
+                                 <a href="@("#song/delete/" + item.Id)"><i class="glyphicon glyphicon-remove-circle"></i></a>
+                             }
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
+    @if(User.IsInRole("Administrator"))
+    {
     <div class="add-button">
         <a href="#song/create"><i class="glyphicon glyphicon-plus"></i></a>
     </div>
+    }
 </div>

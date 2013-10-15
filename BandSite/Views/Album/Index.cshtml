@@ -20,9 +20,12 @@
                             @((item.Published.HasValue) ? item.Published.Value.ToString("yyyy-MM-dd") : "")
                         </td>
                         <td>
-                            <a href="@("#album/edit/" + item.Id)"><i class="glyphicon glyphicon-edit"></i></a>
-                            <a href="@("#album/details/" + item.Id)"><i class="glyphicon glyphicon-info-sign"></i></a>
-                            <a href="@("#album/delete/" + item.Id)"><i class="glyphicon glyphicon-remove-circle"></i></a>
+                             <a href="@("#album/details/" + item.Id)"><i class="glyphicon glyphicon-info-sign"></i></a>
+                             @if (User.IsInRole("Administrator"))
+                             { 
+                                  <a href="@("#album/edit/" + item.Id)"><i class="glyphicon glyphicon-edit"></i></a>
+                                  <a href="@("#album/delete/" + item.Id)"><i class="glyphicon glyphicon-remove-circle"></i></a>
+                             }
                         </td>
                     </tr>
                 }
@@ -30,7 +33,10 @@
             </tbody>
         </table>
     </div>
+    @if(User.IsInRole("Administrator"))
+    {
     <div style="padding: 8px;">
         <a href="#album/create"><i class="glyphicon glyphicon-plus"></i></a>
     </div>
+    }
 </div>

@@ -12,5 +12,8 @@
     <p class="h4">Contains songs</p>
     @Html.Partial("ShowSong", new BandSite.Models.ViewModels.ShowSongsModel {Songs = ViewBag.Songs, AlbumId = Model.Id})
     <br>
+    @if(User.IsInRole("Administrator"))
+    {
     <a href="@("#album/edit/" + Model.Id)"><i class="glyphicon glyphicon-edit"></i></a>
+    }
 </div>

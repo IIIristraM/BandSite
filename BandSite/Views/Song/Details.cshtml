@@ -9,5 +9,8 @@
     <p class="h4">Published in</p>
     @Html.Partial("ShowAlbum", new BandSite.Models.ViewModels.ShowAlbumsModel {Albums = ViewBag.Albums, SongId = Model.Id})
     <br>
-    <a href="@("#song/edit/" + Model.Id)"><i class="glyphicon glyphicon-edit"></i></a>
+    @if(User.IsInRole("Administrator"))
+    {
+          <a href="@("#song/edit/" + Model.Id)"><i class="glyphicon glyphicon-edit"></i></a>
+    }
 </div>
