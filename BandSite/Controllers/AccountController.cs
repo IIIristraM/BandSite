@@ -36,11 +36,11 @@ namespace BandSite.Controllers
         // GET: /Account/Login
 
         [AllowAnonymous]
-        public ActionResult Login(string returnUrl)
+        public ActionResult Login()
         {
             if (!Request.IsAuthenticated)
             {
-                ViewBag.ReturnUrl = returnUrl;
+                ViewBag.ReturnUrl = "#home/index";
                 return PartialView();
             }
             return Json(new { hash = "~/#account/Manage"}, JsonRequestBehavior.AllowGet);

@@ -2,8 +2,10 @@
 
 namespace BandSite.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
+        [AllowAnonymous]
         public ActionResult Navigation()
         {
             return View();
@@ -14,6 +16,7 @@ namespace BandSite.Controllers
             return PartialView();
         }
 
+        [AllowAnonymous]
         public ActionResult Playlist()
         {
             return PartialView();

@@ -189,29 +189,16 @@ namespace BandSite.Controllers
             }
         }
 
-        [AllowAnonymous]
         public ActionResult SongsSearch(string term)
         {
-            if (Request.IsAuthenticated)
+            using (var db = _dbContextFactory.CreateContext())
             {
-                using (var db = _dbContextFactory.CreateContext())
-                {
-                    var songs =
-                        db.Songs.Content.Where(s => s.Title.Contains(term))
-                            .Select(s => new {label = s.Title, value = s.Id})
-                            .ToList();
-                    return Json(songs, JsonRequestBehavior.AllowGet);
-                }
-            }
-            else
-            {
-                var songs = new object[]
-                {
-                    new {label = "You need to log in", value = ""}
-                };
+                var songs =
+                    db.Songs.Content.Where(s => s.Title.Contains(term))
+                        .Select(s => new {label = s.Title, value = s.Id})
+                        .ToList();
                 return Json(songs, JsonRequestBehavior.AllowGet);
-            }
-           
+            }          
         }
 
         [HttpPost]
@@ -250,7 +237,6 @@ namespace BandSite.Controllers
             }
         }
 
-        [AllowAnonymous]
         public FileStreamResult GetStream(int id)
         {
             Response.Headers.Add("Accept-Ranges", "bytes");

@@ -1,11 +1,16 @@
 ﻿$(function () {
     window.addEventListener("hashchange", function () {
         if (location.hash.indexOf("/") !== -1) {
+            clearBackdrop();
             loadContent();
         }
     });
     (location.hash === "") ? location.hash = "#home/index" : loadContent();
 });
+
+function clearBackdrop() {
+    $(".modal-backdrop").remove();
+}
 
 function loadContent() {
     var params = getParams();

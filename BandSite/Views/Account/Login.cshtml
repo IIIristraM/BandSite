@@ -4,39 +4,56 @@
     ViewBag.Title = "Log in";
 }
 
-<div class="container">
-    <div class="panel panel-default">
-        <div class="panel-heading">@ViewBag.Title</div>
-        <div class="panel-body">
-            @using (Html.BeginForm(new { ReturnUrl = ViewBag.ReturnUrl })) {
-                @Html.AntiForgeryToken()
-                @Html.ValidationSummary(true)
-
-                <fieldset>
-                    <div class="form-group">
-                        @Html.LabelFor(m => m.UserName)
-                        <div> @Html.TextBoxFor(m => m.UserName, new {@class = "form-control"})</div>
+<div class='login-dialog modal fade' tabindex='-1' role='dialog' data-backdrop="static">
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <div class='modal-title'>You need to login</div>
+            </div>
+            <div class='modal-body'>
+                 <div class="container">
+                    
+                            @using (Html.BeginForm(new { ReturnUrl = ViewBag.ReturnUrl })) 
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.ValidationSummary(true)
+                                <fieldset>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.UserName)
+                                        <div> @Html.TextBoxFor(m => m.UserName, new {@class = "form-control"})</div>
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.Password)
+                                        <div>@Html.TextBoxFor(m => m.Password, new {@class = "form-control", type = "password"})</div>
+                                    </div>
+                                    <div class="checkbox">
+                                        <label>
+                                            @Html.CheckBoxFor(m => m.RememberMe)
+                                            Remember me
+                                        </label>
+                                    </div>
+                                    <input type="submit" value="Log in" class="btn btn-primary"/>
+                                    <a href="#account/register"><div class="btn btn-primary">Register</div></a>
+                                </fieldset>
+                            }
+                            <hr/>
+                            <div>
+                                <div class="h4">Use another service to log in.</div>
+                                <br/>
+                                <div>@Html.Action("ExternalLoginsList", new { ReturnUrl = ViewBag.ReturnUrl })</div>
+                            </div> 
+                        </div>
                     </div>
-                    <div class="form-group">
-                        @Html.LabelFor(m => m.Password)
-                        <div>@Html.TextBoxFor(m => m.Password, new {@class = "form-control", type = "password"})</div>
-                    </div>
-                    <div class="checkbox">
-                        <label>
-                            @Html.CheckBoxFor(m => m.RememberMe)
-                            Remember me
-                        </label>
-                    </div>
-                    <input type="submit" value="Log in" class="btn btn-primary"/>
-                    <a href="#account/register"><div class="btn btn-primary">Register</div></a>
-                </fieldset>
-            }
-            <hr/>
-            <div>
-                <div class="h4">Use another service to log in.</div>
-                <br/>
-                <div>@Html.Action("ExternalLoginsList", new { ReturnUrl = ViewBag.ReturnUrl })</div>
-            </div>            
+            </div>
         </div>
-    </div>
 </div>
+
+
+<script>
+    $(function () {
+        $(".login-dialog").modal({
+            show: true,
+            keyboard: false
+        });
+    });
+</script>

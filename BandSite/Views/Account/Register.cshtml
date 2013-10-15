@@ -2,11 +2,15 @@
 @{
     ViewBag.Title = "Register";
 }
+<div class='register-dialog modal fade' tabindex='-1' role='dialog' data-backdrop="static">
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <div class='modal-title'>You need to login</div>
+            </div>
+            <div class='modal-body'>
 
-<div class="container">
-    <div class="panel panel-default">
-        <div class="panel-heading">Create a new account</div>
-        <div class="panel-body">
+
             @using (Html.BeginForm()) {
                       @Html.AntiForgeryToken()
                       @Html.ValidationSummary()
@@ -27,6 +31,18 @@
                           <input type="submit" value="Create" class="btn btn-primary"/>
                       </fieldset>
                   }
+
+                </div>
+            </div>
         </div>
     </div>
-</div>
+
+<script>
+    $(function () {
+        $(".register-dialog").modal({
+            show: true,
+            keyboard: false
+        });
+    });
+</script>
+
