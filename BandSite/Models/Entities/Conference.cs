@@ -9,6 +9,7 @@ namespace BandSite.Models.Entities
     public class Conference: EntityBase
     {
         public virtual string Title {get; set;}
+        public virtual Guid Guid { get; set; }
 
         private ICollection<UserProfile> _users;
         private ICollection<Message> _messages;

@@ -396,24 +396,32 @@ namespace BandSite.Controllers
             }
         }
 
-        [AllowAnonymous]
-        public ActionResult GetUserslist()
+        public ActionResult GetConferenceList()
         {
-            if (Request.IsAuthenticated)
+            using (var db = _dbContextFactory.CreateContext())
             {
-                using (var db = _dbContextFactory.CreateContext())
-                {
-                    return
-                        Json(
-                            db.UserProfiles.Content.Where(u => u.UserName != User.Identity.Name)
-                                .Select(u => new {name = u.UserName})
-                                .ToList(), JsonRequestBehavior.AllowGet);
-                }
+                return Json(db.Conferences.Content
+                                          .Where(c => c.Users.Count(u => u.UserName == User.Identity.Name) == 1)
+                                          .Select(c => new {
+                                              guid = c.Guid, 
+                                              title = c.Title,
+                                              users = c.Users.Select(u => u.UserName)
+                                          })
+                                          .ToList(),
+                            JsonRequestBehavior.AllowGet);
+            }   
+        }
+
+        public ActionResult GetUsersList()
+        {
+            using (var db = _dbContextFactory.CreateContext())
+            {
+                return Json(db.UserProfiles.Content
+                                           .Where(u => u.UserName != User.Identity.Name)
+                                           .Select(u => u.UserName)
+                                           .ToList(),
+                            JsonRequestBehavior.AllowGet);
             }
-            else
-            {
-                return Json(new object[] { new { name = "you need to log in" } }, JsonRequestBehavior.AllowGet);
-            }        
         }
 
         [AllowAnonymous]

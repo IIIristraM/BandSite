@@ -15,15 +15,18 @@ function Chat(options) {
     this._$sendBtn = undefined;
     this._$messageTb = undefined;
     this._currentContact = undefined;
-    this._contacts = [];
+    this._conferences = [];
     this._containerTemplate = "<div class='panel panel-default'>" +
                                  "<div class='panel-heading'>" +
                                          "<span>Contacts<span>" +
                                          "<span class='badge conversations-badge'></span>" +
-                                         "<a><i class='minimize-btn glyphicon glyphicon glyphicon-arrow-left'></i></a>" +
+                                         "<a><i class='minimize-btn glyphicon glyphicon-arrow-left'></i></a>" +
                                  "</div>" +
                                  "<div class='panel-body'>" +
-                                   "<div class='contact-scroller'><div class='list-group contact-list'></div></div>" +
+                                   "<div class='contact-scroller'>" +
+                                       "<div class='list-group contact-list'>" +
+                                       "</div>" +
+                                   "</div>" +
                                    "<hr><hr>" +
                                    "<div class='tab-content dialog-tab'></div>" +
                                    "<hr><hr>" +
@@ -77,35 +80,129 @@ Chat.prototype._resize = function () {
     }
 };
 
-Chat.prototype._markAsOnline = function(contact) {
-    $("a[data-contact=" + contact + "]").find("i").removeClass("offline");
+Chat.prototype._markAsOnline = function (users) {
+    for (var conf in this._conferences) {
+        var online = 0;
+        for (var user in this._conferences[conf].online) {
+            for (var j = 0; j < users.length; j++) {
+                if ((users[j] === user) && (this._conferences[conf].online[user] === 0)) {
+                    this._conferences[conf].online[user]++;
+                }
+            }
+            online += this._conferences[conf].online[user];
+        }
+        if (online > 0) {
+            $("a[data-conference=" + conf + "]").find("i").removeClass("offline");
+        }
+    }
 };
 
-Chat.prototype._markAsOffline = function (contact) {
-    $("a[data-contact=" + contact + "]").find("i").addClass("offline");
+Chat.prototype._markAsOffline = function (users) {
+    for (var conf in this._conferences) {
+        var online = 0;
+        for (var user in this._conferences[conf].online) {
+            for (var j = 0; j < users.length; j++) {
+                if ((users[j] === user) && (this._conferences[conf].online[user] === 1)) {
+                    this._conferences[conf].online[user]--;
+                }
+            }
+            online += this._conferences[conf].online[user];
+        }
+        if (online === 0) {
+            $("a[data-conference=" + conf + "]").find("i").addClass("offline");
+        }
+    }
 };
 
 Chat.prototype._setDefaultContact = function() {
     var $contact = $("#" + this.id).find(".contact-list a").first();
     $contact.addClass("active");
-    this._currentContact = $contact.attr("data-contact");
+    this._currentContact = $contact.attr("data-conference");
     $dialog = $($contact.attr("href"));
     $dialog.addClass("active");
 };
 
-Chat.prototype._addContact = function (contact) {
+Chat.prototype._createAddConfButton = function () {
     var self = this;
-    this._contacts[contact] = {
-        unreadMsgCount: 0
+    $("#" + this.id).find(".contact-list").append("<a class='add-conference-btn list-group-item'><i class='glyphicon glyphicon-plus'></i><span>New contact</span></a>");
+    $(".add-conference-btn").click(function () {
+        if ($("body").find(".add-conference-dialog").length === 0) {
+            $("body").append("<div class='add-conference-dialog modal fade' tabindex='-1' role='dialog'>" +
+                          "<div class='modal-dialog'>" +
+                              "<div class='modal-content'>" +
+                                  "<div class='modal-header'>" +
+                                      "<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>×</button>" +
+                                      "<div class='modal-title'>New contact</div>" +
+                                  "</div>" +
+                                  "<div class='modal-body'>" +
+                                      "<div class='form-group'><label>Title</label><input class='form-control contact-title' type='text'/></div>" +
+                                       "<label>Users</label>" +
+                                      "<div class='users-list list-group'></div>" +
+                                      "<div class='btn btn-primary'>Create</div>" +
+                                  "</div>" +
+                              "</div>" +
+                          "</div>" +
+                      "</div>");
+        }
+        var $confDialog = $("body").find(".add-conference-dialog");
+        $.ajax({
+            url: "/Account/GetUsersList",
+            type: "GET",
+            cache: false
+        }).done(function (users) {
+            var invite = {};
+            $confDialog.find(".users-list").empty();
+            for (var i = 0; i < users.length; i++) {
+                $confDialog.find(".users-list").append("<a class='list-group-item'><i class='glyphicon glyphicon-user'></i><span>" + users[i] + "</span></a>");
+            }
+            $confDialog.find(".list-group-item").click(function () {
+                if ($(this).hasClass("active")) {
+                    $(this).removeClass("active");
+                    var user = $(this).find("span").first().html();
+                    invite[user] = 0;
+                } else {
+                    $(this).addClass("active");
+                    var user = $(this).find("span").first().html();
+                    invite[user] = 1;
+                }
+            });
+            $confDialog.find(".btn").click(function () {
+                var title = $confDialog.find(".contact-title").val();
+                var usersArray = [];
+                var i = 0;
+                for (var name in invite) {
+                    usersArray[i] = name;
+                    i++;
+                }
+                if ((title !== "") && (usersArray.length > 0)) {
+                    usersArray[usersArray.length] = self._currentUser;
+                    self._chat.server.createConference(title, usersArray);
+                    $confDialog.modal("hide");
+                }
+            });
+            $confDialog.modal({ show: true });
+        });
+    });
+};
+
+Chat.prototype._addContact = function (conference) {
+    var self = this;
+    this._conferences[conference.guid] = {
+        unreadMsgCount: 0,
+        title: conference.title,
+        online: {}
     };
-    $("#" + this.id).find(".contact-list").append(this._contactListItemTemplate);
-    var $item = $("#" + this.id).find(".contact-list a").last();
+    for (var i = 0; i < conference.users.length; i++) {
+        this._conferences[conference.guid].online[conference.users[i]] = 0;
+    }
+    $("#" + this.id).find(".contact-list").prepend(this._contactListItemTemplate);
+    var $item = $("#" + this.id).find(".contact-list a").first();
     var guid = generateGUID();
     $item.attr("href", "#" + guid);
-    $item.find("span").first().html(contact);
-    $item.attr("data-contact", contact);
+    $item.find("span").first().html(conference.title);
+    $item.attr("data-conference", conference.guid);
     $item.click(function () {
-        self._currentContact = $(this).attr("data-contact");
+        self._currentContact = $(this).attr("data-conference");
         $(this).parent().find(".active").removeClass("active");
         $(this).addClass("active");
         self._checkUnreadMessages(self._currentContact, 1500);
@@ -126,25 +223,27 @@ Chat.prototype.login = function() {
     $.connection.hub.start();
 };
 
-Chat.prototype.increaseUnreadMsgCount = function (tab) {
-    var $badge = $("#" + this.id).find("a[data-contact=" + tab + "] .badge");
-    if (this._contacts[tab].unreadMsgCount === 0) {
+Chat.prototype.increaseUnreadMsgCount = function (guid) {
+    var $badge = $("#" + this.id).find("a[data-conference=" + guid + "] .badge");
+    if (this._conferences[guid].unreadMsgCount === 0) {
         this._unreadConversations++;
         $(".conversations-badge").html(this._unreadConversations);
     }
-    this._contacts[tab].unreadMsgCount++;
-    $badge.html(this._contacts[tab].unreadMsgCount);
+    this._conferences[guid].unreadMsgCount++;
+    $badge.html(this._conferences[guid].unreadMsgCount);
 };
 
-Chat.prototype.decreaseUnreadMsgCount = function (tab) {
-    var $badge = $("#" + this.id).find("a[data-contact=" + tab + "] .badge");
-    this._contacts[tab].unreadMsgCount--;
-    if (this._contacts[tab].unreadMsgCount > 0) {
-        $badge.html(this._contacts[tab].unreadMsgCount);
+Chat.prototype.decreaseUnreadMsgCount = function (guid) {
+    var $badge = $("#" + this.id).find("a[data-conference=" + guid + "] .badge");
+    this._conferences[guid].unreadMsgCount = ((this._conferences[guid].unreadMsgCount - 1) > 0) ? (this._conferences[guid].unreadMsgCount - 1) : 0;
+    if (this._conferences[guid].unreadMsgCount > 0) {
+        $badge.html(this._conferences[guid].unreadMsgCount);
     }
     else {
-        this._unreadConversations--;
-        $(".conversations-badge").html((this._unreadConversations > 0) ? this._unreadConversations : "");
+        if (this._unreadConversations > 0) {
+            this._unreadConversations--;
+            $(".conversations-badge").html((this._unreadConversations > 0) ? this._unreadConversations : "");
+        }
         $badge.html("");
     }
 };
@@ -152,17 +251,17 @@ Chat.prototype.decreaseUnreadMsgCount = function (tab) {
 Chat.prototype._addHubClientMethods = function () {
     var self = this;
     var methodCollection = this._chat.client;
-    methodCollection.messagesDelivered = function (tab) {
-        var tabId = $("#" + self.id).find("a[data-contact=" + tab + "]").attr("href");
+    methodCollection.messagesDelivered = function (guid) {
+        var tabId = $("#" + self.id).find("a[data-conference=" + guid + "]").attr("href");
         var dialogTab = $(tabId);
         dialogTab.find(".undelivered").removeClass("undelivered");
     };
-    methodCollection.addMessage = function (tab, contact, message) {
-        var tabId = $("#" + self.id).find("a[data-contact=" + tab + "]").attr("href");
+    methodCollection.addMessage = function (guid, message) {
+        var tabId = $("#" + self.id).find("a[data-conference=" + guid + "]").attr("href");
         var dialogTab = $(tabId);
         var $dialog = dialogTab.prepend("<a href='" + location.hash + "' class='list-group-item' data-msg-guid='" + message.guid + "'>" +
-                                           "<b class='list-group-item-heading " + ((contact === self._currentUser) ? "my-msg" : "") + "'>" +
-                                                contact + " [" + message.date + "]:" +
+                                           "<b class='list-group-item-heading " + ((message.sender === self._currentUser) ? "my-msg" : "") + "'>" +
+                                                message.sender + " [" + message.date + "]:" +
                                                 "<i class='glyphicon glyphicon-refresh float-right'></i>" +
                                                 "<i class='glyphicon glyphicon-exclamation-sign float-right'></i>" +
                                            "</b>" +
@@ -176,36 +275,32 @@ Chat.prototype._addHubClientMethods = function () {
                 break;
             case "Unread":
                 $dialog.find("a").first().addClass("unread");
-                self.increaseUnreadMsgCount(tab);
+                self.increaseUnreadMsgCount(guid);
                 self._checkUnreadMessages(self._currentContact, 1500);
                 break;
         }
     };
     methodCollection.login = function (me, contactsOnline) {
         $.ajax({
-            url: "/Account/GetUserslist",
+            url: "/Account/GetConferenceList",
             type: "GET",
             cache: false
-        }).done(function (allContacts) {
+        }).done(function (conferences) {
             self._currentUser = me;
-            $("#" + self.id).find(".contact-list").empty();
-            $("#" + self.id).find(".tab-content").empty();
-            for (var i = 0; i < allContacts.length; i++) {
-                self._addContact(allContacts[i].name);
-                self._chat.server.loadHistoryWith(allContacts[i].name);
+            for (var i = 0; i < conferences.length; i++) {
+                self._addContact(conferences[i]);
+                self._chat.server.loadHistory(conferences[i].guid);
             }
-            var onlineCount = (contactsOnline !== undefined) ? contactsOnline.length : 0;
-            for (i = 0; i < onlineCount; i++) {
-                self._markAsOnline(contactsOnline[i]);
-            }
+            self._markAsOnline(contactsOnline);
             self._setDefaultContact();
+            self._createAddConfButton();
         });
     };
-    methodCollection.contactOnline = function (contact) {
-        self._markAsOnline(contact);
+    methodCollection.contactOnline = function (users) {
+        self._markAsOnline(users);
     };
-    methodCollection.contactOffline = function (contact) {
-        self._markAsOffline(contact);
+    methodCollection.contactOffline = function (users) {
+        self._markAsOffline(users);
     };
     methodCollection.disconnect = function () {
         $("body").append("<div class='disconnect-msg modal fade' tabindex='-1' role='dialog'>" +
@@ -226,16 +321,15 @@ Chat.prototype._addHubClientMethods = function () {
         var $msg = $("#" + self.id).find("a[data-msg-guid=" + guid + "]");
         $msg.removeClass("unread");
         var tabId = $msg.parents(".tab-pane").attr("id");
-        var tab = $("#" + self.id).find("a[href=#" + tabId + "]").attr("data-contact");
-        self.decreaseUnreadMsgCount(tab);
+        var confGuid = $("#" + self.id).find("a[href=#" + tabId + "]").attr("data-conference");
+        self.decreaseUnreadMsgCount(confGuid);
+    };
+    methodCollection.createConference = function (conference, online) {
+        self._addContact(conference);
+        self._markAsOnline(online);
     };
 };
 
-//need to write
-Chat.prototype._createConference = function (title, users) {
-
-};
-//--------------------
 Chat.prototype._bindSendBtnClickHandler = function () {
     var self = this;
     this._$sendBtn.click(function () {
@@ -246,9 +340,9 @@ Chat.prototype._bindSendBtnClickHandler = function () {
     });
 };
 
-Chat.prototype._checkUnreadMessages = function (tab, delay) {
+Chat.prototype._checkUnreadMessages = function (guid, delay) {
     var self = this;
-    var tabId = $("#" + self.id).find("a[data-contact=" + tab + "]").attr("href");
+    var tabId = $("#" + self.id).find("a[data-conference=" + guid + "]").attr("href");
     var msgArray = [];
     var arrInd = 0;
    

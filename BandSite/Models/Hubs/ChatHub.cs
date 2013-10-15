@@ -15,13 +15,13 @@ namespace BandSite.Models.Hubs
         private static readonly ConcurrentDictionary<string, List<string>> ConnectedUsers = new ConcurrentDictionary<string, List<string>>();
         private  readonly  IChat _chat;
         private readonly string _dateTemplate;
-        private readonly int _macConnectionsPerUser;
+        private readonly int _maxConnectionsPerUser;
 
         public ChatHub(IChat chat)
         {
             _chat = chat;
             _dateTemplate = "dd-MMM  HH:mm";
-            _macConnectionsPerUser = 3;
+            _maxConnectionsPerUser = 3;
         }
 
         public override Task OnDisconnected()
@@ -37,7 +37,13 @@ namespace BandSite.Models.Hubs
                 {
                     List<string> value;
                     ConnectedUsers.TryRemove(Context.User.Identity.Name, out value);
-                    Clients.Others.contactOffline(Context.User.Identity.Name);
+                    foreach (var user in ConnectedUsers.Keys.Where(k => k != Context.User.Identity.Name))
+                    {
+                        foreach (var conn in ConnectedUsers[user])
+                        {
+                            Clients.Client(conn).contactOffline(new string[] {Context.User.Identity.Name });
+                        }
+                    }
                 }
             }
             return base.OnDisconnected();
@@ -52,100 +58,114 @@ namespace BandSite.Models.Hubs
                 Clients.Client(list[0]).disconnect();
                 list.RemoveAt(0); 
             }
-            Clients.Others.contactOnline(Context.User.Identity.Name);
-            Clients.Caller.login(Context.User.Identity.Name, ConnectedUsers.Select(u => u.Key).ToArray());
+            foreach (var user in ConnectedUsers.Keys.Where(k => k != Context.User.Identity.Name))
+            {
+                foreach (var conn in ConnectedUsers[user])
+                {
+                    Clients.Client(conn).contactOnline(new string[] {Context.User.Identity.Name});
+                }
+            }
+            Clients.Caller.login(Context.User.Identity.Name, ConnectedUsers.Keys.Where(k => k != Context.User.Identity.Name));
             return base.OnConnected();
         }
 
-        public void LoadHistoryWith(string user)
+        private void MessagesDelivered(string confGuid)
         {
-            foreach (var msg in _chat.GetHistory(Context.User.Identity.Name, user))
+            foreach (var msg in _chat.GetUndeliveredMessages(confGuid))
             {
-                if ((msg.Status == MessageStatus.Undelivered) && (msg.UserTo.UserName == Context.User.Identity.Name))
+                msg.Status = (msg.UserFrom.UserName != msg.UserTo.UserName) ? MessageStatus.Unread : MessageStatus.Read;
+                if (ConnectedUsers.ContainsKey(msg.UserFrom.UserName))
                 {
-                    msg.Status = MessageStatus.Unread;
-                }
-                if (ConnectedUsers.ContainsKey(user))
-                {
-                    foreach (var conn in ConnectedUsers[user])
+                    foreach (var conn in ConnectedUsers[msg.UserFrom.UserName])
                     {
-                        Clients.Client(conn).messagesDelivered(Context.User.Identity.Name);
+                        Clients.Client(conn).messagesDelivered(msg.Conference.Guid);
                     }
                 }
+            }
+        }
 
-                Clients.Caller.addMessage(user, 
-                                          msg.UserFrom.UserName,
+        public void LoadHistory(string confGuid)
+        {
+            MessagesDelivered(confGuid);
+            foreach (var msg in _chat.GetHistory(Context.User.Identity.Name, confGuid))
+            {
+                Clients.Caller.addMessage(msg.Conference.Guid.ToString(), 
                                           new
                                           {
-                                              guid = msg.Guid.ToString(),
+                                              guid = msg.Guid,
                                               text = HttpUtility.HtmlEncode(msg.Text),
+                                              sender = msg.UserFrom.UserName,
                                               date = msg.Published.Value.ToString(_dateTemplate),
-                                              status = ((msg.UserFrom.UserName != Context.User.Identity.Name) || 
-                                                       (msg.Status == MessageStatus.Undelivered))
-                                                       ? msg.Status.ToString() : ""
+                                              status = msg.Status.ToString()
                                           });
             }
         }
 
-        public void AddMessage(string users, string message)
+        public void AddMessage(string confGuid, string message)
         {
-            var list = users.Split(new[] { '#' }, StringSplitOptions.RemoveEmptyEntries);
-            MessageStatus callbackStatus = MessageStatus.Undelivered;
-            foreach (var msg in _chat.AddMessage(Context.User.Identity.Name, list, message))
+            var callbackStatus = MessageStatus.Undelivered;
+            Message callbackMsg = null;
+
+            foreach (var msg in _chat.AddMessage(Context.User.Identity.Name, confGuid, message))
             {
-                if (ConnectedUsers.ContainsKey(msg.UserTo.UserName) && (msg.UserTo.UserName != Context.User.Identity.Name))
+                if (msg.UserFrom.UserName != msg.UserTo.UserName)
                 {
-                    msg.Status = MessageStatus.Unread;
-                    callbackStatus = MessageStatus.Unread;
+                    if (ConnectedUsers.ContainsKey(msg.UserTo.UserName))
+                    {
+                        msg.Status = MessageStatus.Unread;
+                    }
+                    callbackStatus = (msg.Status != MessageStatus.Undelivered) ? msg.Status : callbackStatus;
+                }
+                else
+                {
+                    msg.Status = (callbackStatus == MessageStatus.Undelivered) ? callbackStatus : MessageStatus.Read;
+                }
+                if (ConnectedUsers.ContainsKey(msg.UserTo.UserName))
+                {
                     foreach (var conn in ConnectedUsers[msg.UserTo.UserName])
                     {
-                        Clients.Client(conn).addMessage((list.Length == 1) ? Context.User.Identity.Name : users,
-                                                        Context.User.Identity.Name,
+                        Clients.Client(conn).addMessage(msg.Conference.Guid.ToString(),
                                                         new
                                                         {
-                                                            guid = msg.Guid.ToString(),
+                                                            guid = msg.Guid,
                                                             text = HttpUtility.HtmlEncode(msg.Text),
+                                                            sender = msg.UserFrom.UserName,
                                                             date = msg.Published.Value.ToString(_dateTemplate),
                                                             status = msg.Status.ToString()
                                                         });
                     }
                 }
-            }
-            foreach (var conn in ConnectedUsers[Context.User.Identity.Name])
-            {
-                Clients.Client(conn).addMessage(users,
-                                                Context.User.Identity.Name,
-                                                new
-                                                {
-                                                    guid = Guid.NewGuid().ToString(),
-                                                    text = HttpUtility.HtmlEncode(message),
-                                                    date = DateTime.Now.ToString(_dateTemplate),
-                                                    status = (callbackStatus == MessageStatus.Undelivered) ? callbackStatus.ToString() : ""
-                                                });
-            }     
+            }  
         }
 
         public void MarkReadMessages(string[] msgGuids)
         {
-            foreach (var msg in _chat.MarkReadMessages(msgGuids))
+            foreach (var msg in _chat.GetMessages(msgGuids))
             {
+                msg.Status = MessageStatus.Read;
                 foreach (var conn in ConnectedUsers[Context.User.Identity.Name])
                 {
-                    Clients.Client(conn).markReadMessage(msg.Guid.ToString());
+                    Clients.Client(conn).markReadMessage(msg.Guid);
                 }
             }
         }
 
         public void CreateConference(string title, string[] users)
         {
-            _chat.CreateConference(title, users);
+            var guid = _chat.CreateConference(title, users);
             foreach (var user in users)
             {
                 if (ConnectedUsers.ContainsKey(user))
                 {
                     foreach (var conn in ConnectedUsers[user])
                     {
-                        Clients.Client(conn).createConference(title, users);
+                        Clients.Client(conn).createConference(new
+                        {
+                            guid = guid,
+                            title = title,
+                            users = users
+                        },
+                        ConnectedUsers.Keys.Where(k => users.Contains(k) && k != user));
                     }
                 }
             }

@@ -5,9 +5,9 @@ namespace BandSite.Models.Entities
 {
     public enum MessageStatus
     {
-        Unread = 0,
-        Read = 1,
-        Undelivered = 2
+        Undelivered = 0,
+        Unread = 1,
+        Read = 2
     }
 
     public class Message : EntityBase

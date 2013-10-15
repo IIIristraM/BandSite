@@ -55,9 +55,10 @@ namespace BandSite.Models.DataLayer
                         .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Message>()
-                        .HasOptional(m => m.Conference)
+                        .HasRequired(m => m.Conference)
                         .WithMany(c => c.Messages)
-                        .HasForeignKey(m => m.ConferenceId);
+                        .HasForeignKey(m => m.ConferenceId)
+                        .WillCascadeOnDelete(true);
         }
 
         public DbSet<Album> Albums { get; set; }

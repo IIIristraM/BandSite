@@ -16,15 +16,12 @@ namespace BandSite.Models.Functionality
             _dbContextFactory = dbContextFactory;
         }
 
-        public IEnumerable<Message> GetHistory(string caller, string user)
+        public IEnumerable<Message> GetHistory(string user, string confGuid)
         {
             using (var db = _dbContextFactory.CreateContext())
             {
-                foreach (var msg in db.Messages.Content
-                                               .Where(m => (((m.UserFrom.UserName == caller) && (m.UserTo.UserName == user)) ||
-                                                           ((m.UserFrom.UserName == user) && (m.UserTo.UserName == caller))) &&
-                                                           (m.ConferenceId == null))
-                                               .OrderBy(m => m.Published).ToList())
+                var conf = db.Conferences.Content.First(c => c.Guid == new Guid(confGuid));
+                foreach (var msg in conf.Messages.Where(m => m.UserTo.UserName == user).OrderBy(m => m.Published))
                 {
                     yield return msg;
                 }
@@ -32,63 +29,82 @@ namespace BandSite.Models.Functionality
             }
         }
 
-        public IEnumerable<Message> AddMessage(string userFromName, string[] usersToNames, string message)
+        public IEnumerable<Message> AddMessage(string user, string confGuid, string message)
         {
             using (var db = _dbContextFactory.CreateContext())
             {
-                var userFrom = db.UserProfiles.Content.FirstOrDefault(u => u.UserName == userFromName);
-                if (userFrom != null)
+                var conf = db.Conferences.Content.First(c => c.Guid == new Guid(confGuid));
+                var sender = conf.Users.First(u => u.UserName == user);
+                foreach (var usr in MoveSenderToTheEnd(conf.Users.ToList(), sender))
                 {
-                    foreach (var userName in usersToNames)
+                    yield return db.Messages.Insert(new Message()
                     {
-                        var userTo = db.UserProfiles.Content.FirstOrDefault(u => u.UserName == userName);
-                        if (userTo != null)
-                        {
-                            var msg = new Message
-                            {
-                                Text = message,
-                                Status = MessageStatus.Undelivered,
-                                Published = DateTime.Now,
-                                UserFrom = userFrom,
-                                UserTo = userTo,
-                                Guid = Guid.NewGuid()
-                            };
-                            db.Messages.Insert(msg);
-                            yield return msg;
-                        }
-                    }
-                    db.SaveChanges();
+                        Guid = Guid.NewGuid(),
+                        Text = message,
+                        UserFrom = sender,
+                        UserTo = usr,
+                        Published = DateTime.Now,
+                        Status = MessageStatus.Undelivered,
+                        Conference = conf
+                    });
                 }
+                db.SaveChanges();
             }
         }
 
-        public IEnumerable<Message> MarkReadMessages(string[] msgGuids)
+        public IEnumerable<Message> GetMessages(string[] msgGuids)
         {
+            var guids = msgGuids.Select(g => new Guid(g)).ToArray();
             using (var db = _dbContextFactory.CreateContext())
             {
-                var guids = msgGuids.Select(g => new Guid(g)).ToList();
                 foreach (var msg in db.Messages.Content.Where(m => guids.Contains(m.Guid)))
                 {
-                    msg.Status = MessageStatus.Read;
                     yield return msg;
                 }
                 db.SaveChanges();
             }
         }
 
-        public void CreateConference(string Title, string[] users)
+        public Guid CreateConference(string title, string[] users)
         {
             using (var db = _dbContextFactory.CreateContext())
             {
-                var conf = db.Conferences.Insert(new Conference() { 
-                    Title = Title
+                var conf = db.Conferences.Insert(new Conference()
+                {
+                    Title = title,
+                    Guid = Guid.NewGuid()
                 });
                 foreach (var user in db.UserProfiles.Content.Where(u => users.Contains(u.UserName)))
                 {
                     conf.Users.Add(user);
                 }
                 db.SaveChanges();
+                return conf.Guid;
             }
+        }
+
+        public IEnumerable<Message> GetUndeliveredMessages(string confGuid)
+        {
+            using (var db = _dbContextFactory.CreateContext())
+            {
+                var conf = db.Conferences.Content.First(c => c.Guid == new Guid(confGuid));
+                foreach (var msg in conf.Messages.Where(m => m.Status == MessageStatus.Undelivered))
+                {
+                    yield return msg;
+                }
+                db.SaveChanges();
+            }
+        }
+
+        private List<UserProfile> MoveSenderToTheEnd(List<UserProfile> users, UserProfile sender)
+        {
+            var senderIndex = users.IndexOf(sender);
+            if (senderIndex != users.Count - 1)
+            {
+                users.Add(sender);
+                users.RemoveAt(senderIndex);
+            }
+            return users;
         }
     }
 }
