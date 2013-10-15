@@ -20,7 +20,7 @@ namespace BandSite.Models.DataLayer
 
         protected void SetInitializer()
         {
-            Database.SetInitializer(new DropCreateDatabaseIfModelChanges<DbContext>());
+            Database.SetInitializer(new CreateDatabaseIfNotExists<DbContext>());
             using (CreateContext()) { }
         }
 
