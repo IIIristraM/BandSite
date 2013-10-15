@@ -1,14 +1,15 @@
 ﻿$(function () {
     window.addEventListener("hashchange", function () {
         if (location.hash.indexOf("/") !== -1) {
-            clearBackdrop();
+            clearModals();
             loadContent();
         }
     });
     (location.hash === "") ? location.hash = "#home/index" : loadContent();
 });
 
-function clearBackdrop() {
+function clearModals() {
+    $(".modal").remove();
     $(".modal-backdrop").remove();
 }
 
