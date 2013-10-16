@@ -120,12 +120,16 @@ Chat.prototype._markAsOffline = function (users) {
     }
 };
 
-Chat.prototype._setDefaultContact = function() {
-    var $contact = $("#" + this.id).find(".contact-list a").first();
-    $contact.addClass("active");
-    this._currentContact = $contact.attr("data-conference");
-    $dialog = $($contact.attr("href"));
-    $dialog.addClass("active");
+Chat.prototype.checkScrollOnBottom = function () {
+    var scrollheight = $(".dialog-tab").get(0).scrollHeight;
+    var scrollTop = $(".dialog-tab").scrollTop();
+    var dialogTabHeight = $(".dialog-tab").outerHeight();
+    return (scrollheight === scrollTop + dialogTabHeight);
+};
+
+Chat.prototype.moveScrollDown = function () {
+    var height = $(".dialog-tab").get(0).scrollHeight;
+    $(".dialog-tab").scrollTop(height);
 };
 
 Chat.prototype._createAddConfButton = function () {
@@ -239,6 +243,9 @@ Chat.prototype._addContact = function (conference) {
     $("#" + this.id).find(".tab-content").prepend(this._contactDialogTabTemplate);
     $item = $("#" + this.id).find(".tab-content div").first();
     $item.attr("id", guid);
+    $("#" + this.id).find(".contact-list a").first().on('shown.bs.tab', function (e) {
+        self.moveScrollDown();
+    });
 };
 
 Chat.prototype.logout = function () {
@@ -291,7 +298,8 @@ Chat.prototype._addHubClientMethods = function () {
     methodCollection.addMessage = function (guid, message) {
         var tabId = $("#" + self.id).find("a[data-conference=" + guid + "]").attr("href");
         var dialogTab = $(tabId);
-        var $dialog = dialogTab.prepend("<a href='" + location.hash + "' class='list-group-item' data-msg-guid='" + message.guid + "'>" +
+        var isScrollOnBottom = self.checkScrollOnBottom();
+        var $dialog = dialogTab.append("<a href='" + location.hash + "' class='list-group-item' data-msg-guid='" + message.guid + "'>" +
                                            "<b class='list-group-item-heading " + ((message.sender === self._currentUser) ? "my-msg" : "") + "'>" +
                                                 message.sender + " [" + message.date + "]:" +
                                                 "<i class='glyphicon glyphicon-refresh float-right'></i>" +
@@ -301,12 +309,15 @@ Chat.prototype._addHubClientMethods = function () {
                                               "<span>" + message.text + "</span>" +
                                            "</p>" +
                                         "</a>");
+        if (isScrollOnBottom) {
+            self.moveScrollDown();
+        }
         switch (message.status) {
             case "Undelivered":
-                $dialog.find("a").first().addClass("undelivered");
+                $dialog.find("a").last().addClass("undelivered");
                 break;
             case "Unread":
-                $dialog.find("a").first().addClass("unread");
+                $dialog.find("a").last().addClass("unread");
                 self.increaseUnreadMsgCount(guid);
                 self._checkUnreadMessages(self._currentContact, 1500);
                 break;
@@ -324,7 +335,6 @@ Chat.prototype._addHubClientMethods = function () {
                 self._chat.server.loadHistory(conferences[i].guid);
             }
             self._markAsOnline(contactsOnline);
-            self._setDefaultContact();
             self._createAddConfButton();
         });
     };
@@ -389,7 +399,7 @@ Chat.prototype.send = function () {
         this._chat.server.addMessage(this._currentContact, this._$messageTb.val());
         this._$messageTb.val("");
     }
-}
+};
 
 Chat.prototype._bindSendBtnClickHandler = function () {
     var self = this;
@@ -397,15 +407,15 @@ Chat.prototype._bindSendBtnClickHandler = function () {
         self.send();
     });
     this._$messageTb.keydown(function (e) {
-        if ((e.keyCode == 13) && (!self._shiftMode)) {
+        if ((e.keyCode === 13) && (!self._shiftMode)) {
             self.send();
             e.preventDefault();
-        } else if (e.keyCode == 16) {
+        } else if (e.keyCode === 16) {
             self._shiftMode = true;
         }
     });
     this._$messageTb.keyup(function (e) {
-        if (e.keyCode == 16) {
+        if (e.keyCode === 16) {
             self._shiftMode = false;
         }
     });
