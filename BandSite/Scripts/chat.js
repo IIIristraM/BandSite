@@ -124,7 +124,7 @@ Chat.prototype._setDefaultContact = function() {
 
 Chat.prototype._createAddConfButton = function () {
     var self = this;
-    $("#" + this.id).find(".contact-list").append("<a class='add-conference-btn list-group-item'><i class='glyphicon glyphicon-plus'></i><span>New contact</span></a>");
+    $("#" + this.id).find(".contact-list").append("<a class='add-conference-btn list-group-item'><i class='glyphicon glyphicon-plus'></i><span>New conversation</span></a>");
     $(".add-conference-btn").click(function () {
         if ($("body").find(".add-conference-dialog").length === 0) {
             $("body").append("<div class='add-conference-dialog modal fade' tabindex='-1' role='dialog'>" +
@@ -132,11 +132,12 @@ Chat.prototype._createAddConfButton = function () {
                               "<div class='modal-content'>" +
                                   "<div class='modal-header'>" +
                                       "<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>×</button>" +
-                                      "<div class='modal-title'>New contact</div>" +
+                                      "<div class='modal-title'>New conversation</div>" +
                                   "</div>" +
                                   "<div class='modal-body'>" +
+                                      "<div class='error-area'></div>" + 
                                       "<div class='form-group'><label>Title</label><input class='form-control contact-title' type='text'/></div>" +
-                                       "<label>Users</label>" +
+                                       "<label>Add users to conversation</label>" +
                                       "<div class='users-list list-group'></div>" +
                                       "<div class='btn btn-primary'>Create</div>" +
                                   "</div>" +
@@ -171,14 +172,30 @@ Chat.prototype._createAddConfButton = function () {
                 var usersArray = [];
                 var i = 0;
                 for (var name in invite) {
-                    usersArray[i] = name;
-                    i++;
+                    if (invite[name] === 1)
+                    {
+                        usersArray[i] = name;
+                        i++;
+                    }
                 }
                 if ((title !== "") && (usersArray.length > 0)) {
                     usersArray[usersArray.length] = self._currentUser;
                     self._chat.server.createConference(title, usersArray);
                     $confDialog.modal("hide");
                 }
+                else {
+                    $confDialog.find(".error-area").html("<div class='alert alert-block alert-danger fade in'></div>");
+                    if (title === "") {
+                        $confDialog.find(".alert").append("<p>You need to enter a title</p>");
+                    }
+                    if (usersArray.length === 0) {
+                        $confDialog.find(".alert").append("<p>You need to select at least one user</p>");
+                    }
+                    $confDialog.find(".alert").alert();
+                }
+            });
+            $confDialog.on('hidden.bs.modal', function () {
+                $confDialog.remove();
             });
             $confDialog.modal({ show: true });
         });
