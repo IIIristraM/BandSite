@@ -256,7 +256,7 @@ Chat.prototype.decreaseUnreadConversations = function () {
         this._unreadConversations--;
         $(".conversations-badge").html((this._unreadConversations > 0) ? this._unreadConversations : "");
     }
-}
+};
 
 Chat.prototype.increaseUnreadMsgCount = function (guid) {
     var $badge = $("#" + this.id).find("a[data-conference=" + guid + "] .badge");
@@ -381,15 +381,32 @@ Chat.prototype._addHubClientMethods = function () {
         var tabId = $("a[data-conference=" + guid + "]").attr("href");
         $("a[data-conference=" + guid + "]").remove();
         $(tabId).remove();
-    }
+    };
 };
+
+Chat.prototype.send = function () {
+    if (this._$messageTb.val() !== "") {
+        this._chat.server.addMessage(this._currentContact, this._$messageTb.val());
+        this._$messageTb.val("");
+    }
+}
 
 Chat.prototype._bindSendBtnClickHandler = function () {
     var self = this;
     this._$sendBtn.click(function () {
-        if (self._$messageTb.val() !== "") {
-            self._chat.server.addMessage(self._currentContact, self._$messageTb.val());
-            self._$messageTb.val("");
+        self.send();
+    });
+    this._$messageTb.keydown(function (e) {
+        if ((e.keyCode == 13) && (!self._shiftMode)) {
+            self.send();
+            e.preventDefault();
+        } else if (e.keyCode == 16) {
+            self._shiftMode = true;
+        }
+    });
+    this._$messageTb.keyup(function (e) {
+        if (e.keyCode == 16) {
+            self._shiftMode = false;
         }
     });
 };
