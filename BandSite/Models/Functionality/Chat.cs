@@ -96,6 +96,30 @@ namespace BandSite.Models.Functionality
             }
         }
 
+        public void RemoveUserFromConference(string confGuid, string user)
+        {
+            using (var db = _dbContextFactory.CreateContext())
+            {
+                var conf = db.Conferences.Content.First(c => c.Guid == new Guid(confGuid));
+                var target = db.UserProfiles.Content.First(u => u.UserName == user);
+                conf.Users.Remove(target);
+                if (conf.Users.Count == 0)
+                {
+                    db.Conferences.Delete(conf);
+                }
+                db.SaveChanges();
+            }
+        }
+
+        public UserProfile[] GetUsersInConference(string confGuid)
+        {
+            using (var db = _dbContextFactory.CreateContext())
+            {
+                var conf = db.Conferences.Content.First(c => c.Guid == new Guid(confGuid));
+                return conf.Users.ToArray();
+            }
+        }
+
         private List<UserProfile> MoveSenderToTheEnd(List<UserProfile> users, UserProfile sender)
         {
             var senderIndex = users.IndexOf(sender);

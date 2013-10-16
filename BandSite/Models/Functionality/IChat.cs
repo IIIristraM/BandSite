@@ -11,5 +11,7 @@ namespace BandSite.Models.Functionality
         IEnumerable<Message> GetMessages(string[] msgGuids);
         IEnumerable<Message> GetUndeliveredMessages(string confGuid);
         Guid CreateConference(string title, string[] users);
+        void RemoveUserFromConference(string confGuid, string user);
+        UserProfile[] GetUsersInConference(string confGuid); 
     }
 }

@@ -36,7 +36,13 @@ function Chat(options) {
                                    "<button class='btn btn-primary'>Send</button></div>" +
                                  "</div>" +
                               "</div>";
-    this._contactListItemTemplate = "<a class='list-group-item' data-toggle='tab'><i class='offline glyphicon glyphicon-user'></i><span></span><span class='badge'></span></a>";
+    this._contactListItemTemplate = "<a class='list-group-item' data-toggle='tab'>" +
+                                         "<i class='offline glyphicon glyphicon-user'></i>" +
+                                         "<span></span>" +
+                                         "<i class='glyphicon glyphicon-remove-circle float-right'></i>" +
+                                         //"<i class='glyphicon glyphicon-edit float-right'></i>" +
+                                         "<span class='badge'></span>" +
+                                    "</a>";
     this._contactDialogTabTemplate = "<div class='tab-pane fade in list-group'></div>";
 
     this._generateChatMarkup();
@@ -109,7 +115,7 @@ Chat.prototype._markAsOffline = function (users) {
             online += this._conferences[conf].online[user];
         }
         if (online === 0) {
-            $("a[data-conference=" + conf + "]").find("i").addClass("offline");
+            $("a[data-conference=" + conf + "]").find("i.glyphicon-user").addClass("offline");
         }
     }
 };
@@ -225,6 +231,11 @@ Chat.prototype._addContact = function (conference) {
         self._checkUnreadMessages(self._currentContact, 1500);
     });
 
+    $item.find(".glyphicon-remove-circle").click(function () {
+        var guid = $(this).parent().attr("data-conference");
+        self._chat.server.removeUserFromConference(guid, self._currentUser);
+    });
+
     $("#" + this.id).find(".tab-content").prepend(this._contactDialogTabTemplate);
     $item = $("#" + this.id).find(".tab-content div").first();
     $item.attr("id", guid);
@@ -239,6 +250,13 @@ Chat.prototype.logout = function () {
 Chat.prototype.login = function() {
     $.connection.hub.start();
 };
+
+Chat.prototype.decreaseUnreadConversations = function () {
+    if (this._unreadConversations > 0) {
+        this._unreadConversations--;
+        $(".conversations-badge").html((this._unreadConversations > 0) ? this._unreadConversations : "");
+    }
+}
 
 Chat.prototype.increaseUnreadMsgCount = function (guid) {
     var $badge = $("#" + this.id).find("a[data-conference=" + guid + "] .badge");
@@ -257,10 +275,7 @@ Chat.prototype.decreaseUnreadMsgCount = function (guid) {
         $badge.html(this._conferences[guid].unreadMsgCount);
     }
     else {
-        if (this._unreadConversations > 0) {
-            this._unreadConversations--;
-            $(".conversations-badge").html((this._unreadConversations > 0) ? this._unreadConversations : "");
-        }
+        this.decreaseUnreadConversations();
         $badge.html("");
     }
 };
@@ -345,6 +360,28 @@ Chat.prototype._addHubClientMethods = function () {
         self._addContact(conference);
         self._markAsOnline(online);
     };
+    methodCollection.removeUserFromConference = function (guid, user) {
+        var online = 0;
+        for (var name in self._conferences[guid].online) {
+            if (name === user) {
+                delete self._conferences[guid].online[user];
+            } else {
+                online += self._conferences[guid].online[name];
+            }
+        }
+        if (online === 0) {
+            $("a[data-conference=" + guid + "]").find("i.glyphicon-user").addClass("offline");
+        }
+    };
+    methodCollection.removeConference = function (guid) {
+        if (self._conferences[guid].unreadMsgCount > 0) {
+            self.decreaseUnreadConversations();
+        }
+        delete self._conferences[guid];
+        var tabId = $("a[data-conference=" + guid + "]").attr("href");
+        $("a[data-conference=" + guid + "]").remove();
+        $(tabId).remove();
+    }
 };
 
 Chat.prototype._bindSendBtnClickHandler = function () {

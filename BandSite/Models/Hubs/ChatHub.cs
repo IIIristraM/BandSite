@@ -170,5 +170,28 @@ namespace BandSite.Models.Hubs
                 }
             }
         }
+
+        public void RemoveUserFromConference(string confGuid, string user) 
+        {
+            string[] users = _chat.GetUsersInConference(confGuid).Where(u => u.UserName != user).Select(u => u.UserName).ToArray();
+            _chat.RemoveUserFromConference(confGuid, user);
+            foreach (var u in users)
+            {
+                if (ConnectedUsers.ContainsKey(u))
+                {
+                    foreach (var conn in ConnectedUsers[u])
+                    {
+                        Clients.Client(conn).removeUserFromConference(confGuid, user);
+                    }
+                }
+            }
+            if (ConnectedUsers.ContainsKey(user))
+            {
+                foreach (var conn in ConnectedUsers[user])
+                {
+                    Clients.Client(conn).removeConference(confGuid);
+                }
+            }
+        }
     }
 }
