@@ -195,13 +195,17 @@ AudioPlayer.prototype.resetPlaylist = function () {
 AudioPlayer.prototype.playSong = function (btn) {
         var $btn = $(btn);
         var $audio = this.getAudio();
+        self = this;
         if ($btn.attr("data-state") === "play") {
-            if (this.getAudio().get(0).readyState !== 0) {
-                $audio.get(0).play();
-                $btn.attr("data-state", "pause");
-                $btn.removeClass("glyphicon-play");
-                $btn.addClass("glyphicon-pause");
-            }
+            var intervalId = setInterval(function () {
+                if (self.getAudio().get(0).readyState !== 0) {
+                    $audio.get(0).play();
+                    $btn.attr("data-state", "pause");
+                    $btn.removeClass("glyphicon-play");
+                    $btn.addClass("glyphicon-pause");
+                    clearInterval(intervalId);
+                }
+            }, 100);
         }
         else if ($btn.attr("data-state") === "pause") {
             $audio.get(0).pause();

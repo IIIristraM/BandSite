@@ -1,4 +1,5 @@
-﻿//depends on controls.js
+﻿//do not used
+//depends on controls.js
 
 function replaceSimbols(string) {
     string = string.replace(/'/, "_");

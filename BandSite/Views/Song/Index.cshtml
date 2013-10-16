@@ -22,6 +22,10 @@
                                  <a href="@("#song/edit/" + item.Id)"><i class="glyphicon glyphicon-edit"></i></a>
                                  <a href="@("#song/delete/" + item.Id)"><i class="glyphicon glyphicon-remove-circle"></i></a>
                              }
+                             @if((item.File != null)&&(item.File.Length != 0)){
+                             <a href="#song/index" data-role="listen" data-title="@(item.Title)" data-src="@("/Song/GetStream/" + item.Id)"><i class="glyphicon glyphicon-headphones"></i></a>
+                             <a href="#song/index" data-role="add" data-title="@(item.Title)" data-song-id="@(item.Id)"><i class="glyphicon glyphicon-plus"></i></a>
+                             }
                         </td>
                     </tr>
                 }
@@ -35,3 +39,41 @@
     </div>
     }
 </div>
+
+<script type="text/javascript">
+    $(function () {
+        $("a[data-role=listen]").click(function () {
+            if (player !== undefined) {
+                var src = $(this).attr("data-src");
+                var title = $(this).attr("data-title");
+                var $player = $("#" + player.id);
+                var $audio = $player.find("audio");
+                $audio.attr("src", src);
+                $player.find(".song-control-panel").attr("data-song-guid", generateGUID());
+                $player.find(".song-title").empty();
+                $player.find(".song-title").html(title);
+                if ($player.find(".play-btn").attr("data-state") === "play") {
+                    player.playSong($player.find(".play-btn").get(0));
+                }
+                else {
+                    $audio.get(0).play();
+                }
+            }
+        });
+        $("a[data-role=add]").click(function () {
+            var id = $(this).attr("data-song-id");
+            if (player !== undefined) {
+                var title = $(this).attr("data-title");
+                var url = "/Song/GetStream/" + id;
+                var guid;
+                player.addPlaylistItem(title, url, guid);
+                player.bindPlayList();
+                $.ajax({
+                    url: "/Song/PopulateUsersPlaylist?userId=-1&songId=" + id,
+                    cache: false,
+                    type: "POST"
+                });
+            }
+        });
+    });
+</script>

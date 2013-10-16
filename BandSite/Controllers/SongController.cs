@@ -136,12 +136,16 @@ namespace BandSite.Controllers
                     var updatedSong = new Song();
                     if (updatedSong.TrySetPropertiesFrom(song))
                     {
-                        /*if (song.UploadFile != null)
+                        if (song.UploadFile != null)
                         {
                             updatedSong.File = new byte[song.UploadFile.InputStream.Length];
-                            var uploader = new UploaderHub();
-                            uploader.Upload(updatedSong.File, song.UploadFile.InputStream, User.Identity.Name);
-                        }*/
+                            var uploaderHub = new UploaderHub();
+                            var uploader = new Uploader();
+                            foreach (var result in uploader.UploadPartial(updatedSong.File, song.UploadFile.InputStream, User.Identity.Name))
+                            {
+                                uploaderHub.ShowProgress(User.Identity.Name, result);
+                            }
+                        }
                         db.Songs.Update(song.Id, updatedSong);
                         db.SaveChanges();
                         return Json(new { hash = "#song/index" });
