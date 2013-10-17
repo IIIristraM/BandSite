@@ -267,17 +267,17 @@ Chat.prototype.decreaseUnreadConversations = function () {
 
 Chat.prototype.increaseUnreadMsgCount = function (guid) {
     var $badge = $("#" + this.id).find("a[data-conference=" + guid + "] .badge");
+    this._conferences[guid].unreadMsgCount = this._conferences[guid].unreadMsgCount + 1;
     if (this._conferences[guid].unreadMsgCount === 0) {
         this._unreadConversations++;
         $(".conversations-badge").html(this._unreadConversations);
     }
-    this._conferences[guid].unreadMsgCount = this._conferences[guid].unreadMsgCount + 1;
     $badge.html(this._conferences[guid].unreadMsgCount);
 };
 
 Chat.prototype.decreaseUnreadMsgCount = function (guid) {
     var $badge = $("#" + this.id).find("a[data-conference=" + guid + "] .badge");
-    this._conferences[guid].unreadMsgCount = this._conferences[guid].unreadMsgCount - 1;//((this._conferences[guid].unreadMsgCount - 1) > 0) ? (this._conferences[guid].unreadMsgCount - 1) : 0;
+    this._conferences[guid].unreadMsgCount = this._conferences[guid].unreadMsgCount - 1;
     if (this._conferences[guid].unreadMsgCount !== 0) {
         $badge.html(this._conferences[guid].unreadMsgCount);
     }
@@ -426,18 +426,21 @@ Chat.prototype._checkUnreadMessages = function (guid, delay) {
     var tabId = $("#" + self.id).find("a[data-conference=" + guid + "]").attr("href");
     var msgArray = [];
     var arrInd = 0;
-   
-    setTimeout(function () {
-        $(tabId).find("a.unread").each(function () {
-            var $msg = $(this);
-            var $list = $("#" + self.id).find(".dialog-tab");
-            if (($msg.offset().top < $list.offset().top + $list.height() - 10) && ($msg.offset().top > $list.offset().top)) {
-                msgArray[arrInd] = $msg.attr("data-msg-guid");
-                arrInd++;
-            }    
-        });
-        self._chat.server.markReadMessages(msgArray);
-    }, delay);
+    if (!self._locked)
+    {
+        self._locked = true;
+        setTimeout(function () {
+            $(tabId).find("a.unread").each(function () {
+                var $msg = $(this);
+                var $list = $("#" + self.id).find(".dialog-tab");
+                if (($msg.offset().top < $list.offset().top + $list.height() - 10) && ($msg.offset().top > $list.offset().top)) {
+                    msgArray[arrInd] = $msg.attr("data-msg-guid");
+                    arrInd++;
+                }
+            });
+            self._chat.server.markReadMessages(msgArray).done(function () { self._locked = false; });
+        }, delay);
+    }
 };
 
 jQuery.prototype.chat = function () {
