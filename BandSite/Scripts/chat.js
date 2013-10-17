@@ -271,14 +271,14 @@ Chat.prototype.increaseUnreadMsgCount = function (guid) {
         this._unreadConversations++;
         $(".conversations-badge").html(this._unreadConversations);
     }
-    this._conferences[guid].unreadMsgCount++;
+    this._conferences[guid].unreadMsgCount = this._conferences[guid].unreadMsgCount + 1;
     $badge.html(this._conferences[guid].unreadMsgCount);
 };
 
 Chat.prototype.decreaseUnreadMsgCount = function (guid) {
     var $badge = $("#" + this.id).find("a[data-conference=" + guid + "] .badge");
-    this._conferences[guid].unreadMsgCount = ((this._conferences[guid].unreadMsgCount - 1) > 0) ? (this._conferences[guid].unreadMsgCount - 1) : 0;
-    if (this._conferences[guid].unreadMsgCount > 0) {
+    this._conferences[guid].unreadMsgCount = this._conferences[guid].unreadMsgCount - 1;//((this._conferences[guid].unreadMsgCount - 1) > 0) ? (this._conferences[guid].unreadMsgCount - 1) : 0;
+    if (this._conferences[guid].unreadMsgCount !== 0) {
         $badge.html(this._conferences[guid].unreadMsgCount);
     }
     else {
