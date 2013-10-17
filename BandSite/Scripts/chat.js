@@ -16,6 +16,7 @@ function Chat(options) {
     this._$messageTb = undefined;
     this._currentContact = undefined;
     this._conferences = [];
+    this._unreadMsgDelay = 1000;
     this._containerTemplate = "<div class='panel panel-default'>" +
                                  "<div class='panel-heading'>" +
                                          "<span>Contacts<span>" +
@@ -57,8 +58,8 @@ Chat.prototype._generateChatMarkup = function () {
     this._$messageTb = $("#" + this.id).find("textarea");
     $("#" + this.id).find(".contact-list").sortable();
 
-    $("#" + this.id).find(".dialog-tab").scroll($.debounce(750, function () {
-        self._checkUnreadMessages(self._currentContact, 750);
+    $("#" + this.id).find(".dialog-tab").scroll($.debounce(self._unreadMsgDelay / 2, function () {
+        self._checkUnreadMessages(self._currentContact, self._unreadMsgDelay / 2);
     }));
 
     $("#" + this.id).find(".minimize-btn").click(function () {
@@ -232,7 +233,7 @@ Chat.prototype._addContact = function (conference) {
         self._currentContact = $(this).attr("data-conference");
         $(this).parent().find(".active").removeClass("active");
         $(this).addClass("active");
-        self._checkUnreadMessages(self._currentContact, 1500);
+        self._checkUnreadMessages(self._currentContact, self._unreadMsgDelay);
     });
 
     $item.find(".glyphicon-remove-circle").click(function () {
@@ -319,7 +320,7 @@ Chat.prototype._addHubClientMethods = function () {
             case "Unread":
                 $dialog.find("a").last().addClass("unread");
                 self.increaseUnreadMsgCount(guid);
-                self._checkUnreadMessages(self._currentContact, 1500);
+                self._checkUnreadMessages(self._currentContact, self._unreadMsgDelay);
                 break;
         }
     };
@@ -426,9 +427,6 @@ Chat.prototype._checkUnreadMessages = function (guid, delay) {
     var tabId = $("#" + self.id).find("a[data-conference=" + guid + "]").attr("href");
     var msgArray = [];
     var arrInd = 0;
-    //if (!self._locked)
-    //{
-    //self._locked = true;
     clearTimeout(self._unreadMsgTimeout);
     self._unreadMsgTimeout = setTimeout(function () {
             $(tabId).find("a.unread").each(function () {
@@ -441,7 +439,6 @@ Chat.prototype._checkUnreadMessages = function (guid, delay) {
             });
             self._chat.server.markReadMessages(msgArray).done(function () { self._locked = false; });
         }, delay);
-    //}
 };
 
 jQuery.prototype.chat = function () {
