@@ -426,10 +426,11 @@ Chat.prototype._checkUnreadMessages = function (guid, delay) {
     var tabId = $("#" + self.id).find("a[data-conference=" + guid + "]").attr("href");
     var msgArray = [];
     var arrInd = 0;
-    if (!self._locked)
-    {
-        self._locked = true;
-        setTimeout(function () {
+    //if (!self._locked)
+    //{
+    //self._locked = true;
+    clearTimeout(self._unreadMsgTimeout);
+    self._unreadMsgTimeout = setTimeout(function () {
             $(tabId).find("a.unread").each(function () {
                 var $msg = $(this);
                 var $list = $("#" + self.id).find(".dialog-tab");
@@ -440,7 +441,7 @@ Chat.prototype._checkUnreadMessages = function (guid, delay) {
             });
             self._chat.server.markReadMessages(msgArray).done(function () { self._locked = false; });
         }, delay);
-    }
+    //}
 };
 
 jQuery.prototype.chat = function () {
