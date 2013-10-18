@@ -433,7 +433,10 @@ Chat.prototype._checkUnreadMessages = function (guid, delay) {
             $(tabId).find("a.unread").each(function () {
                 var $msg = $(this);
                 var $list = $("#" + self.id).find(".dialog-tab");
-                if (($msg.offset().top < $list.offset().top + $list.height() - 10) && ($msg.offset().top > $list.offset().top)) {
+                var msgTop = $msg.offset().top;
+                var listTop = $list.offset().top;
+                var listHeight = $list.height();
+                if (($msg.offset().top <= $list.offset().top + $list.height()) && ($msg.offset().top > $list.offset().top - 1)) {
                     msgArray[arrInd] = $msg.attr("data-msg-guid");
                     arrInd++;
                 }
