@@ -22,11 +22,15 @@ function Chat(options) {
                                   "<div class='list-group contact-list'>" +
                                   "</div>" +
                               "</div>" +
-                              "<div class='tab-content dialog-tab'></div>" +
-                              "<div class='text-area'><div class='form-group'>" +
-                                    "<textarea class='form-control'>" + this._defaultMessage + "</textarea>" +
-                                     //"<button class='send-btn btn btn-primary'>Send</button>"
-                              "</div></div>";
+                              "<div class='dialog-wrap'>" +
+                                  "<div class='tab-content dialog-tab'></div>" +
+                              "</div>" +
+                              "<div class='text-area'>" +
+                                  "<div class='form-group'>" +
+                                     "<textarea class='form-control'>" + this._defaultMessage + "</textarea>" +
+                                   //"<button class='send-btn btn btn-primary'>Send</button>"
+                                  "</div>" +
+                              "</div>";
     this._contactListItemTemplate = "<a class='list-group-item' data-toggle='tab'>" +
                                          "<div class='content-table'><div class='contact-cell'>" +
                                          "<i class='offline glyphicon glyphicon-user'></i>" +
@@ -43,6 +47,25 @@ function Chat(options) {
     this._addHubClientMethods();
 }
 
+Chat.prototype._scrollContent = function ($container, delta) {
+    var height = this._getContactListHeight();
+    var initialStep = $("#" + this.id).find(".contact-list .list-group-item").first().outerHeight();
+    var offsetTop = $container.parent().offset().top - $container.offset().top;
+    var index = Math.round(offsetTop / initialStep);
+    if (delta > 0) {
+        var step = $($("#" + this.id).find(".contact-list .list-group-item").get(index - 1)).outerHeight();
+        if (offsetTop > 0) {
+            $container.css("margin-top", "+=" + Math.min(step, offsetTop));
+        }
+    } else {
+        var step = $($("#" + this.id).find(".contact-list .list-group-item").get(index)).outerHeight();
+        var d = $container.offset().top + height - ($container.parent().offset().top + $container.parent().outerHeight());
+        if (d > 0) {
+            $container.css("margin-top", "-=" + step);
+        }
+    }
+};
+
 Chat.prototype._generateChatMarkup = function () {
     var self = this;
     $("#" + this.id).html(this._containerTemplate);
@@ -53,35 +76,28 @@ Chat.prototype._generateChatMarkup = function () {
             $(this).val("");
         }
     });
+    this._$messageTb.focusout(function () {
+        if ($(this).val() === "") {
+            $(this).val(self._defaultMessage);
+        }
+    });
     $("#" + this.id).find(".contact-list").sortable();
+    $("#" + this.id).find(".contact-list").mousewheel(function (e, d, dX, dY) {
+        self._scrollContent($(this), d);
+        e.preventDefault();
+    });
 
     $("#" + this.id).find(".dialog-tab").scroll($.debounce(self._unreadMsgDelay / 2, function () {
         self._checkUnreadMessages(self._currentContact, self._unreadMsgDelay / 2);
     }));
-
-    $("#" + this.id).find(".minimize-btn").click(function () {
-        self._resize();
-    });
-    $(window).resize(function () {
-       if (($(this).width() >= 1200) && self._isCompact) self._resize();
-    });
 };
 
-Chat.prototype._resize = function () {
-    if (this._isCompact !== true) {
-        $("#" + this.id).find(".panel-body").css("display", "none");
-        $("#" + this.id).find(".panel").addClass("compact");
-        $("#" + this.id).find(".minimize-btn").removeClass("glyphicon-arrow-left");
-        $("#" + this.id).find(".minimize-btn").addClass("glyphicon-arrow-right");
-        this._isCompact = true;
-    }
-    else {
-        $("#" + this.id).find(".panel-body").css("display", "block");
-        $("#" + this.id).find(".panel").removeClass("compact");
-        $("#" + this.id).find(".minimize-btn").addClass("glyphicon-arrow-left");
-        $("#" + this.id).find(".minimize-btn").removeClass("glyphicon-arrow-right");
-        this._isCompact = false;
-    }
+Chat.prototype._getContactListHeight = function () {
+    var height = 0;
+    $("#" + this.id).find(".contact-list .list-group-item").each(function () {
+        height += $(this).outerHeight();
+    });
+    return height;
 };
 
 Chat.prototype._markAsOnline = function (users) {
@@ -238,7 +254,7 @@ Chat.prototype._addContact = function (conference) {
     });
 
     $item.find(".glyphicon-remove-circle").click(function () {
-        var guid = $(this).parent().attr("data-conference");
+        var guid = $(this).parent().parent().parent().attr("data-conference");
         self._chat.server.removeUserFromConference(guid, self._currentUser);
     });
 
@@ -301,7 +317,7 @@ Chat.prototype._addHubClientMethods = function () {
         var tabId = $("#" + self.id).find("a[data-conference=" + guid + "]").attr("href");
         var dialogTab = $(tabId);
         var isScrollOnBottom = self.checkScrollOnBottom();
-        var $dialog = dialogTab.append("<a href='" + location.hash + "' class='list-group-item' data-msg-guid='" + message.guid + "'>" +
+        var $dialog = dialogTab.append("<a class='list-group-item' data-msg-guid='" + message.guid + "'>" +
                                            "<b class='list-group-item-heading " + ((message.sender === self._currentUser) ? "my-msg" : "") + "'>" +
                                                 message.sender + " [" + message.date + "]:" +
                                                 "<i class='glyphicon glyphicon-refresh float-right'></i>" +

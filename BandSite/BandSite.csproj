@@ -318,6 +318,7 @@
     <Content Include="Scripts\chat.js" />
     <Content Include="Scripts\controls.js" />
     <Content Include="Scripts\jquery.ba-throttle-debounce.js" />
+    <Content Include="Scripts\jquery.mousewheel.js" />
     <Content Include="Views\Song\Index.cshtml" />
     <Content Include="Views\Song\Details.cshtml" />
     <Content Include="Views\Song\Create.cshtml" />
