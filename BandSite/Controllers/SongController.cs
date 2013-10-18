@@ -51,12 +51,7 @@ namespace BandSite.Controllers
                     return HttpNotFound();
                 }
                 ViewBag.Albums = db.Albums.Content.Where(a => a.Songs.Count(s => s.Id == id) == 1).ToList();
-                return PartialView(new CRUDSongModel
-                {
-                    Id = song.Id,
-                    Title = song.Title,
-                    Text = song.Text
-                });
+                return PartialView(song);
             }
         }
 
@@ -79,7 +74,7 @@ namespace BandSite.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var newSong = new Song {Title = song.Title, Text = song.Text};
+                    var newSong = new Song {Title = song.Title, Text = song.Text, Band = song.Band};
                     if (song.UploadFile != null)
                     {
                         newSong.File = new byte[song.UploadFile.InputStream.Length];
@@ -112,6 +107,7 @@ namespace BandSite.Controllers
                                                   Id = s.Id,
                                                   Title = s.Title,
                                                   Text = s.Text,
+                                                  Band = s.Band
                                               }).FirstOrDefault();
                 if (song == null)
                 {
@@ -168,12 +164,7 @@ namespace BandSite.Controllers
                     return HttpNotFound();
                 }
                 ViewBag.Albums = db.Albums.Content.Where(a => a.Songs.Count(s => s.Id == id) == 1).ToList();
-                return PartialView(new CRUDSongModel
-                {
-                    Id = song.Id,
-                    Title = song.Title,
-                    Text = song.Text
-                });
+                return PartialView(song);
             }
         }
 

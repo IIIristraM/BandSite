@@ -1,7 +1,10 @@
-﻿@model BandSite.Models.ViewModels.CRUDSongModel
+﻿@model BandSite.Models.Entities.Song
 <div class="container">
     <p class="h3">A you shure ?</p>
     <br>
+    <br>
+    <p class="h4">@Html.DisplayNameFor(model => model.Band)</p>
+    <p>@Html.DisplayFor(model => model.Band)</p>
     <br>
     <p class="h4">@Html.DisplayNameFor(model => model.Title)</p>
     <p>@Html.DisplayFor(model => model.Title)</p>

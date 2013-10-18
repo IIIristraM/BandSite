@@ -17,32 +17,24 @@ function Chat(options) {
     this._currentContact = undefined;
     this._conferences = [];
     this._unreadMsgDelay = 1000;
-    this._containerTemplate = "<div class='panel panel-default'>" +
-                                 "<div class='panel-heading'>" +
-                                         "<span>Contacts<span>" +
-                                         "<span class='badge conversations-badge'></span>" +
-                                         "<a><i class='minimize-btn glyphicon glyphicon-arrow-left'></i></a>" +
-                                 "</div>" +
-                                 "<div class='panel-body'>" +
-                                   "<div class='contact-scroller'>" +
-                                       "<div class='list-group contact-list'>" +
-                                       "</div>" +
-                                   "</div>" +
-                                   "<hr><hr>" +
-                                   "<div class='tab-content dialog-tab'></div>" +
-                                   "<hr><hr>" +
-                                   "<div class='text-area'><div class='form-group'>" +
-                                         "<textarea class='form-control' />" +
-                                   "</div>" +
-                                   "<button class='btn btn-primary'>Send</button></div>" +
-                                 "</div>" +
-                              "</div>";
+    this._defaultMessage = "Enter you message";
+    this._containerTemplate = "<div class='contact-scroller'>" +
+                                  "<div class='list-group contact-list'>" +
+                                  "</div>" +
+                              "</div>" +
+                              "<div class='tab-content dialog-tab'></div>" +
+                              "<div class='text-area'><div class='form-group'>" +
+                                    "<textarea class='form-control'>" + this._defaultMessage + "</textarea>" +
+                                     //"<button class='send-btn btn btn-primary'>Send</button>"
+                              "</div></div>";
     this._contactListItemTemplate = "<a class='list-group-item' data-toggle='tab'>" +
+                                         "<div class='content-table'><div class='contact-cell'>" +
                                          "<i class='offline glyphicon glyphicon-user'></i>" +
                                          "<span></span>" +
                                          "<i class='glyphicon glyphicon-remove-circle float-right'></i>" +
                                          //"<i class='glyphicon glyphicon-edit float-right'></i>" +
-                                         "<span class='badge'></span>" +
+                                         "<span class='badge float-right'></span>" +
+                                         "</div></div>" +
                                     "</a>";
     this._contactDialogTabTemplate = "<div class='tab-pane fade in list-group'></div>";
 
@@ -54,8 +46,13 @@ function Chat(options) {
 Chat.prototype._generateChatMarkup = function () {
     var self = this;
     $("#" + this.id).html(this._containerTemplate);
-    this._$sendBtn = $("#" + this.id).find(".btn.btn-primary");
+    //this._$sendBtn = $("#" + this.id).find(".btn.btn-primary");
     this._$messageTb = $("#" + this.id).find("textarea");
+    this._$messageTb.click(function () {
+        if ($(this).val() === self._defaultMessage) {
+            $(this).val("");
+        }
+    });
     $("#" + this.id).find(".contact-list").sortable();
 
     $("#" + this.id).find(".dialog-tab").scroll($.debounce(self._unreadMsgDelay / 2, function () {
@@ -135,7 +132,11 @@ Chat.prototype.moveScrollDown = function () {
 
 Chat.prototype._createAddConfButton = function () {
     var self = this;
-    $("#" + this.id).find(".contact-list").append("<a class='add-conference-btn list-group-item'><i class='glyphicon glyphicon-plus'></i><span>New conversation</span></a>");
+    $("#" + this.id).find(".contact-list").append("<a class='add-conference-btn list-group-item'>" +
+                                                     "<div class='content-table'><div class='contact-cell'>" +
+                                                     "<i class='glyphicon glyphicon-plus'></i><span>New conversation</span>" +
+                                                     "</div></div>" + 
+                                                  "</a>");
     $(".add-conference-btn").click(function () {
         if ($("body").find(".add-conference-dialog").length === 0) {
             $("body").append("<div class='add-conference-dialog modal fade' tabindex='-1' role='dialog'>" +
@@ -404,9 +405,9 @@ Chat.prototype.send = function () {
 
 Chat.prototype._bindSendBtnClickHandler = function () {
     var self = this;
-    this._$sendBtn.click(function () {
+    /*this._$sendBtn.click(function () {
         self.send();
-    });
+    });*/
     this._$messageTb.keydown(function (e) {
         if ((e.keyCode === 13) && (!self._shiftMode)) {
             self.send();

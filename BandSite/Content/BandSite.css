@@ -1,38 +1,93 @@
-﻿body{
+﻿.metro.navbar{
+    background-image: none;
+    box-shadow: lightgray 0px 1px;
+    background-color: white;
+    height: 51px;
+}
+
+.metro.navbar ul{
+     background-color: white;
+}
+
+body{
     min-width: 587px;
     width: 100%;
 }
 
 .main-container {
     width:100%;
+    overflow:hidden;
+}
+
+.chat-container{
+    position:fixed; 
+    right: 0; 
+    height: 100%; 
+    width:280px; 
+    padding-top: 52px;
+    background-color: white;
+    z-index: 100;
 }
 
 .action-frame {
+    padding-top: 62px;
     position: relative;
-    top: 30px;
-    margin-left: 290px;
+    margin-right: 290px;
+}
+
+@media (max-width: 767px){
+    .chat-container {
+        padding-top: 200px;
+    }
+
+    .action-frame {
+        padding-top: 210px;
+    }
+
+    .metro.navbar ul {
+        background-color: white;
+        margin: 0 0;
+    }
+
+    p.navbar-text{
+         margin: 0 0;
+         box-shadow: lightgray 0px 1px;
+         width: 100%;
+         text-align:right;
+         float:none !important;
+         background-color: white;
+    }
+}
+
+@media (max-width: 604px) {
+
+    .metro.navbar {
+        background-image: none;
+        box-shadow: lightgray 0px 1px;
+        background-color: white;
+        height: 51px;
+        width: 576px;
+    }
+
+    .chat-container {
+        left: 297px;
+    }
+
+    p.navbar-text {
+        width: 576px;
+    }
+
+    body{
+        overflow-x: hidden;
+    }
 }
 
 #chat {
-    position: relative;
-    top: 30px;
     max-width: 280px;
-    float: left;
-}
-
-@media (max-width: 1199px){
-    .main-container {
-        display: table;
-    }
-    .action-frame{
-        display: table-cell;
-        margin: 0 0;
-        width: 100%;
-    }
-    #chat{
-        display: table-cell;
-        float: none;
-    }
+    width: 280px;
+    right: 0;
+    box-shadow: lightgray -1px 0px;
+    height: 100%;
 }
 
 .add-button {

@@ -24,7 +24,7 @@
         @Scripts.Render("~/Scripts/navigation.js")
     </head>
     <body>
-        <div class="navbar navbar-static-top">
+        <div class="metro navbar navbar-fixed-top">
             <ul class="nav navbar-nav">
                 <li class="active"><a href="#home/index"><i class="glyphicon glyphicon-home"></i></a></li>
                 <li><a href="#song/index">Songs</a></li>
@@ -35,7 +35,10 @@
             <div id="login-area"></div>
         </div>
         <div class="main-container">
-            <div id="chat" class="chat"></div>
+            <div class="chat-container">
+                <div id="chat" class="chat"></div>
+            </div>
+            </div>
             @RenderBody()
         </div>
     </body>

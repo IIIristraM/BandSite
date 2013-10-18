@@ -6,9 +6,11 @@
             htmlAttributes: new {id = "logoutForm" }))
         {
             @Html.AntiForgeryToken()
-            <p class="navbar-text pull-right"><a href="#home/index" onclick="chat.logout(); $('#logoutForm').submit();"><i class="glyphicon glyphicon-log-out"></i></a></p>
+            <p class="navbar-text pull-right">
+                <a id="accountLink" class="link" href="#account/manage"><i class="glyphicon glyphicon-user"></i><span>@User.Identity.Name</span></a>
+                <a href="#home/index" onclick="chat.logout(); $('#logoutForm').submit();"><i class="glyphicon glyphicon-log-out"></i></a>
+            </p>
         }
-        <p class="navbar-text pull-right"><a id="accountLink" class="link" href="#account/manage"><i class="glyphicon glyphicon-user"></i><span>@User.Identity.Name</span></a></p>
 }
 else
 {

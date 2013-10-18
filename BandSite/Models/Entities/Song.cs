@@ -11,6 +11,7 @@ namespace BandSite.Models.Entities
         public virtual string Title { get; set; }
         public virtual string Text { get; set; }
         public virtual byte[] File { get; set; }
+        public virtual string Band { get; set; }
         public virtual ICollection<Album> Albums 
         { 
             get

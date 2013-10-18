@@ -7,6 +7,9 @@ namespace BandSite.Models.ViewModels
     {
         public int Id { get; set; }
 
+        [Required]
+        public string Band { get; set; }
+
         [Display(Name = "Song Title")]
         [Required]
         public string Title { get; set; }
