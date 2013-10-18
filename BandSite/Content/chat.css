@@ -95,9 +95,12 @@
 
 .chat a.list-group-item {
     border: 0px;
-    border-top: 1px lightgray solid;
     margin-bottom: 0px;
     height: 20%;
+}
+
+.chat .contact-list a.list-group-item{
+    border-top: 1px lightgray solid;
 }
 
 .chat a.list-group-item:first-child{

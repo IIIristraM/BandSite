@@ -122,7 +122,7 @@ Chat.prototype.checkScrollOnBottom = function () {
     var scrollheight = $(".dialog-tab").get(0).scrollHeight;
     var scrollTop = $(".dialog-tab").scrollTop();
     var dialogTabHeight = $(".dialog-tab").outerHeight();
-    return (scrollheight === scrollTop + dialogTabHeight);
+    return (scrollheight - scrollTop - dialogTabHeight <= 5);
 };
 
 Chat.prototype.moveScrollDown = function () {
