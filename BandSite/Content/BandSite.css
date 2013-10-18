@@ -182,3 +182,7 @@ i {
 textarea{
     resize: vertical !important;
 }
+
+.modal{
+    overflow-y: hidden !important;
+}
