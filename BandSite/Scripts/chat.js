@@ -32,14 +32,20 @@ function Chat(options) {
                                   "</div>" +
                               "</div>";
     this._contactListItemTemplate = "<a class='list-group-item' data-toggle='tab'>" +
-                                         "<div class='content-table'><div class='contact-cell'>" +
-                                         "<i class='offline glyphicon glyphicon-user'></i>" +
-                                         "<span></span>" +
-                                         "<i class='glyphicon glyphicon-resize-vertical float-right'></i>" +
-                                         "<i class='glyphicon glyphicon-remove-circle float-right'></i>" +
-                                         //"<i class='glyphicon glyphicon-edit float-right'></i>" +
-                                         "<span class='badge float-right'></span>" +
-                                         "</div></div>" +
+                                         "<div class='sortable-area float-right'>" +
+                                             "<div class='content-table'><div class='contact-cell'>" +
+                                                 "<i class='glyphicon glyphicon-resize-vertical'></i>" +
+                                             "</div></div>" +
+                                         "</div>" +
+                                         "<div class='scrollable-area float-right'>" +
+                                             "<div class='content-table'><div class='contact-cell'>" +
+                                                 "<i class='offline glyphicon glyphicon-user'></i>" +
+                                                 "<span></span>" +
+                                                 "<i class='glyphicon glyphicon-remove-circle float-right'></i>" +
+                                                 //"<i class='glyphicon glyphicon-edit float-right'></i>" +
+                                                 "<span class='badge float-right'></span>" +
+                                             "</div></div>" +
+                                         "</div>" +
                                     "</a>";
     this._contactDialogTabTemplate = "<div class='tab-pane fade in list-group'></div>";
 
@@ -84,7 +90,8 @@ Chat.prototype._generateChatMarkup = function () {
     });
     $("#" + this.id).find(".contact-list").sortable({
         axis: "y",
-        handle: ".glyphicon-resize-vertical"
+        handle: ".sortable-area",
+        items: ".list-group-item:not(:last-child)"
     });
     $("#" + this.id).find(".contact-list").mousewheel(function (e, d, dX, dY) {
         self._scrollContent($(this), d);
@@ -258,7 +265,7 @@ Chat.prototype._addContact = function (conference) {
     });
 
     $item.find(".glyphicon-remove-circle").click(function () {
-        var guid = $(this).parent().parent().parent().attr("data-conference");
+        var guid = $(this).parent().parent().parent().parent().attr("data-conference");
         self._chat.server.removeUserFromConference(guid, self._currentUser);
     });
 

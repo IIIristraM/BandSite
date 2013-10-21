@@ -7,17 +7,26 @@
     margin-bottom: 0;
 }
 
-.chat .contact-list .list-group-item{
-      padding-right: 0;
+.chat .contact-list .list-group-item:not(:last-child){
+      padding: 0 0;
 }
 
-.chat .contact-list .list-group-item:focus{
-      padding-right: 0;
-      border-top: 1px lightgray solid;
+.sortable-area,
+.scrollable-area {
+    height: 100%;
+}
+
+.sortable-area{
+    width: 40px;
+}
+
+.scrollable-area {
+    width: 240px
 }
 
 .chat .contact-list .glyphicon-resize-vertical{
-    padding: 0 10px;
+    padding: 0 13px;
+    margin: 0 0;
 }
 
 .dialog-wrap{
@@ -36,7 +45,7 @@
     overflow-y: scroll;
 }
 
-.contact-list span {
+.contact-list .list-group-item:last-child span {
     margin-left: 5px;
 }
 
@@ -130,12 +139,9 @@
     margin-bottom: 0px;
 }
 
-.chat .contact-list a.list-group-item {
-     height: 50px;
-}
-
 .chat .contact-list a.list-group-item{
-   border-bottom: 1px lightgray solid;
+    border-bottom: 1px lightgray solid;
+    height: 50px;
 }
 
 .chat a.list-group-item:first-child{
