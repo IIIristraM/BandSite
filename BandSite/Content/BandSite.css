@@ -1,4 +1,8 @@
-﻿.metro.navbar{
+﻿html {
+    -ms-touch-action: none;
+}
+
+.metro.navbar{
     background-image: none;
     box-shadow: lightgray 0px 1px;
     background-color: white;
