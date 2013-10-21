@@ -7,6 +7,19 @@
     margin-bottom: 0;
 }
 
+.chat .contact-list .list-group-item{
+      padding-right: 0;
+}
+
+.chat .contact-list .list-group-item:focus{
+      padding-right: 0;
+      border-top: 1px lightgray solid;
+}
+
+.chat .contact-list .glyphicon-resize-vertical{
+    padding: 0 10px;
+}
+
 .dialog-wrap{
     height: 100%;
     padding-top: 250px;
