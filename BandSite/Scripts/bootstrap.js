@@ -1865,7 +1865,7 @@ if (!jQuery) { throw new Error("Bootstrap requires jQuery") }
   // ============
 
   $(document).on('click.bs.tab.data-api', '[data-toggle="tab"], [data-toggle="pill"]', function (e) {
-    e.preventDefault()
+    //e.preventDefault()
     $(this).tab('show')
   })
 

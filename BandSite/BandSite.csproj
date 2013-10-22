@@ -343,6 +343,9 @@
     <Content Include="Scripts\audioPlayer.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\bootstrap.min.js.map">
+      <DependentUpon>bootstrap.js</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-1.9.1.intellisense.js" />
     <Content Include="Scripts\jquery-1.9.1.js" />
     <Content Include="Scripts\jquery-1.9.1.min.js" />

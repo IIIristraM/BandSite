@@ -83,7 +83,7 @@ Chat.prototype._generateChatMarkup = function () {
             $(this).val("");
         }
     });
-    this._$messageTb.focusout(function () {
+    this._$messageTb.on('focusout', function () {
         if ($(this).val() === "") {
             $(this).val(self._defaultMessage);
         }
@@ -92,6 +92,14 @@ Chat.prototype._generateChatMarkup = function () {
         axis: "y",
         handle: ".sortable-area",
         items: ".list-group-item:not(:last-child)"
+    });
+    $("#" + this.id).find(".contact-list").mousemove(function (e) {
+        if (self._scrollState === "start") {
+            self._scrollContent($(this), self._cursorYstart - e.pageY);
+        }
+    });
+    $("#" + this.id).find(".contact-list").mouseup(function () {
+        self._scrollState = "stop";
     });
     $("#" + this.id).find(".contact-list").mousewheel(function (e, d, dX, dY) {
         self._scrollContent($(this), d);
@@ -267,6 +275,10 @@ Chat.prototype._addContact = function (conference) {
     $item.find(".glyphicon-remove-circle").click(function () {
         var guid = $(this).parent().parent().parent().parent().attr("data-conference");
         self._chat.server.removeUserFromConference(guid, self._currentUser);
+    });
+    $item.find(".scrollable-area").mousedown(function (e) {
+        self._scrollState = "start";
+        self._cursorYstart = e.pageY;
     });
 
     $("#" + this.id).find(".tab-content").prepend(this._contactDialogTabTemplate);
