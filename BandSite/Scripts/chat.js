@@ -102,6 +102,7 @@ Chat.prototype._generateChatMarkup = function () {
         }
     });
     $("html").mouseup(function (e) {
+        self._cursorYstop = e.pageY;
         self.stopScroll();
     });
     $("#" + this.id).find(".contact-list").mousewheel(function (e, d, dX, dY) {
@@ -114,8 +115,24 @@ Chat.prototype._generateChatMarkup = function () {
     }));
 };
 
-Chat.prototype.stopScroll = function(){
+Chat.prototype.stopScroll = function () {
+    var self = this;
     this._scrollState = "stop";
+    var step = $("#" + this.id).find(".contact-list .list-group-item").first().outerHeight();
+    var seconds = ((new Date()).getTime() - this._scrolStartTime) / 1000;
+    var dy = Math.abs(this._cursorYstop - this._cursorYstart) / step;
+    var tail = Math.round(dy / seconds * 0.3);
+    var start = this._cursorYstart;
+    var stop = this._cursorYstop;
+    self._scrollIntervalId = setInterval(function () {
+        if (tail > 0) {
+            self._scrollContent($("#" + self.id).find(".contact-list"),  stop - start);
+            tail--;
+        } else {
+            clearInterval(self._scrollIntervalId);
+        }
+    }, 100);
+    this._scrolStartTime = undefined;
     this._cursorY = undefined;
     this._cursorYstart = undefined;
 }
@@ -286,8 +303,10 @@ Chat.prototype._addContact = function (conference) {
         self._chat.server.removeUserFromConference(guid, self._currentUser);
     });
     $item.find(".scrollable-area").mousedown(function (e) {
+        clearInterval(self._scrollIntervalId);
         self._scrollState = "start";
         self._cursorYstart = e.pageY;
+        self._scrolStartTime = (new Date()).getTime();
     });
 
     $("#" + this.id).find(".tab-content").prepend(this._contactDialogTabTemplate);
