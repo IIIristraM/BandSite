@@ -103,6 +103,7 @@ Chat.prototype._generateChatMarkup = function () {
     });
     $("html").mouseup(function (e) {
         self.stopScroll();
+        self._$messageTb.val(self._scrollState);
     });
     $("#" + this.id).find(".contact-list").mousewheel(function (e, d, dX, dY) {
         self._scrollContent($(this), d);
@@ -117,6 +118,7 @@ Chat.prototype._generateChatMarkup = function () {
 Chat.prototype.stopScroll = function(){
     this._scrollState = "stop";
     this._cursorY = undefined;
+    this._cursorYstart = undefined;
 }
 
 Chat.prototype._getContactListHeight = function () {
@@ -274,7 +276,6 @@ Chat.prototype._addContact = function (conference) {
     $item.find("span").first().html(conference.title);
     $item.attr("data-conference", conference.guid);
     $item.click(function () {
-        self.stopScroll();
         self._currentContact = $(this).attr("data-conference");
         $(this).parent().find(".active").removeClass("active");
         $(this).addClass("active");
@@ -288,6 +289,7 @@ Chat.prototype._addContact = function (conference) {
     $item.find(".scrollable-area").mousedown(function (e) {
         self._scrollState = "start";
         self._cursorYstart = e.pageY;
+        self._$messageTb.val(self._scrollState);
     });
 
     $("#" + this.id).find(".tab-content").prepend(this._contactDialogTabTemplate);
