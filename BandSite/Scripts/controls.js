@@ -205,20 +205,6 @@ $(function() {
     });
 
     document.addEventListener("MSHoldVisual", function (e) { e.preventDefault(); }, false);
-    document.addEventListener("MSGestureStart", function (e) { e.preventDefault(); }, false);
-    document.addEventListener("MSGestureEnd", function (e) { e.preventDefault(); }, false);
-    document.addEventListener("MSGestureChange", function (e) { e.preventDefault(); }, false);
-    document.addEventListener("MSInertiaStart", function (e) { e.preventDefault(); }, false);
-    document.addEventListener("MSGestureTap", function (e) { e.preventDefault(); }, false);
-    document.addEventListener("MSGestureHold", function (e) { e.preventDefault(); }, false);
-    document.addEventListener("pointerdown", function (e) { e.preventDefault(); }, false);
-
-    document.addEventListener("MSPointerDown", function (e) { e.preventDefault(); }, false);
-    document.addEventListener("MSPointerMove", function (e) { e.preventDefault(); }, false);
-    document.addEventListener("MSPointerUp", function (e) { e.preventDefault(); }, false);
-    document.addEventListener("MSPointerOver", function (e) { e.preventDefault(); }, false);
-    document.addEventListener("MSPointerOut", function (e) { e.preventDefault(); }, false);
-    document.addEventListener("MSPointerHover", function (e) { e.preventDefault(); }, false);
 });
 
 function getPlaylist()
