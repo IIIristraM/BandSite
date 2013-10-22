@@ -93,13 +93,18 @@ Chat.prototype._generateChatMarkup = function () {
         handle: ".sortable-area",
         items: ".list-group-item:not(:last-child)"
     });
-    $("#" + this.id).find(".contact-list").mousemove($.throttle(100, function (e) {
-        if (self._scrollState === "start") {
-            self._scrollContent($(this),  -self._cursorYstart + e.pageY);
+    $("#" + this.id).find(".contact-list").mousemove(function (e) {
+        e.preventDefault();
+        if (self._cursorY === undefined) self._cursorY = self._cursorYstart;
+        if ((self._scrollState === "start") && (Math.abs(e.pageY - self._cursorY) > 20)) {
+            self._scrollContent($(this), e.pageY - self._cursorY);
+            self._cursorY = e.pageY;
         }
-    }));
-    $("#" + this.id).find(".contact-list").mouseup(function () {
+    });
+    $("#" + this.id).find(".contact-list").mouseup(function (e) {
+        e.preventDefault();
         self._scrollState = "stop";
+        self._cursorY = undefined;
     });
     $("#" + this.id).find(".contact-list").mousewheel(function (e, d, dX, dY) {
         self._scrollContent($(this), d);
