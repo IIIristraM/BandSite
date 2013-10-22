@@ -263,6 +263,7 @@ Chat.prototype._addContact = function (conference) {
         $(this).addClass("active");
         self._checkUnreadMessages(self._currentContact, self._unreadMsgDelay);
     });
+    $it
 
     $item.find(".glyphicon-remove-circle").click(function () {
         var guid = $(this).parent().parent().parent().parent().attr("data-conference");
