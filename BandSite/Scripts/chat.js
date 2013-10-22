@@ -131,7 +131,7 @@ Chat.prototype.stopScroll = function () {
         } else {
             clearInterval(self._scrollIntervalId);
         }
-    }, 100);
+    }, 110);
     this._scrolStartTime = undefined;
     this._cursorY = undefined;
     this._cursorYstart = undefined;
