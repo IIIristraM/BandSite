@@ -93,11 +93,11 @@ Chat.prototype._generateChatMarkup = function () {
         handle: ".sortable-area",
         items: ".list-group-item:not(:last-child)"
     });
-    $("#" + this.id).find(".contact-list").mousemove(function (e) {
+    $("#" + this.id).find(".contact-list").mousemove($.throttle(100, function (e) {
         if (self._scrollState === "start") {
-            self._scrollContent($(this), self._cursorYstart - e.pageY);
+            self._scrollContent($(this),  -self._cursorYstart + e.pageY);
         }
-    });
+    }));
     $("#" + this.id).find(".contact-list").mouseup(function () {
         self._scrollState = "stop";
     });
