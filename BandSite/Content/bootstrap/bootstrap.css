@@ -4909,6 +4909,7 @@ a.badge:focus {
 }
 
 a.list-group-item.active > .badge,
+div.list-group-item.active > .badge,
 .nav-pills > .active > a > .badge {
   color: #428bca;
   background-color: #ffffff;
@@ -5271,16 +5272,20 @@ a.thumbnail:focus {
   margin-right: 5px;
 }
 
-a.list-group-item {
+a.list-group-item, 
+div.list-group-item {
   color: #555555;
 }
 
-a.list-group-item .list-group-item-heading {
+a.list-group-item .list-group-item-heading,
+div.list-group-item .list-group-item-heading{
   color: #333333;
 }
 
-a.list-group-item:hover,
-a.list-group-item:focus {
+a.list-group-item:hover, 
+div.list-group-item:hover,
+a.list-group-itemfocus, 
+div.list-group-item:focus {
   text-decoration: none;
   background-color: #f5f5f5;
 }

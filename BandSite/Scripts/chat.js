@@ -31,7 +31,7 @@ function Chat(options) {
                                    //"<button class='send-btn btn btn-primary'>Send</button>"
                                   "</div>" +
                               "</div>";
-    this._contactListItemTemplate = "<a class='list-group-item' data-toggle='tab'>" +
+    this._contactListItemTemplate = "<div class='list-group-item' data-toggle='tab'>" +
                                          "<div class='sortable-area float-right'>" +
                                              "<div class='content-table'><div class='contact-cell'>" +
                                                  "<i class='glyphicon glyphicon-resize-vertical'></i>" +
@@ -46,7 +46,7 @@ function Chat(options) {
                                                  "<span class='badge float-right'></span>" +
                                              "</div></div>" +
                                          "</div>" +
-                                    "</a>";
+                                    "</div>";
     this._contactDialogTabTemplate = "<div class='tab-pane fade in list-group'></div>";
 
     this._generateChatMarkup();
@@ -123,7 +123,7 @@ Chat.prototype._markAsOnline = function (users) {
             online += this._conferences[conf].online[user];
         }
         if (online > 0) {
-            $("a[data-conference=" + conf + "]").find("i").removeClass("offline");
+            $("div[data-conference=" + conf + "]").find("i").removeClass("offline");
         }
     }
 };
@@ -140,7 +140,7 @@ Chat.prototype._markAsOffline = function (users) {
             online += this._conferences[conf].online[user];
         }
         if (online === 0) {
-            $("a[data-conference=" + conf + "]").find("i.glyphicon-user").addClass("offline");
+            $("div[data-conference=" + conf + "]").find("i.glyphicon-user").addClass("offline");
         }
     }
 };
@@ -159,11 +159,11 @@ Chat.prototype.moveScrollDown = function () {
 
 Chat.prototype._createAddConfButton = function () {
     var self = this;
-    $("#" + this.id).find(".contact-list").append("<a class='add-conference-btn list-group-item'>" +
+    $("#" + this.id).find(".contact-list").append("<div class='add-conference-btn list-group-item'>" +
                                                      "<div class='content-table'><div class='contact-cell'>" +
                                                      "<i class='glyphicon glyphicon-plus'></i><span>New conversation</span>" +
                                                      "</div></div>" + 
-                                                  "</a>");
+                                                  "</div>");
     $(".add-conference-btn").click(function () {
         if ($("body").find(".add-conference-dialog").length === 0) {
             $("body").append("<div class='add-conference-dialog modal fade' tabindex='-1' role='dialog'>" +
@@ -252,7 +252,7 @@ Chat.prototype._addContact = function (conference) {
         this._conferences[conference.guid].online[conference.users[i]] = 0;
     }
     $("#" + this.id).find(".contact-list").prepend(this._contactListItemTemplate);
-    var $item = $("#" + this.id).find(".contact-list a").first();
+    var $item = $("#" + this.id).find(".contact-list div").first();
     var guid = generateGUID();
     $item.attr("href", "#" + guid);
     $item.find("span").first().html(conference.title);
@@ -263,9 +263,6 @@ Chat.prototype._addContact = function (conference) {
         $(this).addClass("active");
         self._checkUnreadMessages(self._currentContact, self._unreadMsgDelay);
     });
-    $item.mouseover(function () {
-        $(this).attr("title", "");
-    });
 
     $item.find(".glyphicon-remove-circle").click(function () {
         var guid = $(this).parent().parent().parent().parent().attr("data-conference");
@@ -275,7 +272,7 @@ Chat.prototype._addContact = function (conference) {
     $("#" + this.id).find(".tab-content").prepend(this._contactDialogTabTemplate);
     $item = $("#" + this.id).find(".tab-content div").first();
     $item.attr("id", guid);
-    $("#" + this.id).find(".contact-list a").first().on('shown.bs.tab', function (e) {
+    $("#" + this.id).find(".contact-list div").first().on('shown.bs.tab', function (e) {
         self.moveScrollDown();
     });
 };
@@ -298,7 +295,7 @@ Chat.prototype.decreaseUnreadConversations = function () {
 };
 
 Chat.prototype.increaseUnreadMsgCount = function (guid) {
-    var $badge = $("#" + this.id).find("a[data-conference=" + guid + "] .badge");
+    var $badge = $("#" + this.id).find("div[data-conference=" + guid + "] .badge");
     this._conferences[guid].unreadMsgCount = this._conferences[guid].unreadMsgCount + 1;
     if (this._conferences[guid].unreadMsgCount === 0) {
         this._unreadConversations++;
@@ -308,7 +305,7 @@ Chat.prototype.increaseUnreadMsgCount = function (guid) {
 };
 
 Chat.prototype.decreaseUnreadMsgCount = function (guid) {
-    var $badge = $("#" + this.id).find("a[data-conference=" + guid + "] .badge");
+    var $badge = $("#" + this.id).find("div[data-conference=" + guid + "] .badge");
     this._conferences[guid].unreadMsgCount = this._conferences[guid].unreadMsgCount - 1;
     if (this._conferences[guid].unreadMsgCount !== 0) {
         $badge.html(this._conferences[guid].unreadMsgCount);
@@ -323,15 +320,15 @@ Chat.prototype._addHubClientMethods = function () {
     var self = this;
     var methodCollection = this._chat.client;
     methodCollection.messagesDelivered = function (guid) {
-        var tabId = $("#" + self.id).find("a[data-conference=" + guid + "]").attr("href");
+        var tabId = $("#" + self.id).find("div[data-conference=" + guid + "]").attr("href");
         var dialogTab = $(tabId);
         dialogTab.find(".undelivered").removeClass("undelivered");
     };
     methodCollection.addMessage = function (guid, message) {
-        var tabId = $("#" + self.id).find("a[data-conference=" + guid + "]").attr("href");
+        var tabId = $("#" + self.id).find("div[data-conference=" + guid + "]").attr("href");
         var dialogTab = $(tabId);
         var isScrollOnBottom = self.checkScrollOnBottom();
-        var $dialog = dialogTab.append("<a class='list-group-item' data-msg-guid='" + message.guid + "'>" +
+        var $dialog = dialogTab.append("<div class='list-group-item' data-msg-guid='" + message.guid + "'>" +
                                            "<b class='list-group-item-heading " + ((message.sender === self._currentUser) ? "my-msg" : "") + "'>" +
                                                 message.sender + " [" + message.date + "]:" +
                                                 "<i class='glyphicon glyphicon-refresh float-right'></i>" +
@@ -340,16 +337,16 @@ Chat.prototype._addHubClientMethods = function () {
                                            "<p class='list-group-item-text'>" +
                                               "<span>" + message.text + "</span>" +
                                            "</p>" +
-                                        "</a>");
+                                        "</div>");
         if (isScrollOnBottom) {
             self.moveScrollDown();
         }
         switch (message.status) {
             case "Undelivered":
-                $dialog.find("a").last().addClass("undelivered");
+                $dialog.find("div").last().addClass("undelivered");
                 break;
             case "Unread":
-                $dialog.find("a").last().addClass("unread");
+                $dialog.find("div").last().addClass("unread");
                 self.increaseUnreadMsgCount(guid);
                 self._checkUnreadMessages(self._currentContact, self._unreadMsgDelay);
                 break;
@@ -392,10 +389,10 @@ Chat.prototype._addHubClientMethods = function () {
         self.logout();
     };
     methodCollection.markReadMessage = function (guid) {
-        var $msg = $("#" + self.id).find("a[data-msg-guid=" + guid + "]");
+        var $msg = $("#" + self.id).find("div[data-msg-guid=" + guid + "]");
         $msg.removeClass("unread");
         var tabId = $msg.parents(".tab-pane").attr("id");
-        var confGuid = $("#" + self.id).find("a[href=#" + tabId + "]").attr("data-conference");
+        var confGuid = $("#" + self.id).find("div[href=#" + tabId + "]").attr("data-conference");
         self.decreaseUnreadMsgCount(confGuid);
     };
     methodCollection.createConference = function (conference, online) {
@@ -412,7 +409,7 @@ Chat.prototype._addHubClientMethods = function () {
             }
         }
         if (online === 0) {
-            $("a[data-conference=" + guid + "]").find("i.glyphicon-user").addClass("offline");
+            $("div[data-conference=" + guid + "]").find("i.glyphicon-user").addClass("offline");
         }
     };
     methodCollection.removeConference = function (guid) {
@@ -420,8 +417,8 @@ Chat.prototype._addHubClientMethods = function () {
             self.decreaseUnreadConversations();
         }
         delete self._conferences[guid];
-        var tabId = $("a[data-conference=" + guid + "]").attr("href");
-        $("a[data-conference=" + guid + "]").remove();
+        var tabId = $("div[data-conference=" + guid + "]").attr("href");
+        $("div[data-conference=" + guid + "]").remove();
         $(tabId).remove();
     };
 };
@@ -455,12 +452,12 @@ Chat.prototype._bindSendBtnClickHandler = function () {
 
 Chat.prototype._checkUnreadMessages = function (guid, delay) {
     var self = this;
-    var tabId = $("#" + self.id).find("a[data-conference=" + guid + "]").attr("href");
+    var tabId = $("#" + self.id).find("div[data-conference=" + guid + "]").attr("href");
     var msgArray = [];
     var arrInd = 0;
     clearTimeout(self._unreadMsgTimeout);
     self._unreadMsgTimeout = setTimeout(function () {
-            $(tabId).find("a.unread").each(function () {
+            $(tabId).find("div.unread").each(function () {
                 var $msg = $(this);
                 var $list = $("#" + self.id).find(".dialog-tab");
                 var msgTop = $msg.offset().top;
