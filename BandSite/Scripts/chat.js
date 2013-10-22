@@ -101,8 +101,7 @@ Chat.prototype._generateChatMarkup = function () {
             self._cursorY = e.pageY;
         }
     });
-    $("#" + this.id).find(".contact-list").mouseup(function (e) {
-        e.preventDefault();
+    $("html").mouseup(function (e) {
         self._scrollState = "stop";
         self._cursorY = undefined;
     });
