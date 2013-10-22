@@ -203,6 +203,8 @@ $(function() {
             chat.login();
         }
     });
+
+    document.addEventListener("MSHoldVisual", function (e) { e.preventDefault(); }, false);
 });
 
 function getPlaylist()
