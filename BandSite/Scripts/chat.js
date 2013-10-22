@@ -103,7 +103,6 @@ Chat.prototype._generateChatMarkup = function () {
     });
     $("html").mouseup(function (e) {
         self.stopScroll();
-        self._$messageTb.val(self._scrollState);
     });
     $("#" + this.id).find(".contact-list").mousewheel(function (e, d, dX, dY) {
         self._scrollContent($(this), d);
@@ -289,7 +288,6 @@ Chat.prototype._addContact = function (conference) {
     $item.find(".scrollable-area").mousedown(function (e) {
         self._scrollState = "start";
         self._cursorYstart = e.pageY;
-        self._$messageTb.val(self._scrollState);
     });
 
     $("#" + this.id).find(".tab-content").prepend(this._contactDialogTabTemplate);
