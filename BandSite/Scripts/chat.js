@@ -121,20 +121,30 @@ Chat.prototype.stopScroll = function () {
     var step = $("#" + this.id).find(".contact-list .list-group-item").first().outerHeight();
     var seconds = ((new Date()).getTime() - this._scrolStartTime) / 1000;
     var dy = Math.abs(this._cursorYstop - this._cursorYstart) / step;
-    var tail = Math.round(dy / seconds * 0.3);
+    var tail = Math.round(dy / seconds * 0.4);
     var start = this._cursorYstart;
     var stop = this._cursorYstop;
-    self._scrollIntervalId = setInterval(function () {
-        if (tail > 0) {
-            self._scrollContent($("#" + self.id).find(".contact-list"),  stop - start);
-            tail--;
-        } else {
-            clearInterval(self._scrollIntervalId);
-        }
-    }, 90);
+    var firstT = 10;
+    var lastT = 100;
+    var dt = (lastT * lastT - firstT * firstT) / tail;
+    var i = 0;
+    var t = Math.sqrt(firstT * firstT);
+    self._recursiveScroll(firstT, t, dt, i, tail, stop - start);
     this._scrolStartTime = undefined;
     this._cursorY = undefined;
     this._cursorYstart = undefined;
+}
+
+Chat.prototype._recursiveScroll = function (firstT, t, dt, i, tail, dy) {
+    var self = this;
+    self._scrollIntervalId = setTimeout(function () {
+        if (i < tail) {
+            self._scrollContent($("#" + self.id).find(".contact-list"), dy);
+            i++;
+            t = Math.sqrt(firstT * firstT + dt * i);
+            self._recursiveScroll(firstT, t, dt, i, tail, dy);
+        }
+    }, t);
 }
 
 Chat.prototype._getContactListHeight = function () {

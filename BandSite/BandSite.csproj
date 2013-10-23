@@ -317,6 +317,7 @@
     <Content Include="Images\Google.png" />
     <Content Include="Scripts\chat.js" />
     <Content Include="Scripts\controls.js" />
+    <Content Include="Scripts\jquery-ui-1.10.3.js" />
     <Content Include="Scripts\jquery.ba-throttle-debounce.js" />
     <Content Include="Scripts\jquery.mousewheel.js" />
     <Content Include="Scripts\jquery.ui.touch-punch.min.js" />
