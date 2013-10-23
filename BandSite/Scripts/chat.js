@@ -16,7 +16,7 @@ function Chat(options) {
     this._$messageTb = undefined;
     this._currentContact = undefined;
     this._conferences = [];
-    this._unreadMsgDelay = 1000;
+    this._unreadMsgDelay = 1500;
     this._defaultMessage = "Enter you message";
     this._containerTemplate = "<div class='contact-scroller'>" +
                                   "<div class='list-group contact-list'>" +
