@@ -51,27 +51,33 @@ namespace BandSite.Models.Hubs
 
         public override Task OnReconnected()
         {
+            RegisterNewConnection();
             return base.OnReconnected();
         }
 
         public override Task OnConnected()
         {
+            RegisterNewConnection();
+            return base.OnConnected();
+        }
+
+        private void RegisterNewConnection()
+        {
             var list = ConnectedUsers.GetOrAdd(Context.User.Identity.Name, new List<string>());
             list.Add(Context.ConnectionId);
-            if (list.Count > 3) 
+            if (list.Count > 3)
             {
                 Clients.Client(list[0]).disconnect();
-                list.RemoveAt(0); 
+                list.RemoveAt(0);
             }
             foreach (var user in ConnectedUsers.Keys.Where(k => k != Context.User.Identity.Name))
             {
                 foreach (var conn in ConnectedUsers[user])
                 {
-                    Clients.Client(conn).contactOnline(new string[] {Context.User.Identity.Name});
+                    Clients.Client(conn).contactOnline(new string[] { Context.User.Identity.Name });
                 }
             }
             Clients.Caller.login(Context.User.Identity.Name, ConnectedUsers.Keys.Where(k => k != Context.User.Identity.Name));
-            return base.OnConnected();
         }
 
         private void MessagesDelivered(string confGuid)
