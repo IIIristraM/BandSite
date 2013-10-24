@@ -49,6 +49,11 @@ namespace BandSite.Models.Hubs
             return base.OnDisconnected();
         }
 
+        public override Task OnReconnected()
+        {
+            return base.OnReconnected();
+        }
+
         public override Task OnConnected()
         {
             var list = ConnectedUsers.GetOrAdd(Context.User.Identity.Name, new List<string>());

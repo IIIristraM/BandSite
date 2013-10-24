@@ -1,5 +1,6 @@
 ﻿var player;
 var chat;
+var logoutInitialized = false;
 
 function generatePlayer() {
     $.ajax({

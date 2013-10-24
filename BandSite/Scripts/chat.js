@@ -16,7 +16,7 @@ function Chat(options) {
     this._$messageTb = undefined;
     this._currentContact = undefined;
     this._conferences = [];
-    this._unreadMsgDelay = 1500;
+    this._unreadMsgDelay = 2500;
     this._defaultMessage = "Enter you message";
     this._containerTemplate = "<div class='contact-scroller'>" +
                                   "<div class='list-group contact-list'>" +
@@ -133,7 +133,7 @@ Chat.prototype.stopScroll = function () {
     this._scrolStartTime = undefined;
     this._cursorY = undefined;
     this._cursorYstart = undefined;
-}
+};
 
 Chat.prototype._recursiveScroll = function (firstT, t, dt, i, tail, dy) {
     var self = this;
@@ -145,7 +145,7 @@ Chat.prototype._recursiveScroll = function (firstT, t, dt, i, tail, dy) {
             self._recursiveScroll(firstT, t, dt, i, tail, dy);
         }
     }, t);
-}
+};
 
 Chat.prototype._getContactListHeight = function () {
     var height = 0;
@@ -505,21 +505,28 @@ Chat.prototype._checkUnreadMessages = function (guid, delay) {
     var tabId = $("#" + self.id).find("div[data-conference=" + guid + "]").attr("href");
     var msgArray = [];
     var arrInd = 0;
-    clearTimeout(self._unreadMsgTimeout);
-    self._unreadMsgTimeout = setTimeout(function () {
+    if (!self._unreadLock)
+    {
+        self._unreadLock = true;
+        setTimeout(function () {
             $(tabId).find("div.unread").each(function () {
                 var $msg = $(this);
-                var $list = $("#" + self.id).find(".dialog-tab");
-                var msgTop = $msg.offset().top;
-                var listTop = $list.offset().top;
-                var listHeight = $list.height();
-                if (($msg.offset().top <= $list.offset().top + $list.height()) && ($msg.offset().top > $list.offset().top - 1)) {
-                    msgArray[arrInd] = $msg.attr("data-msg-guid");
-                    arrInd++;
+                if ($msg.attr("reading") === undefined) {
+                    var $list = $("#" + self.id).find(".dialog-tab");
+                    var msgTop = $msg.offset().top;
+                    var listTop = $list.offset().top;
+                    var listHeight = $list.height();
+                    if (($msg.offset().top <= $list.offset().top + $list.height()) && ($msg.offset().top > $list.offset().top - 1)) {
+                        $msg.attr("reading", "");
+                        msgArray[arrInd] = $msg.attr("data-msg-guid");
+                        arrInd++;
+                    }
                 }
             });
-            self._chat.server.markReadMessages(msgArray).done(function () { self._locked = false; });
+            self._chat.server.markReadMessages(msgArray);
+            self._unreadLock = false;
         }, delay);
+    }
 };
 
 jQuery.prototype.chat = function () {
